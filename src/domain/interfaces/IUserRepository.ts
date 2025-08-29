@@ -1,4 +1,4 @@
-import { User } from '../../domain/entities/User';
+import { User } from '../entities/User';
 
 export interface IUserRepository {
     getUserById(id: string): User | undefined;

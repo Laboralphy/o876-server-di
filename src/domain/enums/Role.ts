@@ -2,6 +2,6 @@ export enum Role {
     NONE,
     USER,
     MODERATOR,
-    MASTER,
+    GAME_MASTER,
     ADMIN,
 }
