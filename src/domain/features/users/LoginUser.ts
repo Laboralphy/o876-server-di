@@ -1,0 +1,19 @@
+import { IUserRepository } from '../../interfaces/repositories/IUserRepository';
+import { User } from '../../entities/User';
+import { IEncryptor } from '../../interfaces/interactors/IEncryptor';
+
+/**
+ * Checks if specified username / password matches the user
+ */
+export class LoginUser {
+    constructor(
+        private readonly userRepository: IUserRepository,
+        private readonly encryptor: IEncryptor
+    ) {}
+
+    async execute(name: string, password: string): Promise<User | null> {
+        const encryptedPassword = this.encryptor.encryptSHA256(password);
+        const user = await this.userRepository.findByName(name);
+        return user && user.password === encryptedPassword ? user : null;
+    }
+}

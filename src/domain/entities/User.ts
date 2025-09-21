@@ -1,16 +1,16 @@
 import z from 'zod';
-import { Role } from '../enums/Role';
-import { NumericKey } from '../types';
+import { Roles } from '../enums';
+import { EntityId } from '../types';
 import { BanSchema } from './Ban';
 
 export const UserSchema = z.object({
-    id: NumericKey,
+    id: EntityId,
     name: z.string(),
     password: z.string(),
-    email: z.string(),
+    email: z.email(),
     dateCreation: z.date(),
     dateLastUsed: z.date(),
-    roles: z.array(z.enum(Role)),
+    roles: z.array(z.enum(Roles)),
     ban: BanSchema.nullable(),
 });
 

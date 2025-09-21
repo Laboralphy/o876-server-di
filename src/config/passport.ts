@@ -4,10 +4,8 @@ import { getEnv } from './dotenv';
 
 const jwtOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: process.env.JWT_SECRET!,
+    secretOrKey: getEnv().JWT_SECRET!,
 };
-
-//
 
 passport.use(
     new JwtStrategy(jwtOptions, async (payload, done) => {
