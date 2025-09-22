@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +21,6 @@
     "koa": "^3.0.1",
     "koa-bodyparser": "^4.4.1",
     "koa-passport": "^6.0.0",
-    "nanoid": "^5.1.5",
     "o876-json-db": "github:Laboralphy/o876-json-db#v1.0.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",

@@ -1,5 +1,5 @@
 import { IUserRepository } from '../../interfaces/repositories/IUserRepository';
-import { User } from '../../entities/User';
+import { User } from '../../../domain/entities/User';
 import { IEncryptor } from '../../interfaces/interactors/IEncryptor';
 
 /**
@@ -12,7 +12,7 @@ export class LoginUser {
     ) {}
 
     async execute(name: string, password: string): Promise<User | null> {
-        const encryptedPassword = this.encryptor.encryptSHA256(password);
+        const encryptedPassword = this.encryptor.encryptPassword(password);
         const user = await this.userRepository.findByName(name);
         return user && user.password === encryptedPassword ? user : null;
     }

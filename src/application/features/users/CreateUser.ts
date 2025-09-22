@@ -1,8 +1,8 @@
 import { IUserRepository } from '../../interfaces/repositories/IUserRepository';
-import { CreateUserDTO } from '../../dto/CreateUserDTO';
+import { CreateUserPort } from '../../ports/CreateUserPort';
 import { IEncryptor } from '../../interfaces/interactors/IEncryptor';
 import { IUIDGenerator } from '../../interfaces/interactors/IUIDGenerator';
-import { UserSchema, User } from '../../entities/User';
+import { UserSchema, User } from '../../../domain/entities/User';
 
 export class CreateUser {
     constructor(
@@ -11,12 +11,12 @@ export class CreateUser {
         private readonly uidGenerator: IUIDGenerator
     ) {}
 
-    async execute(createUserDTO: CreateUserDTO) {
+    async execute(createUserPort: CreateUserPort) {
         const user: User = UserSchema.parse({
             id: this.uidGenerator.getUID(),
-            name: createUserDTO.name,
-            password: this.encryptor.encryptSHA256(createUserDTO.password),
-            email: createUserDTO.email,
+            name: createUserPort.name,
+            password: this.encryptor.encryptPassword(createUserPort.password),
+            email: createUserPort.email,
             dateCreation: new Date(),
             dateLastUsed: new Date(),
             roles: [],

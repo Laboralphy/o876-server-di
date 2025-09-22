@@ -1,4 +1,4 @@
-import { User } from '../../entities/User';
+import { User } from '../../../domain/entities/User';
 import { IUserRepository } from '../../interfaces/repositories/IUserRepository';
 import { IEncryptor } from '../../interfaces/interactors/IEncryptor';
 
@@ -9,7 +9,7 @@ export class SetUserPassword {
     ) {}
 
     async execute(user: User, password: string) {
-        user.password = this.encryptor.encryptSHA256(password);
+        user.password = this.encryptor.encryptPassword(password);
         await this.userRepository.save(user);
     }
 }

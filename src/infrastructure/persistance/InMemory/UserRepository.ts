@@ -1,5 +1,5 @@
 import { User } from '../../../domain/entities/User';
-import { IUserRepository } from '../../../domain/interfaces/repositories/IUserRepository';
+import { IUserRepository } from '../../../application/interfaces/repositories/IUserRepository';
 
 export class UserRepository implements IUserRepository {
     private _users: Map<string, User> = new Map<string, User>();
