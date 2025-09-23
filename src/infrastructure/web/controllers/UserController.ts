@@ -14,7 +14,11 @@ export class UserController {
         const dto: CreateUserDto = CreateUserDtoSchema.parse(ctx.request.body);
         const user = await this.createUser.execute(dto);
         ctx.status = 201;
-        console.log('create user :', user);
         ctx.body = { user: user.id };
+    }
+
+    async getList(ctx: Context): Promise<void> {
+        ctx.status = 200;
+        ctx.body = { users: [] };
     }
 }

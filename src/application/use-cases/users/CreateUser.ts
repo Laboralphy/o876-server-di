@@ -3,13 +3,18 @@ import { CreateUserDto } from '../../dto/CreateUserDto';
 import { IEncryptor } from '../../ports/services/IEncryptor';
 import { IUIDGenerator } from '../../ports/services/IUIDGenerator';
 import { UserSchema, User } from '../../../domain/entities/User';
+import { Cradle } from '../../../config/container';
 
 export class CreateUser {
-    constructor(
-        private readonly userRepository: IUserRepository,
-        private readonly encryptor: IEncryptor,
-        private readonly uidGenerator: IUIDGenerator
-    ) {}
+    private readonly userRepository: IUserRepository;
+    private readonly encryptor: IEncryptor;
+    private readonly uidGenerator: IUIDGenerator;
+
+    constructor(cradle: Cradle) {
+        this.userRepository = cradle.userRepository;
+        this.encryptor = cradle.encryptor;
+        this.uidGenerator = cradle.uidGenerator;
+    }
 
     async execute(createUserDto: CreateUserDto): Promise<User> {
         const user: User = UserSchema.parse({

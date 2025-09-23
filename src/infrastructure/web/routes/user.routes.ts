@@ -6,6 +6,8 @@ import Router from '@koa/router';
 export function userRoutes(userController: UserController): Router {
     const router = new Router({ prefix: '/users' });
 
+    router.get('/', (ctx) => userController.getList(ctx));
+
     router.post(
         '/',
         validate(CreateUserDtoSchema), // Middleware de validation
