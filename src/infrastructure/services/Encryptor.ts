@@ -1,4 +1,4 @@
-import { IEncryptor } from '../../application/interfaces/interactors/IEncryptor';
+import { IEncryptor } from '../../application/ports/services/IEncryptor';
 import * as crypto from 'node:crypto';
 
 export class Encryptor implements IEncryptor {

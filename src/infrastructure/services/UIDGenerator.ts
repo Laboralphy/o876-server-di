@@ -1,4 +1,4 @@
-import { IUIDGenerator } from '../../application/interfaces/interactors/IUIDGenerator';
+import { IUIDGenerator } from '../../application/ports/services/IUIDGenerator';
 import crypto from 'node:crypto';
 
 const ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyz';

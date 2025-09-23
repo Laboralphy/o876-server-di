@@ -1,7 +1,7 @@
-import { IUserRepository } from '../../interfaces/repositories/IUserRepository';
-import { CreateUserPort } from '../../ports/CreateUserPort';
-import { IEncryptor } from '../../interfaces/interactors/IEncryptor';
-import { IUIDGenerator } from '../../interfaces/interactors/IUIDGenerator';
+import { IUserRepository } from '../../ports/repositories/IUserRepository';
+import { CreateUserDto } from '../../dto/CreateUserDto';
+import { IEncryptor } from '../../ports/services/IEncryptor';
+import { IUIDGenerator } from '../../ports/services/IUIDGenerator';
 import { UserSchema, User } from '../../../domain/entities/User';
 
 export class CreateUser {
@@ -11,12 +11,12 @@ export class CreateUser {
         private readonly uidGenerator: IUIDGenerator
     ) {}
 
-    async execute(createUserPort: CreateUserPort) {
+    async execute(createUserDto: CreateUserDto): Promise<User> {
         const user: User = UserSchema.parse({
             id: this.uidGenerator.getUID(),
-            name: createUserPort.name,
-            password: this.encryptor.encryptPassword(createUserPort.password),
-            email: createUserPort.email,
+            name: createUserDto.name,
+            password: this.encryptor.encryptPassword(createUserDto.password),
+            email: createUserDto.email,
             dateCreation: new Date(),
             dateLastUsed: new Date(),
             roles: [],
@@ -29,5 +29,6 @@ export class CreateUser {
             throw new Error(`User with id "${user.id}" already exists`);
         }
         await this.userRepository.save(user);
+        return user;
     }
 }

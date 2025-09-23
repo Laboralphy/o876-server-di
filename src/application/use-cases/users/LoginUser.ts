@@ -1,6 +1,6 @@
-import { IUserRepository } from '../../interfaces/repositories/IUserRepository';
+import { IUserRepository } from '../../ports/repositories/IUserRepository';
 import { User } from '../../../domain/entities/User';
-import { IEncryptor } from '../../interfaces/interactors/IEncryptor';
+import { IEncryptor } from '../../ports/services/IEncryptor';
 
 /**
  * Checks if specified username / password matches the user

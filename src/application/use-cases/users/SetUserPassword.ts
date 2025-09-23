@@ -1,6 +1,6 @@
 import { User } from '../../../domain/entities/User';
-import { IUserRepository } from '../../interfaces/repositories/IUserRepository';
-import { IEncryptor } from '../../interfaces/interactors/IEncryptor';
+import { IUserRepository } from '../../ports/repositories/IUserRepository';
+import { IEncryptor } from '../../ports/services/IEncryptor';
 
 export class SetUserPassword {
     constructor(
