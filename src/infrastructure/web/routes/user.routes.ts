@@ -8,11 +8,7 @@ export function userRoutes(userController: UserController): Router {
 
     router.get('/', (ctx) => userController.getList(ctx));
 
-    router.post(
-        '/',
-        validate(CreateUserDtoSchema), // Middleware de validation
-        (ctx) => userController.create(ctx)
-    );
+    router.post('/', validate(CreateUserDtoSchema), (ctx) => userController.create(ctx));
 
     return router;
 }

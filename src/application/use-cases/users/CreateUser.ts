@@ -5,6 +5,9 @@ import { IUIDGenerator } from '../../ports/services/IUIDGenerator';
 import { UserSchema, User } from '../../../domain/entities/User';
 import { Cradle } from '../../../config/container';
 
+/**
+ * Creates a new User
+ */
 export class CreateUser {
     private readonly userRepository: IUserRepository;
     private readonly encryptor: IEncryptor;
@@ -34,6 +37,7 @@ export class CreateUser {
             throw new Error(`User with id "${user.id}" already exists`);
         }
         await this.userRepository.save(user);
+        console.log(await this.userRepository.getAll());
         return user;
     }
 }

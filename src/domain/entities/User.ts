@@ -8,8 +8,8 @@ export const UserSchema = z.object({
     name: z.string(),
     password: z.string(),
     email: z.email(),
-    dateCreation: z.date(),
-    dateLastUsed: z.date(),
+    dateCreation: z.coerce.date(),
+    dateLastUsed: z.coerce.date(),
     roles: z.array(z.enum(Roles)),
     ban: BanSchema.nullable(),
 });

@@ -17,6 +17,10 @@ export class UserRepository implements IUserRepository {
         return this._users.get(id);
     }
 
+    async getAll(): Promise<User[]> {
+        return Array.from(this._users.values());
+    }
+
     async findByName(name: string): Promise<User | undefined> {
         for (const user of this._users.values()) {
             if (user.name === name) {
