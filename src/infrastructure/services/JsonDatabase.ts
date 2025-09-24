@@ -8,6 +8,7 @@ import {
     DiskStorage,
     INDEX_TYPES,
 } from 'o876-json-db';
+import { JsonObject, ScalarValue } from '../../domain/types';
 
 export class JsonDatabase implements IDatabaseAdapter {
     private collections: Map<string, Collection> = new Map<string, Collection>();
@@ -18,12 +19,21 @@ export class JsonDatabase implements IDatabaseAdapter {
         name: string,
         storage: IStorage,
         options: InitOptions,
-        indexOptions: IndexCreationOptions
+        indexOptions: { [indexName: string]: IndexCreationOptions }
     ) {
-        const collection = new Collection(path.resolve(options.host, name), indexOptions);
+        const collection = new Collection(path.resolve(options.host, 'data', name), indexOptions);
         collection.storage = storage;
         this.collections.set(name, collection);
-        await userCollection.init();
+        await collection.init();
+    }
+
+    getCollection(name: string): Collection {
+        const oCollection = this.collections.get(name);
+        if (oCollection) {
+            return oCollection;
+        } else {
+            throw new Error(`Could not get collection "${name}"`);
+        }
     }
 
     async init(options: InitOptions): Promise<void> {
@@ -36,18 +46,12 @@ export class JsonDatabase implements IDatabaseAdapter {
         });
     }
 
-    getCollection(name: string): Collection {
-        if (!this.collections.has(name)) {
-            throw new Error(`Could not get collection "${name}"`);
-        }
-        return this.collections.get(name);
-    }
-
     async find(table: string, query: { [p: string]: ScalarValue }): Promise<JsonObject[]> {
-        return this.getCollection(table).find(query);
+        const cursor = await this.getCollection(table).find(query);
+        return cursor.fetchAll();
     }
 
-    async load(table: string, key: string): Promise<JsonObject> {
+    async load(table: string, key: string): Promise<JsonObject | undefined> {
         return this.getCollection(table).load(key);
     }
 
@@ -56,6 +60,6 @@ export class JsonDatabase implements IDatabaseAdapter {
     }
 
     async store(table: string, key: string, data: JsonObject): Promise<void> {
-        return this.getCollection(table).store(key, data);
+        return this.getCollection(table).save(key, data);
     }
 }

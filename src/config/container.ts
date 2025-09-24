@@ -7,6 +7,8 @@ import { LoginUser } from '../application/use-cases/users/LoginUser';
 import { SetUserPassword } from '../application/use-cases/users/SetUserPassword';
 import { UserController } from '../infrastructure/web/controllers/UserController';
 import { GetUserList } from '../application/use-cases/users/GetUserList';
+import { IDatabaseAdapter } from '../domain/ports/IDatabaseAdapter';
+import { JsonDatabase } from '../infrastructure/services/JsonDatabase';
 
 export interface Cradle {
     // use cases
@@ -24,6 +26,7 @@ export interface Cradle {
     // services
     encryptor: Encryptor;
     uidGenerator: UIDGenerator;
+    database: IDatabaseAdapter;
 }
 
 // Container creation
@@ -46,4 +49,5 @@ container.register({
     // services
     encryptor: asClass(Encryptor).singleton(),
     uidGenerator: asClass(UIDGenerator).singleton(),
+    database: asClass(JsonDatabase).singleton(),
 });

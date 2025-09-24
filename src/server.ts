@@ -1,3 +1,4 @@
+import path from 'node:path';
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import { userRoutes } from './infrastructure/web/routes/user.routes';
@@ -6,20 +7,22 @@ import { scopePerRequest } from 'awilix-koa';
 import { printDbg } from './libs/print-dbg';
 import { getEnv } from './config/dotenv';
 import { FsHelper } from 'o876-fs-ts';
-import path from 'node:path';
 import { expandPath } from './libs/expand-path';
 
 const debugServer = printDbg('server');
 
 export class Server {
-    private readonly app: Koa;
+    private readonly httpApi: Koa;
     private readonly env = getEnv();
     private readonly fsHelper = new FsHelper();
 
     constructor() {
-        this.app = new Koa();
+        this.httpApi = new Koa();
     }
 
+    /**
+     * Build directory tree, for storing database, modules ...
+     */
     async initDataDirectory() {
         const sDataLocation = this.env.DATA_HOME;
         if (sDataLocation === undefined) {
@@ -32,33 +35,60 @@ export class Server {
         await this.fsHelper.mkdir(path.join(sBasePath, 'modules'));
     }
 
-    async initHttpService() {
+    async initDatabase() {
+        debugServer('initializing database');
+        const database = container.resolve('database');
+        await database.init({
+            host: this.env.DB_HOST ?? '',
+            user: this.env.DB_USER ?? '',
+            password: this.env.DB_PASSWORD ?? '',
+        });
+    }
+
+    /**
+     * Start http service on
+     */
+    async initApiService() {
+        debugServer('starting api service');
         const port = parseInt(this.env.SERVER_HTTP_API_PORT ?? '8080');
-        debugServer('starting http server');
+        const app = this.httpApi;
+
+        // Database
+        await this.initDatabase();
+
+        // Middlewares
+        debugServer('initializing middlewares');
+        app.use(bodyParser());
+        app.use(scopePerRequest(container));
+
+        // Routes.
+        // Each route is declared as middleware
+        // and receive its controller dependencies on construction
+        debugServer('initializing routes');
+        app.use(userRoutes(container.resolve('userController')).routes());
+
         return new Promise((resolve) => {
-            const app = this.app;
-
-            // Middlewares
-            debugServer('init middlewares');
-            app.use(bodyParser());
-            app.use(scopePerRequest(container));
-
-            // Routes
-            // Each route is declared as middleware
-            // and receive its controller dependencies on construction
-            debugServer('init routes');
-            app.use(userRoutes(container.resolve('userController')).routes());
-
             // Start listening
             app.listen(port, '127.0.0.1', () => {
-                debugServer('http service is now listening on port %d', port);
+                debugServer('http api service is now listening on port %d', port);
                 resolve(true);
             });
         });
     }
 
+    async initTelnetService() {
+        debugServer('initializing telnet service');
+    }
+
+    async initWebsocketService() {
+        debugServer('initializing websocket service');
+    }
+
     async run() {
         await this.initDataDirectory();
-        await this.initHttpService();
+        await this.initDatabase();
+        await this.initApiService();
+        await this.initTelnetService();
+        await this.initWebsocketService();
     }
 }

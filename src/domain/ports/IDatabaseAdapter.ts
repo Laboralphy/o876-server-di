@@ -26,7 +26,7 @@ export interface IDatabaseAdapter {
      * @param table table name
      * @param key json document primary key
      */
-    load(table: string, key: string): Promise<JsonObject>;
+    load(table: string, key: string): Promise<JsonObject | undefined>;
 
     /**
      * Deletes the specified document
