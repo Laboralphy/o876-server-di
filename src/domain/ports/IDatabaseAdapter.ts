@@ -1,17 +1,24 @@
 import { JsonObject, ScalarValue } from '../types';
+import { ZodSchema } from 'zod';
 
-export type InitOptions = {
+export type DatabaseInitOptions = {
     host: string;
+    port: number;
     user: string;
     password: string;
+    name: string;
 };
+
+export interface ForEachCallback<T> {
+    (data: T, key: string): void;
+}
 
 export interface IDatabaseAdapter {
     /**
      * Database initialization process.
      * Make connection, create schema, if first connection....
      */
-    init(options: InitOptions): Promise<void>;
+    init(options: DatabaseInitOptions): Promise<void>;
 
     /**
      * Store a JSON document in the specified table, with the specified key
@@ -41,4 +48,13 @@ export interface IDatabaseAdapter {
      * @param query
      */
     find(table: string, query: { [property: string]: ScalarValue }): Promise<JsonObject[]>;
+
+    /**
+     * A general purpose iteration mechanism
+     * Iterate through all items of the collection
+     * Useful for collection with large amount of items.
+     * @param table
+     * @param callback
+     */
+    forEach<T>(table: string, callback: ForEachCallback<T>): Promise<void>;
 }

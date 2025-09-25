@@ -1,4 +1,8 @@
-import { IDatabaseAdapter, InitOptions } from '../../domain/ports/IDatabaseAdapter';
+import {
+    IDatabaseAdapter,
+    DatabaseInitOptions,
+    ForEachCallback,
+} from '../../domain/ports/IDatabaseAdapter';
 import path from 'node:path';
 import {
     Collection,
@@ -9,6 +13,10 @@ import {
     INDEX_TYPES,
 } from 'o876-json-db';
 import { JsonObject, ScalarValue } from '../../domain/types';
+import { printDbg } from '../../libs/print-dbg';
+import { expandPath } from '../../libs/expand-path';
+
+const debugDb = printDbg('database');
 
 export class JsonDatabase implements IDatabaseAdapter {
     private collections: Map<string, Collection> = new Map<string, Collection>();
@@ -18,10 +26,12 @@ export class JsonDatabase implements IDatabaseAdapter {
     async initCollection(
         name: string,
         storage: IStorage,
-        options: InitOptions,
+        options: DatabaseInitOptions,
         indexOptions: { [indexName: string]: IndexCreationOptions }
     ) {
-        const collection = new Collection(path.resolve(options.host, 'data', name), indexOptions);
+        const sCollectionLocation = path.join(expandPath(options.host), name);
+        debugDb('initializing collection "%s" at location : %s', name, sCollectionLocation);
+        const collection = new Collection(sCollectionLocation, indexOptions);
         collection.storage = storage;
         this.collections.set(name, collection);
         await collection.init();
@@ -36,7 +46,8 @@ export class JsonDatabase implements IDatabaseAdapter {
         }
     }
 
-    async init(options: InitOptions): Promise<void> {
+    async init(options: DatabaseInitOptions): Promise<void> {
+        debugDb('json-database management system : json json-database');
         // Users
         await this.initCollection('users', this.diskStorage, options, {
             name: {
@@ -44,6 +55,7 @@ export class JsonDatabase implements IDatabaseAdapter {
                 caseInsensitive: true,
             },
         });
+        debugDb('json-database initialization complete');
     }
 
     async find(table: string, query: { [p: string]: ScalarValue }): Promise<JsonObject[]> {
@@ -61,5 +73,12 @@ export class JsonDatabase implements IDatabaseAdapter {
 
     async store(table: string, key: string, data: JsonObject): Promise<void> {
         return this.getCollection(table).save(key, data);
+    }
+
+    async forEach<T>(table: string, callback: ForEachCallback<T>): Promise<void> {
+        await this.getCollection(table).filter((data: JsonObject, key: string) => {
+            callback(data as T, key);
+            return false;
+        });
     }
 }

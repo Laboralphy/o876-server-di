@@ -21,27 +21,26 @@ export class Server {
     }
 
     /**
-     * Build directory tree, for storing database, modules ...
+     * Build directory tree, for storing json-database, modules ...
      */
     async initDataDirectory() {
-        const sDataLocation = this.env.DATA_HOME;
-        if (sDataLocation === undefined) {
-            throw new Error(`environment variable not set : DATA_HOME}`);
+        if (!this.env.PATH_MODULES) {
+            throw new Error(`environment variable not set : PATH_MODULES`);
         }
-        const sBasePath = expandPath(sDataLocation);
-        debugServer('initializing data directory %s', sBasePath);
-        await this.fsHelper.mkdir(sBasePath);
-        await this.fsHelper.mkdir(path.join(sBasePath, 'data'));
-        await this.fsHelper.mkdir(path.join(sBasePath, 'modules'));
+        const sModuleLocation = expandPath(this.env.PATH_MODULES);
+        debugServer('module directory is %s', sModuleLocation);
+        await this.fsHelper.mkdir(sModuleLocation);
     }
 
     async initDatabase() {
-        debugServer('initializing database');
+        debugServer('json-database init phase');
         const database = container.resolve('database');
         await database.init({
             host: this.env.DB_HOST ?? '',
             user: this.env.DB_USER ?? '',
             password: this.env.DB_PASSWORD ?? '',
+            port: parseInt(this.env.DB_PORT ?? ''),
+            name: this.env.DB_NAME ?? '',
         });
     }
 

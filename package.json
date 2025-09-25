@@ -1,6 +1,10 @@
 {
   "name": "o876-srv-di",
   "version": "1.0.0",
+  "author": "Raphaël Marandet",
+  "license": "ISC",
+  "description": "Dependency injection experimental server",
+  "keywords": [],
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
@@ -8,10 +12,6 @@
     "build": "tsc",
     "run": "tsx ./index"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "@koa/router": "^14.0.0",
     "awilix": "^12.0.5",

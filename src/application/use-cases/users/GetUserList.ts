@@ -9,8 +9,11 @@ export class GetUserList {
         this.userRepository = cradle.userRepository;
     }
 
-    async execute(): Promise<User[]> {
-        console.log(await this.userRepository.getAll());
-        return this.userRepository.getAll();
+    async execute(): Promise<{ [name: string]: string }> {
+        const oUsers: { [name: string]: string } = {};
+        await this.userRepository.forEach((u: User) => {
+            oUsers[u.id] = u.name;
+        });
+        return oUsers;
     }
 }

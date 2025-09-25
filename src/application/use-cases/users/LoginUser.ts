@@ -14,6 +14,14 @@ export class LoginUser {
     async execute(name: string, password: string): Promise<User | null> {
         const encryptedPassword = this.encryptor.encryptPassword(password);
         const user = await this.userRepository.findByName(name);
-        return user && user.password === encryptedPassword ? user : null;
+        if (!user) {
+            return null;
+        }
+        if (user.password !== encryptedPassword) {
+            return null;
+        }
+        user.tsLastUsed = Date.now();
+        await this.userRepository.save(user);
+        return user;
     }
 }

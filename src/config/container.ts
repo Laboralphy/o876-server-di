@@ -1,5 +1,5 @@
 import { createContainer, asClass } from 'awilix';
-import { UserRepository } from '../infrastructure/persistance/in-memory/UserRepository';
+import { UserRepository } from '../infrastructure/persistance/json-database/UserRepository';
 import { Encryptor } from '../infrastructure/services/Encryptor';
 import { UIDGenerator } from '../infrastructure/services/UIDGenerator';
 import { CreateUser } from '../application/use-cases/users/CreateUser';

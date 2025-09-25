@@ -20,13 +20,14 @@ export class CreateUser {
     }
 
     async execute(createUserDto: CreateUserDto): Promise<User> {
+        const nNow = Date.now();
         const user: User = UserSchema.parse({
             id: this.uidGenerator.getUID(),
             name: createUserDto.name,
             password: this.encryptor.encryptPassword(createUserDto.password),
             email: createUserDto.email,
-            dateCreation: new Date(),
-            dateLastUsed: new Date(),
+            tsCreation: nNow,
+            tsLastUsed: nNow,
             roles: [],
             ban: null,
         });
@@ -37,7 +38,6 @@ export class CreateUser {
             throw new Error(`User with id "${user.id}" already exists`);
         }
         await this.userRepository.save(user);
-        console.log(await this.userRepository.getAll());
         return user;
     }
 }
