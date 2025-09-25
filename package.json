@@ -20,7 +20,7 @@
     "koa": "^3.0.1",
     "koa-bodyparser": "^4.4.1",
     "o876-fs-ts": "github:Laboralphy/o876-fs-ts#v1.0.1",
-    "o876-json-db": "github:Laboralphy/o876-json-db#v1.2.2",
+    "o876-json-db": "github:Laboralphy/o876-json-db#v1.3.0",
     "reflect-metadata": "^0.2.2",
     "zod": "^4.1.9"
   },
