@@ -58,7 +58,7 @@ describe('renderDuration', function () {
     });
 
     describe('render', function () {
-        expect(dd.render(new Date(), 'dur')).toBe('now');
+        expect(dd.renderDate(new Date(), 'dur')).toBe('now');
     });
 
     describe('custom duration render', function () {

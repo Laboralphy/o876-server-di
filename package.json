@@ -10,7 +10,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "build": "tsc",
-    "run": "tsx ./index"
+    "start": "tsx ./index"
   },
   "dependencies": {
     "@koa/router": "^14.0.0",
@@ -20,8 +20,9 @@
     "koa": "^3.0.1",
     "koa-bodyparser": "^4.4.1",
     "o876-fs-ts": "github:Laboralphy/o876-fs-ts#v1.0.1",
-    "o876-json-db": "github:Laboralphy/o876-json-db#v1.3.0",
+    "o876-json-db": "github:Laboralphy/o876-json-db#v1.4.0",
     "reflect-metadata": "^0.2.2",
+    "yargs": "^18.0.0",
     "zod": "^4.1.9"
   },
   "devDependencies": {
@@ -30,6 +31,7 @@
     "@types/koa__router": "^12.0.4",
     "@types/koa-bodyparser": "^4.3.12",
     "@types/node": "^24.5.2",
+    "@types/yargs": "^17.0.33",
     "eslint": "^9.36.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",

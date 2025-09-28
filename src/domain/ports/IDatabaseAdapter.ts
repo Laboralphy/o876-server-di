@@ -1,5 +1,4 @@
 import { JsonObject, ScalarValue } from '../types';
-import { ZodSchema } from 'zod';
 
 export type DatabaseInitOptions = {
     host: string;

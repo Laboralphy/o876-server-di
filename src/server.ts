@@ -1,4 +1,3 @@
-import path from 'node:path';
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import { userRoutes } from './infrastructure/web/routes/user.routes';

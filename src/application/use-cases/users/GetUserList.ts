@@ -1,6 +1,7 @@
 import { IUserRepository } from '../../ports/repositories/IUserRepository';
 import { Cradle } from '../../../config/container';
 import { User } from '../../../domain/entities/User';
+import { UserListDto } from '../../dto/UserListDto';
 
 export class GetUserList {
     private readonly userRepository: IUserRepository;
@@ -9,11 +10,17 @@ export class GetUserList {
         this.userRepository = cradle.userRepository;
     }
 
-    async execute(): Promise<{ [name: string]: string }> {
-        const oUsers: { [name: string]: string } = {};
+    async execute(): Promise<UserListDto> {
+        const aUsers: UserListDto = [];
         await this.userRepository.forEach((u: User) => {
-            oUsers[u.id] = u.name;
+            aUsers.push({
+                id: u.id,
+                name: u.name,
+                tsCreated: u.tsCreation,
+                tsLogin: u.tsLastUsed,
+                email: u.email,
+            });
         });
-        return oUsers;
+        return aUsers;
     }
 }

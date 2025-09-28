@@ -117,7 +117,7 @@ export function renderDuration(nDuration: number, options: RenderDurationOptions
     return sOutput === '' ? now : sOutput;
 }
 
-export function render(date: Date, format = 'ymd'): string {
+export function renderDate(date: Date, format = 'ymd'): string {
     return format
         .split(' ')
         .map((s) => {
