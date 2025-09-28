@@ -4,18 +4,18 @@ import { Encryptor } from '../infrastructure/services/Encryptor';
 import { UIDGenerator } from '../infrastructure/services/UIDGenerator';
 import { CreateUser } from '../application/use-cases/users/CreateUser';
 import { LoginUser } from '../application/use-cases/users/LoginUser';
-import { SetUserPassword } from '../application/use-cases/users/SetUserPassword';
 import { UserController } from '../infrastructure/web/controllers/UserController';
 import { GetUserList } from '../application/use-cases/users/GetUserList';
 import { IDatabaseAdapter } from '../domain/ports/IDatabaseAdapter';
 import { JsonDatabase } from '../infrastructure/services/JsonDatabase';
+import { ModifyUser } from '../application/use-cases/users/ModifyUser';
 
 export interface Cradle {
     // use cases
     createUser: CreateUser;
+    modifyUser: ModifyUser;
     getUserList: GetUserList;
     loginUser: LoginUser;
-    setUserPassword: SetUserPassword;
 
     // repositories
     userRepository: UserRepository;
@@ -36,9 +36,9 @@ export const container = createContainer<Cradle>();
 container.register({
     // use cases
     createUser: asClass(CreateUser).singleton(),
+    modifyUser: asClass(ModifyUser).singleton(),
     getUserList: asClass(GetUserList).singleton(),
     loginUser: asClass(LoginUser).singleton(),
-    setUserPassword: asClass(SetUserPassword).singleton(),
 
     // repositories
     userRepository: asClass(UserRepository).singleton(),

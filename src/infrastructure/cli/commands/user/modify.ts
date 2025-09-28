@@ -2,13 +2,13 @@ import { Argv, Arguments } from 'yargs';
 
 interface IUserModifyArgs extends Arguments {
     name: string;
-    password: string;
-    email: string;
+    password?: string;
+    email?: string;
 }
 
 export function modifyCommand(yargs: Argv): Argv {
     return yargs.command<IUserModifyArgs>(
-        'create <name>',
+        'modify <name>',
         'Modify a user',
         (yargs) =>
             yargs
