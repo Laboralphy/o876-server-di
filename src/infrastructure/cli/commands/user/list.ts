@@ -6,6 +6,8 @@ import { wfGet } from '../../tools/web-fetcher';
 
 interface IUserListArgs extends Arguments {
     filter: string;
+    page: number;
+    pagesize: number;
 }
 
 export function listCommand(yargs: Argv): Argv {
@@ -13,25 +15,49 @@ export function listCommand(yargs: Argv): Argv {
         'list',
         'List users',
         (yargs) =>
-            yargs.option('filter', {
-                type: 'string',
-                describe: "Filter user's name",
-                alias: 'f',
-                demandOption: false,
-            }),
+            yargs
+                .option('filter', {
+                    type: 'string',
+                    describe: "Filter user's name",
+                    default: '',
+                    alias: 'f',
+                    demandOption: false,
+                })
+                .option('page', {
+                    type: 'number',
+                    describe: 'Page number (starting page = 1 ; all pages = 0)',
+                    alias: 'p',
+                    default: 0,
+                    demandOption: false,
+                })
+                .option('pagesize', {
+                    type: 'number',
+                    describe: 'Number of items per page',
+                    alias: 's',
+                    default: 25,
+                    demandOption: false,
+                }),
         async (argv) => {
-            const userList = (await wfGet('users')) as UserListDto;
+            const { data } = await wfGet('users');
+            const userList = data as UserListDto;
+            const filteredUserList = userList.filter((user) => {
+                if (argv.filter) {
+                    return user.name.includes(argv.filter);
+                } else {
+                    return true;
+                }
+            });
             const tr = new TableRenderer();
             tr.theme = Themes.filetThin;
             const nNow = Date.now();
-            const output = userList
-                .filter((user) => {
-                    if (argv.filter) {
-                        return user.name.includes(argv.filter);
-                    } else {
-                        return true;
-                    }
-                })
+            const bPaginationMode = filteredUserList.length > argv.pagesize && argv.page > 0;
+            const nStart = bPaginationMode ? (argv.page - 1) * argv.pagesize : 0;
+            const nCount = bPaginationMode ? argv.pagesize : Infinity;
+            const nPageMax = bPaginationMode
+                ? Math.ceil(filteredUserList.length / argv.pagesize)
+                : 1;
+            const output = filteredUserList
+                .slice(nStart, nStart + nCount)
                 .map((row) => [
                     row.id,
                     row.name,
@@ -42,7 +68,16 @@ export function listCommand(yargs: Argv): Argv {
             if (output.length > 0) {
                 output.unshift(['id', 'name', 'date created', 'last login', 'email']);
                 console.log(tr.render(output).join('\n'));
-                console.log(userList.length, 'user(s)');
+                if (bPaginationMode) {
+                    console.log(
+                        `Page ${argv.page} of ${nPageMax} (Users per page: ${argv.pagesize}). Total: ${filteredUserList.length} user${filteredUserList.length > 1 ? 's' : ''}.`
+                    );
+                } else {
+                    console.log(
+                        filteredUserList.length,
+                        `user${filteredUserList.length > 1 ? 's' : ''}`
+                    );
+                }
             } else {
                 console.log('No user matching filter');
             }

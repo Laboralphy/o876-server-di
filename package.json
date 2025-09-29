@@ -10,7 +10,8 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "build": "tsc",
-    "start": "tsx ./index"
+    "start": "tsx ./index",
+    "admin": "tsx ./src/admin"
   },
   "dependencies": {
     "@koa/router": "^14.0.0",

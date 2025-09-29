@@ -4,11 +4,13 @@ import { deleteCommand } from './delete';
 import { listCommand } from './list';
 import { banCommand } from './ban';
 import { unbanCommand } from './unban';
+import { modifyCommand } from './modify';
 
 export function user(yargs: Argv) {
     createCommand(yargs);
-    deleteCommand(yargs);
     listCommand(yargs);
+    modifyCommand(yargs);
+    deleteCommand(yargs);
     banCommand(yargs);
     unbanCommand(yargs);
 }

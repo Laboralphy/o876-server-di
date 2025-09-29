@@ -9,6 +9,8 @@ import { GetUserList } from '../application/use-cases/users/GetUserList';
 import { IDatabaseAdapter } from '../domain/ports/IDatabaseAdapter';
 import { JsonDatabase } from '../infrastructure/services/JsonDatabase';
 import { ModifyUser } from '../application/use-cases/users/ModifyUser';
+import { FindUser } from '../application/use-cases/users/FindUser';
+import { DeleteUser } from '../application/use-cases/users/DeleteUser';
 
 export interface Cradle {
     // use cases
@@ -16,6 +18,8 @@ export interface Cradle {
     modifyUser: ModifyUser;
     getUserList: GetUserList;
     loginUser: LoginUser;
+    findUser: FindUser;
+    deleteUser: DeleteUser;
 
     // repositories
     userRepository: UserRepository;
@@ -39,6 +43,8 @@ container.register({
     modifyUser: asClass(ModifyUser).singleton(),
     getUserList: asClass(GetUserList).singleton(),
     loginUser: asClass(LoginUser).singleton(),
+    findUser: asClass(FindUser).singleton(),
+    deleteUser: asClass(DeleteUser).singleton(),
 
     // repositories
     userRepository: asClass(UserRepository).singleton(),

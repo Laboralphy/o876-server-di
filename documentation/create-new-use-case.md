@@ -39,3 +39,13 @@ export class UseCaseName {
 
 Use cases are located in `src/application/use-cases`
 
+## Add Use case to container
+
+You must add use case to awilix container :
+
+1) open ./src/config/container.ts
+2) modify interface Cradle : add use-case class
+3) modify container.register parameters : add use-class as class singleton
+
+If use case is to be exposed, consider making an action controller.
+

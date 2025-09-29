@@ -1,4 +1,7 @@
 import { Argv, Arguments } from 'yargs';
+import { wfGet, wfPatch, wfPut } from '../../tools/web-fetcher';
+import { User } from '../../../../domain/entities/User';
+import { PatchUserDto } from '../../../web/dto/PatchUserDto';
 
 interface IUserModifyArgs extends Arguments {
     name: string;
@@ -29,10 +32,17 @@ export function modifyCommand(yargs: Argv): Argv {
                     alias: 'm',
                     demandOption: false,
                 }),
-        (argv) => {
-            console.log('Modify User name:', argv.name);
-            console.log('Password:', argv.password);
-            console.log('Email:', argv.email);
+        async (argv) => {
+            const { data } = await wfGet('users/name/' + argv.name);
+            const user = data as User;
+            const oPayload: PatchUserDto = {};
+            if (argv.password) {
+                oPayload.password = argv.password;
+            }
+            if (argv.email) {
+                oPayload.email = argv.email;
+            }
+            await wfPatch('users/' + user.id, oPayload);
         }
     );
 }
