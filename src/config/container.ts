@@ -11,6 +11,9 @@ import { JsonDatabase } from '../infrastructure/services/JsonDatabase';
 import { ModifyUser } from '../application/use-cases/users/ModifyUser';
 import { FindUser } from '../application/use-cases/users/FindUser';
 import { DeleteUser } from '../application/use-cases/users/DeleteUser';
+import { ITime } from '../application/ports/services/ITime';
+import { TimeVanilla } from '../infrastructure/services/TimeVanilla';
+import { GetUserBan } from '../application/use-cases/users/GetUserBan';
 
 export interface Cradle {
     // use cases
@@ -20,6 +23,7 @@ export interface Cradle {
     loginUser: LoginUser;
     findUser: FindUser;
     deleteUser: DeleteUser;
+    getUserBan: GetUserBan;
 
     // repositories
     userRepository: UserRepository;
@@ -31,6 +35,7 @@ export interface Cradle {
     encryptor: Encryptor;
     uidGenerator: UIDGenerator;
     database: IDatabaseAdapter;
+    time: ITime;
 }
 
 // Container creation
@@ -45,6 +50,7 @@ container.register({
     loginUser: asClass(LoginUser).singleton(),
     findUser: asClass(FindUser).singleton(),
     deleteUser: asClass(DeleteUser).singleton(),
+    getUserBan: asClass(GetUserBan).singleton(),
 
     // repositories
     userRepository: asClass(UserRepository).singleton(),
@@ -56,4 +62,5 @@ container.register({
     encryptor: asClass(Encryptor).singleton(),
     uidGenerator: asClass(UIDGenerator).singleton(),
     database: asClass(JsonDatabase).singleton(),
+    time: asClass(TimeVanilla).singleton(),
 });

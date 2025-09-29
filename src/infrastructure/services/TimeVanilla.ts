@@ -5,7 +5,7 @@ export class TimeVanilla {
         return Date.now();
     }
 
-    renderDuration(nDuration: number, options: RenderDurationOptions = {}) {
+    renderDuration(nDuration: number, options?: RenderDurationOptions) {
         return renderDuration(nDuration, options);
     }
 }

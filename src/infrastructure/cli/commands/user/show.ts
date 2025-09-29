@@ -22,9 +22,13 @@ async function ban2str(ban: Ban | null): Promise<null | Ban2StrResult> {
     }
     let bannedBy = 'admin';
     if (ban.bannedBy) {
-        const { data } = await wfGet('users/' + ban.bannedBy);
-        const userBannedBy = data as User;
-        bannedBy = userBannedBy.name;
+        try {
+            const { data } = await wfGet('users/' + ban.bannedBy);
+            const userBannedBy = data as User;
+            bannedBy = userBannedBy.name;
+        } catch {
+            bannedBy = '[Unknown user]';
+        }
     }
     const dateBegin = new Date(ban.tsBegin);
     const reason = ban.reason;

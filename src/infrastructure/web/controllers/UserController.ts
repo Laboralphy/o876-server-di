@@ -9,6 +9,7 @@ import { PatchUserDto, PatchUserDtoSchema } from '../dto/PatchUserDto';
 import { FindUser } from '../../../application/use-cases/users/FindUser';
 import { User } from '../../../domain/entities/User';
 import { DeleteUser } from '../../../application/use-cases/users/DeleteUser';
+import { GetUserBan } from '../../../application/use-cases/users/GetUserBan';
 
 export class UserController {
     private readonly createUser: CreateUser;
@@ -16,13 +17,15 @@ export class UserController {
     private readonly modifyUser: ModifyUser;
     private readonly findUser: FindUser;
     private readonly deleteUser: DeleteUser;
+    private readonly getUserBan: GetUserBan;
 
-    constructor({ createUser, getUserList, modifyUser, findUser, deleteUser }: Cradle) {
-        this.createUser = createUser;
-        this.getUserList = getUserList;
-        this.modifyUser = modifyUser;
-        this.findUser = findUser;
-        this.deleteUser = deleteUser;
+    constructor(cradle: Cradle) {
+        this.createUser = cradle.createUser;
+        this.getUserList = cradle.getUserList;
+        this.modifyUser = cradle.modifyUser;
+        this.findUser = cradle.findUser;
+        this.deleteUser = cradle.deleteUser;
+        this.getUserBan = cradle.getUserBan;
     }
 
     async create(ctx: Context): Promise<void> {
@@ -67,5 +70,19 @@ export class UserController {
         const idUser = ctx.params.id;
         await this.deleteUser.execute(idUser);
         ctx.status = HttpStatus.NO_CONTENT;
+    }
+
+    async getInfo(ctx: Context): Promise<void> {
+        const idUser = ctx.params.id;
+        const ban = await this.getUserBan.execute(idUser);
+        const user = await this.modifyUser.execute(idUser, {});
+        ctx.body = {
+            data: {
+                id: idUser,
+                name: user.name,
+                email: user.email,
+                ban,
+            },
+        };
     }
 }

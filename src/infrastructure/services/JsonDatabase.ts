@@ -1,16 +1,16 @@
 import {
-    IDatabaseAdapter,
     DatabaseInitOptions,
     ForEachCallback,
+    IDatabaseAdapter,
 } from '../../domain/ports/IDatabaseAdapter';
 import path from 'node:path';
 import {
     Collection,
-    IStorage,
-    IndexCreationOptions,
-    MemoryStorage,
     DiskStorage,
     INDEX_TYPES,
+    IndexCreationOptions,
+    IStorage,
+    MemoryStorage,
 } from 'o876-json-db';
 import { JsonObject, ScalarValue } from '../../domain/types';
 import { printDbg } from '../../libs/print-dbg';
@@ -54,12 +54,17 @@ export class JsonDatabase implements IDatabaseAdapter {
                 type: INDEX_TYPES.HASH,
                 caseInsensitive: true,
             },
+            ban: {
+                type: INDEX_TYPES.TRUTHY,
+                nullable: true,
+            },
         });
         debugDb('json-database initialization complete');
     }
 
     async find(table: string, query: { [p: string]: ScalarValue }): Promise<JsonObject[]> {
-        const cursor = await this.getCollection(table).find(query);
+        const collection = this.getCollection(table);
+        const cursor = await collection.find(query);
         return cursor.fetchAll();
     }
 
