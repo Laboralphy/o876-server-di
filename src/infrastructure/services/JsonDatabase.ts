@@ -59,6 +59,7 @@ export class JsonDatabase implements IDatabaseAdapter {
                 nullable: true,
             },
         });
+        await this.initCollection('user-secrets', this.diskStorage, options, {});
         debugDb('json-database initialization complete');
     }
 

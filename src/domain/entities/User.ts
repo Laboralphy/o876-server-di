@@ -6,7 +6,6 @@ import { BanSchema } from './Ban';
 export const UserSchema = z.object({
     id: EntityId,
     name: z.string(),
-    password: z.string(),
     email: z.email(),
     tsCreation: z.number(),
     tsLastUsed: z.number(),

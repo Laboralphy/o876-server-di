@@ -31,3 +31,8 @@ export const UserSchema = z.object({
 
 export type User = z.infer<typeof UserSchema>;
 ```
+
+- Create an interface in src/application/ports/repositories
+- This interface should extend IRepository<EntityType>
+- Create an implementation in src/infrastructure/persistance/<database>/
+- Add repository to container

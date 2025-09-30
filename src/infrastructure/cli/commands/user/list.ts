@@ -1,8 +1,8 @@
 import { Argv, Arguments } from 'yargs';
 import { TableRenderer, Themes } from '../../../../libs/table-renderer';
 import { renderDate, renderDuration } from '../../../../libs/date-renderer';
-import { UserListDto } from '../../../../application/dto/UserListDto';
 import { wfGet } from '../../tools/web-fetcher';
+import { User } from '../../../../domain/entities/User';
 
 interface IUserListArgs extends Arguments {
     filter: string;
@@ -39,7 +39,7 @@ export function listCommand(yargs: Argv): Argv {
                 }),
         async (argv) => {
             const { data } = await wfGet('users');
-            const userList = data as UserListDto;
+            const userList = data as User[];
             const filteredUserList = userList.filter((user) => {
                 if (argv.filter) {
                     return user.name.includes(argv.filter);
@@ -61,8 +61,8 @@ export function listCommand(yargs: Argv): Argv {
                 .map((row) => [
                     row.id,
                     row.name,
-                    renderDate(new Date(row.tsCreated)),
-                    renderDuration(nNow - row.tsLogin),
+                    renderDate(new Date(row.tsCreation)),
+                    renderDuration(nNow - row.tsLastUsed),
                     row.email,
                 ]);
             if (output.length > 0) {

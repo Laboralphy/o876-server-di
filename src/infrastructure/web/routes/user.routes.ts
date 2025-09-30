@@ -8,6 +8,7 @@ export function userRoutes(userController: UserController): Router {
     const router = new Router({ prefix: '/users' });
 
     router.get('/name/:name', (ctx) => userController.findByName(ctx));
+    router.get('/:id', async (ctx) => userController.getInfo(ctx));
     router.get('/', (ctx) => userController.getList(ctx));
 
     router.post('/', validate(PostUserDtoSchema), (ctx) => userController.create(ctx));

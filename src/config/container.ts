@@ -14,6 +14,8 @@ import { DeleteUser } from '../application/use-cases/users/DeleteUser';
 import { ITime } from '../application/ports/services/ITime';
 import { TimeVanilla } from '../infrastructure/services/TimeVanilla';
 import { GetUserBan } from '../application/use-cases/users/GetUserBan';
+import { UserSecretRepository } from '../infrastructure/persistance/json-database/UserSecretRepository';
+import { ChangeUserPassword } from '../application/use-cases/users/ChangeUserPassword';
 
 export interface Cradle {
     // use cases
@@ -24,9 +26,11 @@ export interface Cradle {
     findUser: FindUser;
     deleteUser: DeleteUser;
     getUserBan: GetUserBan;
+    changeUserPassword: ChangeUserPassword;
 
     // repositories
     userRepository: UserRepository;
+    userSecretRepository: UserSecretRepository;
 
     // controller
     userController: UserController;
@@ -51,9 +55,11 @@ container.register({
     findUser: asClass(FindUser).singleton(),
     deleteUser: asClass(DeleteUser).singleton(),
     getUserBan: asClass(GetUserBan).singleton(),
+    changeUserPassword: asClass(ChangeUserPassword).singleton(),
 
     // repositories
     userRepository: asClass(UserRepository).singleton(),
+    userSecretRepository: asClass(UserSecretRepository).singleton(),
 
     // controller
     userController: asClass(UserController).singleton(),

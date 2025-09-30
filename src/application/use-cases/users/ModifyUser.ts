@@ -4,7 +4,6 @@ import { Cradle } from '../../../config/container';
 import { IEncryptor } from '../../ports/services/IEncryptor';
 
 export class ModifyUser {
-    private encryptor: IEncryptor;
     private userRepository: IUserRepository;
 
     constructor(cradle: Cradle) {
@@ -23,10 +22,6 @@ export class ModifyUser {
                 } else {
                     throw new TypeError(`Invalid email address ${dto.email}`);
                 }
-            }
-            if (dto.password) {
-                user.password = this.encryptor.encryptPassword(dto.password);
-                modified = true;
             }
             if (modified) {
                 await this.userRepository.save(user);

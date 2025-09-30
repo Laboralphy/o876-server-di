@@ -30,8 +30,8 @@ export class UserRepository implements IUserRepository {
         }
     }
 
-    async forEach(callback: ForEachCallback<User>): Promise<void> {
-        await this.database.forEach<User>(COLLECTION_NAME, callback);
+    async forEach(callback: ForEachCallback<any>): Promise<void> {
+        await this.database.forEach(COLLECTION_NAME, callback);
     }
 
     async findByName(name: string): Promise<User | undefined> {

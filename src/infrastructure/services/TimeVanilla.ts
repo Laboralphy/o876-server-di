@@ -1,4 +1,4 @@
-import { renderDuration, RenderDurationOptions } from '../../libs/date-renderer';
+import { renderDate, renderDuration, RenderDurationOptions } from '../../libs/date-renderer';
 
 export class TimeVanilla {
     now() {

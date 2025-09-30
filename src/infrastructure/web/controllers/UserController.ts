@@ -81,6 +81,7 @@ export class UserController {
                 id: idUser,
                 name: user.name,
                 email: user.email,
+                since: user.tsCreation,
                 ban,
             },
         };

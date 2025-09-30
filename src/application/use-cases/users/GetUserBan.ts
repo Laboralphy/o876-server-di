@@ -26,11 +26,11 @@ export class GetUserBan {
                     bannedBy = moderator?.name ?? '[unknown user]';
                 }
                 return {
-                    forever: user.ban.forever,
-                    reason: user.ban.reason,
                     bannedBy,
-                    until: user.ban.tsEnd,
-                    duration: this.time.renderDuration(this.time.now() - user.ban.tsEnd),
+                    reason: user.ban.reason,
+                    duration: user.ban.forever
+                        ? 'forever'
+                        : this.time.renderDuration(this.time.now() - user.ban.tsEnd),
                 };
             } else {
                 return false;
