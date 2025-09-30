@@ -11,6 +11,8 @@ export function userRoutes(userController: UserController): Router {
     router.get('/:id', async (ctx) => userController.getInfo(ctx));
     router.get('/', (ctx) => userController.getList(ctx));
 
+    router.put('/:id/password', async (ctx) => userController.setPassword(ctx));
+
     router.post('/', validate(PostUserDtoSchema), (ctx) => userController.create(ctx));
 
     router.patch('/:id', validate(PatchUserDtoSchema), (ctx) => userController.modify(ctx));

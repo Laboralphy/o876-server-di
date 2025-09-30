@@ -14,26 +14,10 @@ export class GetUserBan {
     async execute(idUser: string) {
         const user = await this.userRepository.get(idUser);
         if (user) {
-            const nNow = this.time.now();
-            if (user.ban) {
-                if (!user.ban.forever && nNow >= user.ban.tsEnd) {
-                    // ban is removed
-                    return false;
-                }
-                let bannedBy = '[admin]';
-                if (user.ban.bannedBy) {
-                    const moderator = await this.userRepository.get(user.ban.bannedBy);
-                    bannedBy = moderator?.name ?? '[unknown user]';
-                }
-                return {
-                    bannedBy,
-                    reason: user.ban.reason,
-                    duration: user.ban.forever
-                        ? 'forever'
-                        : this.time.renderDuration(this.time.now() - user.ban.tsEnd),
-                };
+            if (user.ban && (user.ban.forever || user.ban.tsEnd > this.time.now())) {
+                return user.ban;
             } else {
-                return false;
+                return null;
             }
         } else {
             throw new Error(`User does not exist: ${idUser}`);

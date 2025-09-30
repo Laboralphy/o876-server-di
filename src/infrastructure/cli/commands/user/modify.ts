@@ -5,26 +5,19 @@ import { PatchUserDto } from '../../../web/dto/PatchUserDto';
 
 interface IUserModifyArgs extends Arguments {
     name: string;
-    password?: string;
     email?: string;
 }
 
 export function modifyCommand(yargs: Argv): Argv {
     return yargs.command<IUserModifyArgs>(
         'modify <name>',
-        'Modify a user',
+        'Modify a user properties',
         (yargs) =>
             yargs
                 .positional('name', {
                     type: 'string',
                     describe: "User's name",
                     demandOption: true,
-                })
-                .option('password', {
-                    type: 'string',
-                    describe: "User's new password",
-                    alias: 'p',
-                    demandOption: false,
                 })
                 .option('email', {
                     type: 'string',
@@ -36,9 +29,6 @@ export function modifyCommand(yargs: Argv): Argv {
             const { data } = await wfGet('users/name/' + argv.name);
             const user = data as User;
             const oPayload: PatchUserDto = {};
-            if (argv.password) {
-                oPayload.password = argv.password;
-            }
             if (argv.email) {
                 oPayload.email = argv.email;
             }

@@ -7,9 +7,13 @@ import { ModifyUser } from '../../../application/use-cases/users/ModifyUser';
 import { PostUserDto, PostUserDtoSchema } from '../dto/PostUserDto';
 import { PatchUserDto, PatchUserDtoSchema } from '../dto/PatchUserDto';
 import { FindUser } from '../../../application/use-cases/users/FindUser';
-import { User } from '../../../domain/entities/User';
 import { DeleteUser } from '../../../application/use-cases/users/DeleteUser';
 import { GetUserBan } from '../../../application/use-cases/users/GetUserBan';
+import { PutUserPasswordDto, PutUserPasswordDtoSchema } from '../dto/PutUserPasswordDto';
+import { SetUserPassword } from '../../../application/use-cases/users/SetUserPassword';
+import { GetUserInfoDto, GetUserInfoDtoSchema } from '../dto/GetUserInfoDto';
+import { ITime } from '../../../application/ports/services/ITime';
+import { GetUser } from '../../../application/use-cases/users/GetUser';
 
 export class UserController {
     private readonly createUser: CreateUser;
@@ -18,6 +22,9 @@ export class UserController {
     private readonly findUser: FindUser;
     private readonly deleteUser: DeleteUser;
     private readonly getUserBan: GetUserBan;
+    private readonly getUser: GetUser;
+    private readonly setUserPassword: SetUserPassword;
+    private readonly time: ITime;
 
     constructor(cradle: Cradle) {
         this.createUser = cradle.createUser;
@@ -26,6 +33,9 @@ export class UserController {
         this.findUser = cradle.findUser;
         this.deleteUser = cradle.deleteUser;
         this.getUserBan = cradle.getUserBan;
+        this.getUser = cradle.getUser;
+        this.setUserPassword = cradle.setUserPassword;
+        this.time = cradle.time;
     }
 
     async create(ctx: Context): Promise<void> {
@@ -59,11 +69,17 @@ export class UserController {
         const idUser = ctx.params.id;
         const dto: PatchUserDto = PatchUserDtoSchema.parse(ctx.request.body);
         const user = await this.modifyUser.execute(idUser, {
-            password: dto.password,
             email: dto.email,
         });
         ctx.status = HttpStatus.CREATED;
         ctx.body = { data: user };
+    }
+
+    async setPassword(ctx: Context): Promise<void> {
+        const idUser = ctx.params.id;
+        const dto: PutUserPasswordDto = PutUserPasswordDtoSchema.parse(ctx.request.body);
+        await this.setUserPassword.execute(idUser, dto.password);
+        ctx.status = HttpStatus.OK;
     }
 
     async delete(ctx: Context): Promise<void> {
@@ -74,16 +90,43 @@ export class UserController {
 
     async getInfo(ctx: Context): Promise<void> {
         const idUser = ctx.params.id;
-        const ban = await this.getUserBan.execute(idUser);
-        const user = await this.modifyUser.execute(idUser, {});
-        ctx.body = {
-            data: {
-                id: idUser,
-                name: user.name,
-                email: user.email,
-                since: user.tsCreation,
-                ban,
-            },
-        };
+        const user = await this.getUser.execute(idUser);
+        const userBan = await this.getUserBan.execute(idUser);
+        if (!user) {
+            ctx.status = HttpStatus.NOT_FOUND;
+            return;
+        }
+        if (userBan) {
+            const bannedByUser = await this.getUser.execute(userBan.bannedBy);
+            ctx.status = HttpStatus.OK;
+            ctx.body = {
+                data: GetUserInfoDtoSchema.parse({
+                    id: idUser,
+                    name: user.name,
+                    email: user.email,
+                    since: this.time.renderDate(user.tsCreation, 'ymd'),
+                    connected: false,
+                    ban: {
+                        bannedBy: bannedByUser?.name ?? '[admin or deleted user]',
+                        reason: userBan.reason,
+                        duration: userBan.forever
+                            ? 'forever'
+                            : this.time.renderDuration(this.time.now() - userBan.tsEnd),
+                    },
+                }),
+            };
+        } else {
+            ctx.status = HttpStatus.OK;
+            ctx.body = {
+                data: GetUserInfoDtoSchema.parse({
+                    id: idUser,
+                    name: user.name,
+                    email: user.email,
+                    since: this.time.renderDate(user.tsCreation, 'ymd'),
+                    connected: false,
+                    ban: null,
+                }),
+            };
+        }
     }
 }

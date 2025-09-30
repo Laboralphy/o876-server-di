@@ -60,16 +60,7 @@ export function showCommand(yargs: Argv): Argv {
             const { data: userData } = await wfGet('users/name/' + argv.name);
             const { id: idUser } = userData as User;
             const { data: userFullData } = await wfGet('users/' + idUser);
-            const ban = Ban as Ban;
-            const oDisplayUser = {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                dateCreation: new Date(user.tsCreation),
-                dateLastUsed: new Date(user.tsLastUsed),
-                ban: ,
-            };
-            const yamlStr = YAML.stringify(oDisplayUser, {
+            const yamlStr = YAML.stringify(userFullData, {
                 indent: 2, // Set indentation level (2 spaces by default)
             });
             console.log(yamlStr);

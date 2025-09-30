@@ -1,11 +1,9 @@
 import { Argv, Arguments } from 'yargs';
-import { CreateUserDto, CreateUserDtoSchema } from '../../../../application/dto/CreateUserDto';
-import { container } from '../../../../config/container';
 import { wfPost } from '../../tools/web-fetcher';
+import { askPassword } from '../../../../libs/ask-password';
 
 interface IUserCreateArgs extends Arguments {
     name: string;
-    password: string;
     email: string;
 }
 
@@ -20,12 +18,6 @@ export function createCommand(yargs: Argv): Argv {
                     describe: "User's name",
                     demandOption: true,
                 })
-                .option('password', {
-                    type: 'string',
-                    describe: "User's password",
-                    alias: 'p',
-                    demandOption: true,
-                })
                 .option('email', {
                     type: 'string',
                     describe: "User's email address",
@@ -33,9 +25,15 @@ export function createCommand(yargs: Argv): Argv {
                     demandOption: true,
                 }),
         async (argv) => {
+            const password = await askPassword(`Choose a password for user ${argv.name}: `);
+            const repeatPassword = await askPassword('Repeat password: ');
+            if (password !== repeatPassword) {
+                console.error('Passwords are not matching.');
+                return;
+            }
             await wfPost('users', {
                 name: argv.name,
-                password: argv.password,
+                password,
                 email: argv.email,
             });
         }

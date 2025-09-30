@@ -6,6 +6,7 @@ import { banCommand } from './ban';
 import { unbanCommand } from './unban';
 import { modifyCommand } from './modify';
 import { showCommand } from './show';
+import { passwordCommand } from './password';
 
 export function user(yargs: Argv) {
     createCommand(yargs);
@@ -15,4 +16,5 @@ export function user(yargs: Argv) {
     showCommand(yargs);
     banCommand(yargs);
     unbanCommand(yargs);
+    passwordCommand(yargs);
 }

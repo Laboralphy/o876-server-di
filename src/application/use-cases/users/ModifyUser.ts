@@ -1,13 +1,11 @@
 import { IUserRepository } from '../../ports/repositories/IUserRepository';
 import { ModifyUserDto } from '../../dto/ModifyUserDto';
 import { Cradle } from '../../../config/container';
-import { IEncryptor } from '../../ports/services/IEncryptor';
 
 export class ModifyUser {
     private userRepository: IUserRepository;
 
     constructor(cradle: Cradle) {
-        this.encryptor = cradle.encryptor;
         this.userRepository = cradle.userRepository;
     }
 

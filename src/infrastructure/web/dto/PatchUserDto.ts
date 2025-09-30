@@ -1,7 +1,6 @@
 import z from 'zod';
 
 export const PatchUserDtoSchema = z.object({
-    password: z.string().optional(),
     email: z.email().optional(),
 });
 

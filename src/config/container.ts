@@ -15,7 +15,14 @@ import { ITime } from '../application/ports/services/ITime';
 import { TimeVanilla } from '../infrastructure/services/TimeVanilla';
 import { GetUserBan } from '../application/use-cases/users/GetUserBan';
 import { UserSecretRepository } from '../infrastructure/persistance/json-database/UserSecretRepository';
-import { ChangeUserPassword } from '../application/use-cases/users/ChangeUserPassword';
+import { SetUserPassword } from '../application/use-cases/users/SetUserPassword';
+import { GetUser } from '../application/use-cases/users/GetUser';
+
+/**
+ * To as a new use case, port ...,
+ * Update interface Cradle : add a new property with the same type as the new class
+ * Update container.register : add a new property as class singleton
+ */
 
 export interface Cradle {
     // use cases
@@ -26,7 +33,8 @@ export interface Cradle {
     findUser: FindUser;
     deleteUser: DeleteUser;
     getUserBan: GetUserBan;
-    changeUserPassword: ChangeUserPassword;
+    getUser: GetUser;
+    setUserPassword: SetUserPassword;
 
     // repositories
     userRepository: UserRepository;
@@ -55,7 +63,8 @@ container.register({
     findUser: asClass(FindUser).singleton(),
     deleteUser: asClass(DeleteUser).singleton(),
     getUserBan: asClass(GetUserBan).singleton(),
-    changeUserPassword: asClass(ChangeUserPassword).singleton(),
+    getUser: asClass(GetUser).singleton(),
+    setUserPassword: asClass(SetUserPassword).singleton(),
 
     // repositories
     userRepository: asClass(UserRepository).singleton(),

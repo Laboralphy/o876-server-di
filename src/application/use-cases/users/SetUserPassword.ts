@@ -1,10 +1,10 @@
-import { IUserRepository } from '../../ports/repositories/IUserRepository';
-import { ModifyUserDto } from '../../dto/ModifyUserDto';
 import { Cradle } from '../../../config/container';
 import { IEncryptor } from '../../ports/services/IEncryptor';
 import { IUserSecretRepository } from '../../ports/repositories/IUserSecretRepository';
+import { UserSecretSchema } from '../../../domain/entities/UserSecret';
+import { id } from 'zod/locales';
 
-export class ChangeUserPassword {
+export class SetUserPassword {
     private encryptor: IEncryptor;
     private userSecretRepository: IUserSecretRepository;
 
@@ -15,11 +15,16 @@ export class ChangeUserPassword {
 
     async execute(idUser: string, password: string) {
         const userSecret = await this.userSecretRepository.get(idUser);
+        const sEncryptedPassword = this.encryptor.encryptPassword(password);
         if (userSecret) {
-            userSecret.password = this.encryptor.encryptPassword(password);
+            userSecret.password = sEncryptedPassword;
             await this.userSecretRepository.save(userSecret);
         } else {
-            throw new Error(`User does not exist: ${idUser}`);
+            const userSecret = UserSecretSchema.parse({
+                id: idUser,
+                password: sEncryptedPassword,
+            });
+            await this.userSecretRepository.save(userSecret);
         }
     }
 }
