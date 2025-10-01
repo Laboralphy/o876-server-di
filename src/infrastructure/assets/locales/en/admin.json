@@ -1,0 +1,13 @@
+{
+  "banCmd": {
+    "describe": "Ban a user",
+    "nameOpt": "Name of user to ban",
+    "daysOpt": "Ban duration in days",
+    "hoursOpt": "Ban duration in hours",
+    "minutesOpt": "Ban duration in minutes",
+    "reasonOpt": "Reason why this user is banned"
+  },
+  "errors": {
+    "unknownUserErr": "Unknown user : {{ name }}"
+  }
+}

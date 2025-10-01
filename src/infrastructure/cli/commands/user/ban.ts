@@ -2,6 +2,9 @@ import { Argv, Arguments } from 'yargs';
 import { wfGet, wfPut } from '../../tools/web-fetcher';
 import { User } from '../../../../domain/entities/User';
 import { PutUserBanDto } from '../../../web/dto/PutUserBanDto';
+import i18n from 'i18next';
+
+const { t } = i18n;
 
 interface IUserBanArgs extends Arguments {
     name: string;
@@ -15,38 +18,38 @@ interface IUserBanArgs extends Arguments {
 export function banCommand(yargs: Argv): Argv {
     return yargs.command<IUserBanArgs>(
         'ban <name>',
-        'Ban a user',
+        t('banCmd.describe'),
         (yargs) =>
             yargs
                 .positional('name', {
                     type: 'string',
-                    describe: "User's name",
+                    describe: t('banCmd.nameOpt'),
                     demandOption: true,
                 })
                 .option('days', {
                     type: 'number',
-                    describe: 'Ban duration in days',
+                    describe: t('banCmd.daysOpt'),
                     alias: 'd',
                     demandOption: false,
                     default: 0,
                 })
                 .option('hours', {
                     type: 'number',
-                    describe: 'Ban duration in hours',
+                    describe: t('banCmd.hoursOpt'),
                     alias: 'h',
                     demandOption: false,
                     default: 0,
                 })
                 .option('minutes', {
                     type: 'number',
-                    describe: 'Ban duration in minutes',
+                    describe: t('banCmd.minutesOpt'),
                     alias: 'm',
                     demandOption: false,
                     default: 0,
                 })
                 .option('reason', {
                     type: 'string',
-                    describe: 'Reason why this user is banned',
+                    describe: t('banCmd.reasonOpt'),
                     alias: 'r',
                     demandOption: false,
                     default: '',
@@ -54,7 +57,7 @@ export function banCommand(yargs: Argv): Argv {
         async (argv) => {
             const user: User = await wfGet('users/name/' + argv.name);
             if (!user) {
-                throw new Error(`User ${argv.name} not found`);
+                throw new Error(t('errors.unknownUserErr', { name: argv.name }));
             }
             const forever: boolean = argv.days == 0 && argv.hours == 0 && argv.minutes == 0;
             const oPayload: PutUserBanDto = {

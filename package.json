@@ -18,6 +18,8 @@
     "awilix": "^12.0.5",
     "awilix-koa": "^11.1.0",
     "dotenv": "^17.2.2",
+    "i18next": "^25.5.3",
+    "i18next-fs-backend": "^2.6.0",
     "koa": "^3.0.1",
     "koa-bodyparser": "^4.4.1",
     "o876-fs-ts": "github:Laboralphy/o876-fs-ts#v1.0.1",
