@@ -1,6 +1,6 @@
 import z from 'zod';
 
-export const EntityId = z.string();
+export const EntityId = z.string().regex(/^[a-z0-9]+$/);
 
 export type ScalarValue = number | string | boolean | null;
 

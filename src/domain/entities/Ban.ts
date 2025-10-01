@@ -6,7 +6,7 @@ export const BanSchema = z.object({
     tsEnd: z.number(),
     forever: z.boolean(),
     reason: z.string(),
-    bannedBy: EntityId,
+    bannedBy: EntityId.nullable(),
 });
 
 export type Ban = z.infer<typeof BanSchema>;

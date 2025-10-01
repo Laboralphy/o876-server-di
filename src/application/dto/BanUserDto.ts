@@ -1,8 +1,9 @@
 import z from 'zod';
+import { EntityId } from '../../domain/types';
 
 export const BanUserDtoSchema = z.object({
-    bannedBy: z.string(),
-    duration: z.string(),
+    bannedBy: EntityId.nullable(),
+    duration: z.number(),
     reason: z.string(),
 });
 

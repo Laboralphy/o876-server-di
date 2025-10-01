@@ -5,7 +5,7 @@ import { listCommand } from './list';
 import { banCommand } from './ban';
 import { unbanCommand } from './unban';
 import { modifyCommand } from './modify';
-import { showCommand } from './show';
+import { infoCommand } from './info';
 import { passwordCommand } from './password';
 
 export function user(yargs: Argv) {
@@ -13,7 +13,7 @@ export function user(yargs: Argv) {
     listCommand(yargs);
     modifyCommand(yargs);
     deleteCommand(yargs);
-    showCommand(yargs);
+    infoCommand(yargs);
     banCommand(yargs);
     unbanCommand(yargs);
     passwordCommand(yargs);

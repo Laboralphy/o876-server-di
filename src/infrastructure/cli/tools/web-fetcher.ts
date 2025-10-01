@@ -7,19 +7,12 @@ function buildUrl(url: string): string {
     return `http://localhost:${port}/${url}`;
 }
 
-type ResultRequest = {
-    data: JsonValue | undefined;
-};
-
-async function doJsonRequest(
-    method: string,
-    url: string,
-    body?: JsonObject
-): Promise<ResultRequest | undefined> {
+async function doJsonRequest(method: string, url: string, body?: JsonObject): Promise<JsonValue> {
     const payload: { [key: string]: JsonValue } = {
         method,
         headers: {
             'Content-Type': 'application/json',
+            Accept: 'application/json',
         },
     };
     if (body) {
@@ -27,36 +20,21 @@ async function doJsonRequest(
     }
     const sFinalUrl = buildUrl(url);
     const response = await fetch(sFinalUrl, payload);
-    if (!response.ok) {
+    if (response.ok) {
+        if (response.status !== HttpStatus.NO_CONTENT) {
+            return response.json();
+        } else {
+            return '';
+        }
+    } else {
         const sErrorMessage = await response.text();
         throw new Error(`error ${response.status} : ${sErrorMessage}`);
     }
-    const sContentType = response.headers.get('content-type');
-    const bJson = (sContentType ?? '').includes('application/json');
-    if (bJson) {
-        const result = await response.json();
-        if ('data' in result) {
-            return {
-                data: result.data,
-            };
-        } else {
-            throw new Error(
-                `output malformed : end point ${sFinalUrl} result did not have "data" property`
-            );
-        }
-    } else {
-        return {
-            data: await response.text(),
-        };
-    }
 }
 
-export async function wfGet(url: string): Promise<ResultRequest> {
-    const content = await doJsonRequest('GET', url);
-    if (!content) {
-        return { data: undefined };
-    }
-    return content;
+export async function wfGet<T>(url: string): Promise<T> {
+    const data = await doJsonRequest('GET', url);
+    return data as T;
 }
 
 export async function wfPost(url: string, body: JsonObject) {

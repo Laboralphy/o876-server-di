@@ -38,8 +38,7 @@ export function listCommand(yargs: Argv): Argv {
                     demandOption: false,
                 }),
         async (argv) => {
-            const { data } = await wfGet('users');
-            const userList = data as User[];
+            const userList: User[] = await wfGet('users');
             const filteredUserList = userList.filter((user) => {
                 if (argv.filter) {
                     return user.name.includes(argv.filter);
@@ -64,9 +63,10 @@ export function listCommand(yargs: Argv): Argv {
                     renderDate(new Date(row.tsCreation)),
                     renderDuration(nNow - row.tsLastUsed),
                     row.email,
+                    row.ban ? 'banned' : ' ',
                 ]);
             if (output.length > 0) {
-                output.unshift(['id', 'name', 'date created', 'last login', 'email']);
+                output.unshift(['id', 'name', 'date created', 'last login', 'email', 'banned']);
                 console.log(tr.render(output).join('\n'));
                 if (bPaginationMode) {
                     console.log(

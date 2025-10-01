@@ -17,8 +17,7 @@ export function deleteCommand(yargs: Argv): Argv {
                 demandOption: true,
             }),
         async (argv) => {
-            const { data } = await wfGet('users/name/' + argv.name);
-            const user = data as User;
+            const user: User = await wfGet('users/name/' + argv.name);
             if (user) {
                 await wfDelete('users/' + user.id);
             } else {

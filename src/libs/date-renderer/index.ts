@@ -35,6 +35,14 @@ export type RenderDurationOptions = {
     space?: string;
 };
 
+export type DurationParts = {
+    days?: number;
+    hours?: number;
+    minutes?: number;
+    seconds?: number;
+    milliseconds?: number;
+};
+
 export function renderDuration(nDuration: number, options: RenderDurationOptions = {}): string {
     const {
         year = 'y',

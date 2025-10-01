@@ -26,8 +26,7 @@ export function modifyCommand(yargs: Argv): Argv {
                     demandOption: false,
                 }),
         async (argv) => {
-            const { data } = await wfGet('users/name/' + argv.name);
-            const user = data as User;
+            const user: User = await wfGet('users/name/' + argv.name);
             const oPayload: PatchUserDto = {};
             if (argv.email) {
                 oPayload.email = argv.email;

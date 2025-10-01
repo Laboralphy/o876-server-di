@@ -17,6 +17,8 @@ import { GetUserBan } from '../application/use-cases/users/GetUserBan';
 import { UserSecretRepository } from '../infrastructure/persistance/json-database/UserSecretRepository';
 import { SetUserPassword } from '../application/use-cases/users/SetUserPassword';
 import { GetUser } from '../application/use-cases/users/GetUser';
+import { BanUser } from '../application/use-cases/users/BanUser';
+import { UnbanUser } from '../application/use-cases/users/UnbanUser';
 
 /**
  * To as a new use case, port ...,
@@ -35,6 +37,8 @@ export interface Cradle {
     getUserBan: GetUserBan;
     getUser: GetUser;
     setUserPassword: SetUserPassword;
+    banUser: BanUser;
+    unbanUser: UnbanUser;
 
     // repositories
     userRepository: UserRepository;
@@ -65,6 +69,8 @@ container.register({
     getUserBan: asClass(GetUserBan).singleton(),
     getUser: asClass(GetUser).singleton(),
     setUserPassword: asClass(SetUserPassword).singleton(),
+    banUser: asClass(BanUser).singleton(),
+    unbanUser: asClass(UnbanUser).singleton(),
 
     // repositories
     userRepository: asClass(UserRepository).singleton(),

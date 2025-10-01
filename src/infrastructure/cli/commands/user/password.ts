@@ -20,8 +20,7 @@ export function passwordCommand(yargs: Argv): Argv {
                 demandOption: true,
             }),
         async (argv) => {
-            const { data } = await wfGet('users/name/' + argv.name);
-            const user = data as User;
+            const user: User = await wfGet('users/name/' + argv.name);
             const password = await askPassword(`Choose new password for user ${argv.name}: `);
             const repeatPassword = await askPassword('Repeat password: ');
             if (password !== repeatPassword) {

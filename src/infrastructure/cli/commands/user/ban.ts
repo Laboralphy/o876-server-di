@@ -1,8 +1,13 @@
 import { Argv, Arguments } from 'yargs';
+import { wfGet, wfPut } from '../../tools/web-fetcher';
+import { User } from '../../../../domain/entities/User';
+import { PutUserBanDto } from '../../../web/dto/PutUserBanDto';
 
 interface IUserBanArgs extends Arguments {
     name: string;
-    duration: string;
+    days: number;
+    hours: number;
+    minutes: number;
     reason: string;
 }
 
@@ -18,12 +23,26 @@ export function banCommand(yargs: Argv): Argv {
                     describe: "User's name",
                     demandOption: true,
                 })
-                .option('duration', {
-                    type: 'string',
-                    describe: 'Ban duration',
+                .option('days', {
+                    type: 'number',
+                    describe: 'Ban duration in days',
                     alias: 'd',
                     demandOption: false,
-                    default: 'forever',
+                    default: 0,
+                })
+                .option('hours', {
+                    type: 'number',
+                    describe: 'Ban duration in hours',
+                    alias: 'h',
+                    demandOption: false,
+                    default: 0,
+                })
+                .option('minutes', {
+                    type: 'number',
+                    describe: 'Ban duration in minutes',
+                    alias: 'm',
+                    demandOption: false,
+                    default: 0,
                 })
                 .option('reason', {
                     type: 'string',
@@ -32,10 +51,24 @@ export function banCommand(yargs: Argv): Argv {
                     demandOption: false,
                     default: '',
                 }),
-        (argv) => {
-            console.log('Banned User name:', argv.name);
-            console.log('Duration:', argv.duration);
-            console.log('Email:', argv.email);
+        async (argv) => {
+            const user: User = await wfGet('users/name/' + argv.name);
+            if (!user) {
+                throw new Error(`User ${argv.name} not found`);
+            }
+            const forever: boolean = argv.days == 0 && argv.hours == 0 && argv.minutes == 0;
+            const oPayload: PutUserBanDto = {
+                reason: argv.reason,
+                forever,
+            };
+            if (!forever) {
+                oPayload.duration = {
+                    days: argv.days,
+                    hours: argv.hours,
+                    minutes: argv.minutes,
+                };
+            }
+            await wfPut('users/' + user.id + '/ban', oPayload);
         }
     );
 }

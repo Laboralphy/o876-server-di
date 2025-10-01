@@ -1,4 +1,6 @@
 import { Argv, Arguments } from 'yargs';
+import { User } from '../../../../domain/entities/User';
+import { wfGet, wfPut } from '../../tools/web-fetcher';
 
 interface IUserUnbanArgs extends Arguments {
     name: string;
@@ -15,8 +17,9 @@ export function unbanCommand(yargs: Argv): Argv {
                 describe: "User's name",
                 demandOption: true,
             }),
-        (argv) => {
-            console.log('Unbanned User name:', argv.name);
+        async (argv) => {
+            const user: User = await wfGet('users/name/' + argv.name);
+            await wfPut('users/' + user.id + '/unban', {});
         }
     );
 }

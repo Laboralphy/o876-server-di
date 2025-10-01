@@ -11,9 +11,12 @@ import { DeleteUser } from '../../../application/use-cases/users/DeleteUser';
 import { GetUserBan } from '../../../application/use-cases/users/GetUserBan';
 import { PutUserPasswordDto, PutUserPasswordDtoSchema } from '../dto/PutUserPasswordDto';
 import { SetUserPassword } from '../../../application/use-cases/users/SetUserPassword';
-import { GetUserInfoDto, GetUserInfoDtoSchema } from '../dto/GetUserInfoDto';
 import { ITime } from '../../../application/ports/services/ITime';
 import { GetUser } from '../../../application/use-cases/users/GetUser';
+import { PutUserBanDto, PutUserBanDtoSchema } from '../dto/PutUserBanDto';
+import { BanUser } from '../../../application/use-cases/users/BanUser';
+import { UnbanUser } from '../../../application/use-cases/users/UnbanUser';
+import { GetUserInfoDtoSchema } from '../dto/GetUserInfoDto';
 
 export class UserController {
     private readonly createUser: CreateUser;
@@ -24,6 +27,8 @@ export class UserController {
     private readonly getUserBan: GetUserBan;
     private readonly getUser: GetUser;
     private readonly setUserPassword: SetUserPassword;
+    private readonly banUser: BanUser;
+    private readonly unbanUser: UnbanUser;
     private readonly time: ITime;
 
     constructor(cradle: Cradle) {
@@ -35,6 +40,8 @@ export class UserController {
         this.getUserBan = cradle.getUserBan;
         this.getUser = cradle.getUser;
         this.setUserPassword = cradle.setUserPassword;
+        this.banUser = cradle.banUser;
+        this.unbanUser = cradle.unbanUser;
         this.time = cradle.time;
     }
 
@@ -46,20 +53,20 @@ export class UserController {
             email: dto.email,
         });
         ctx.status = HttpStatus.CREATED;
-        ctx.body = { data: user };
+        ctx.body = user;
     }
 
     async getList(ctx: Context): Promise<void> {
         const users = await this.getUserList.execute();
         ctx.status = HttpStatus.OK;
-        ctx.body = { data: users };
+        ctx.body = users;
     }
 
     async findByName(ctx: Context): Promise<void> {
         const user = await this.findUser.execute(ctx.params.name);
         if (user) {
             ctx.status = HttpStatus.OK;
-            ctx.body = { data: user };
+            ctx.body = user;
         } else {
             ctx.status = HttpStatus.NOT_FOUND;
         }
@@ -72,14 +79,36 @@ export class UserController {
             email: dto.email,
         });
         ctx.status = HttpStatus.CREATED;
-        ctx.body = { data: user };
+        ctx.body = user;
+    }
+
+    async ban(ctx: Context): Promise<void> {
+        const idUser = ctx.params.id;
+        const dto: PutUserBanDto = PutUserBanDtoSchema.parse(ctx.request.body);
+        const duration = dto.forever
+            ? Infinity
+            : dto.duration
+              ? this.time.convertToMilliseconds(dto?.duration)
+              : 0;
+        await this.banUser.execute(idUser, {
+            reason: dto.reason,
+            duration,
+            bannedBy: '',
+        });
+        ctx.status = HttpStatus.NO_CONTENT;
+    }
+
+    async unban(ctx: Context): Promise<void> {
+        const idUser = ctx.params.id;
+        await this.unbanUser.execute(idUser);
+        ctx.status = HttpStatus.NO_CONTENT;
     }
 
     async setPassword(ctx: Context): Promise<void> {
         const idUser = ctx.params.id;
         const dto: PutUserPasswordDto = PutUserPasswordDtoSchema.parse(ctx.request.body);
         await this.setUserPassword.execute(idUser, dto.password);
-        ctx.status = HttpStatus.OK;
+        ctx.status = HttpStatus.NO_CONTENT;
     }
 
     async delete(ctx: Context): Promise<void> {
@@ -97,36 +126,35 @@ export class UserController {
             return;
         }
         if (userBan) {
-            const bannedByUser = await this.getUser.execute(userBan.bannedBy);
+            const bannedByUser = userBan.bannedBy
+                ? await this.getUser.execute(userBan.bannedBy)
+                : null;
             ctx.status = HttpStatus.OK;
-            ctx.body = {
-                data: GetUserInfoDtoSchema.parse({
-                    id: idUser,
-                    name: user.name,
-                    email: user.email,
-                    since: this.time.renderDate(user.tsCreation, 'ymd'),
-                    connected: false,
-                    ban: {
-                        bannedBy: bannedByUser?.name ?? '[admin or deleted user]',
-                        reason: userBan.reason,
-                        duration: userBan.forever
-                            ? 'forever'
-                            : this.time.renderDuration(this.time.now() - userBan.tsEnd),
-                    },
-                }),
-            };
+            ctx.body = GetUserInfoDtoSchema.parse({
+                id: idUser,
+                name: user.name,
+                email: user.email,
+                created: this.time.renderDate(user.tsCreation, 'ymd'),
+                connected: false,
+                ban: {
+                    bannedBy: bannedByUser?.name ?? '[admin or deleted user]',
+                    reason: userBan.reason,
+                    since: this.time.renderDate(userBan.tsBegin, 'ymd hm'),
+                    until: userBan.forever
+                        ? 'the end of time'
+                        : this.time.renderDate(userBan.tsEnd, 'ymd hm'),
+                },
+            });
         } else {
             ctx.status = HttpStatus.OK;
-            ctx.body = {
-                data: GetUserInfoDtoSchema.parse({
-                    id: idUser,
-                    name: user.name,
-                    email: user.email,
-                    since: this.time.renderDate(user.tsCreation, 'ymd'),
-                    connected: false,
-                    ban: null,
-                }),
-            };
+            ctx.body = GetUserInfoDtoSchema.parse({
+                id: idUser,
+                name: user.name,
+                email: user.email,
+                created: this.time.renderDate(user.tsCreation, 'ymd'),
+                connected: false,
+                ban: null,
+            });
         }
     }
 }
