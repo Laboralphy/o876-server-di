@@ -1,6 +1,6 @@
 import { Argv, Arguments } from 'yargs';
 import { TableRenderer, Themes } from '../../../../libs/table-renderer';
-import { renderDate, renderDuration } from '../../../../libs/date-renderer';
+import { renderDate } from '../../../../libs/date-renderer';
 import { wfGet } from '../../tools/web-fetcher';
 import { User } from '../../../../domain/entities/User';
 
@@ -48,7 +48,6 @@ export function listCommand(yargs: Argv): Argv {
             });
             const tr = new TableRenderer();
             tr.theme = Themes.filetThin;
-            const nNow = Date.now();
             const bPaginationMode = filteredUserList.length > argv.pagesize && argv.page > 0;
             const nStart = bPaginationMode ? (argv.page - 1) * argv.pagesize : 0;
             const nCount = bPaginationMode ? argv.pagesize : Infinity;
@@ -61,12 +60,11 @@ export function listCommand(yargs: Argv): Argv {
                     row.id,
                     row.name,
                     renderDate(new Date(row.tsCreation)),
-                    renderDuration(nNow - row.tsLastUsed),
-                    row.email,
+                    renderDate(new Date(row.tsLastUsed), 'ymd hm'),
                     row.ban ? 'banned' : ' ',
                 ]);
             if (output.length > 0) {
-                output.unshift(['id', 'name', 'date created', 'last login', 'email', 'banned']);
+                output.unshift(['id', 'name', 'date created', 'last login', 'banned']);
                 console.log(tr.render(output).join('\n'));
                 if (bPaginationMode) {
                     console.log(
