@@ -1,39 +1,42 @@
 import { Argv, Arguments } from 'yargs';
-import { HttpError, wfGet, wfPatch, wfPut } from '../../tools/web-fetcher';
+import { HttpError, wfGet, wfPatch } from '../../tools/web-fetcher';
 import { User } from '../../../../domain/entities/User';
 import { PatchUserDto } from '../../../web/dto/PatchUserDto';
+import i18n from 'i18next';
+const { t } = i18n;
 
 interface IUserModifyArgs extends Arguments {
-    uname: string;
+    user: string;
     email?: string;
+    name?: string;
 }
 
 export function modifyCommand(yargs: Argv): Argv {
     return yargs.command<IUserModifyArgs>(
-        'modify <username>',
-        'Modify a user properties',
+        'modify <user>',
+        t('userModifyCmd.describe'),
         (yargs) =>
             yargs
-                .positional('username', {
+                .positional('user', {
                     type: 'string',
-                    describe: "User's name",
+                    describe: t('userModifyCmd.userOpt'),
                     demandOption: true,
                 })
                 .option('name', {
                     type: 'string',
-                    describe: "User's new email address",
-                    alias: 'm',
+                    describe: t('userModifyCmd.nameOpt'),
+                    alias: 'n',
                     demandOption: false,
                 })
                 .option('email', {
                     type: 'string',
-                    describe: "User's new email address",
+                    describe: t('userModifyCmd.emailOpt'),
                     alias: 'm',
                     demandOption: false,
                 }),
         async (argv) => {
             try {
-                const user: User = await wfGet('users/name/' + argv.uname);
+                const user: User = await wfGet('users/name/' + argv.user);
                 const oPayload: PatchUserDto = {};
                 if (argv.email) {
                     oPayload.email = argv.email;
@@ -41,7 +44,9 @@ export function modifyCommand(yargs: Argv): Argv {
                 await wfPatch('users/' + user.id, oPayload);
             } catch (error) {
                 if (error instanceof HttpError) {
-                    console.error(`Error ${error.statusCode}: ${error.message}`);
+                    console.error(
+                        t('errors.apiError', { code: error.statusCode, message: error.message })
+                    );
                 } else {
                     throw error;
                 }

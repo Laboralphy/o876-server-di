@@ -3,6 +3,8 @@ import { TableRenderer, Themes } from '../../../../libs/table-renderer';
 import { renderDate } from '../../../../libs/date-renderer';
 import { HttpError, wfGet } from '../../tools/web-fetcher';
 import { User } from '../../../../domain/entities/User';
+import i18n from 'i18next';
+const { t } = i18n;
 
 interface IUserListArgs extends Arguments {
     filter: string;
@@ -13,26 +15,26 @@ interface IUserListArgs extends Arguments {
 export function listCommand(yargs: Argv): Argv {
     return yargs.command<IUserListArgs>(
         'list',
-        'List users',
+        t('userListCmd.describe'),
         (yargs) =>
             yargs
                 .option('filter', {
                     type: 'string',
-                    describe: "Filter user's name",
+                    describe: t('userListCmd.filterOpt'),
                     default: '',
                     alias: 'f',
                     demandOption: false,
                 })
                 .option('page', {
                     type: 'number',
-                    describe: 'Page number (starting page = 1 ; all pages = 0)',
+                    describe: t('userListCmd.pageOpt'),
                     alias: 'p',
                     default: 0,
                     demandOption: false,
                 })
                 .option('pagesize', {
                     type: 'number',
-                    describe: 'Number of items per page',
+                    describe: t('userListCmd.describe'),
                     alias: 's',
                     default: 25,
                     demandOption: false,
@@ -55,6 +57,8 @@ export function listCommand(yargs: Argv): Argv {
                 const nPageMax = bPaginationMode
                     ? Math.ceil(filteredUserList.length / argv.pagesize)
                     : 1;
+                const sBanned = t('userListCmd.listLabelBanned');
+                const sNotBanned = ' ';
                 const output = filteredUserList
                     .slice(nStart, nStart + nCount)
                     .map((row) => [
@@ -62,27 +66,39 @@ export function listCommand(yargs: Argv): Argv {
                         row.name,
                         renderDate(new Date(row.tsCreation)),
                         renderDate(new Date(row.tsLastUsed), 'ymd hm'),
-                        row.ban ? 'banned' : ' ',
+                        row.ban ? sBanned : sNotBanned,
                     ]);
                 if (output.length > 0) {
-                    output.unshift(['id', 'name', 'date created', 'last login', 'banned']);
+                    output.unshift([
+                        t('userListCmd.listLabelId'),
+                        t('userListCmd.listLabelName'),
+                        t('userListCmd.listLabelDateCreate'),
+                        t('userListCmd.listLabelLastLogin'),
+                        t('userListCmd.listLabelBanned'),
+                    ]);
                     console.log(tr.render(output).join('\n'));
                     if (bPaginationMode) {
                         console.log(
-                            `Page ${argv.page} of ${nPageMax} (Users per page: ${argv.pagesize}). Total: ${filteredUserList.length} user${filteredUserList.length > 1 ? 's' : ''}.`
+                            t('userListCmd.listPage', {
+                                page: argv.page,
+                                max: nPageMax,
+                                pagesize: argv.pagesize,
+                                count: filteredUserList.length,
+                            })
                         );
                     } else {
                         console.log(
-                            filteredUserList.length,
-                            `user${filteredUserList.length > 1 ? 's' : ''}`
+                            t('userListCmd.listUserCount', { count: filteredUserList.length })
                         );
                     }
                 } else {
-                    console.log('No user matching filter');
+                    console.log(t('userListCmd.listNoUser'));
                 }
             } catch (error) {
                 if (error instanceof HttpError) {
-                    console.error(`Error ${error.statusCode}: ${error.message}`);
+                    console.error(
+                        t('errors.apiError', { code: error.statusCode, message: error.message })
+                    );
                 } else {
                     throw error;
                 }

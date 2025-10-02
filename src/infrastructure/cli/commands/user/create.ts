@@ -1,6 +1,8 @@
 import { Argv, Arguments } from 'yargs';
 import { HttpError, wfPost } from '../../tools/web-fetcher';
 import { askPassword } from '../../../../libs/ask-password';
+import i18n from 'i18next';
+const { t } = i18n;
 
 interface IUserCreateArgs extends Arguments {
     name: string;
@@ -10,26 +12,28 @@ interface IUserCreateArgs extends Arguments {
 export function createCommand(yargs: Argv): Argv {
     return yargs.command<IUserCreateArgs>(
         'create <name>',
-        'Create a new user',
+        t('userCreateCmd.describe'),
         (yargs) =>
             yargs
                 .positional('name', {
                     type: 'string',
-                    describe: "User's name",
+                    describe: t('userCreateCmd.nameOpt'),
                     demandOption: true,
                 })
                 .option('email', {
                     type: 'string',
-                    describe: "User's email address",
+                    describe: t('userCreateCmd.emailOpt'),
                     alias: 'm',
                     demandOption: true,
                 }),
         async (argv) => {
             try {
-                const password = await askPassword(`Choose a password for user ${argv.name}: `);
-                const repeatPassword = await askPassword('Repeat password: ');
+                const password = await askPassword(
+                    t('genericCmd.setPassword', { user: argv.name })
+                );
+                const repeatPassword = await askPassword(t('genericCmd.repeatPassword'));
                 if (password !== repeatPassword) {
-                    console.error('Passwords are not matching.');
+                    console.error(t('errors.passwordMismatch'));
                     return;
                 }
                 await wfPost('users', {
@@ -39,7 +43,9 @@ export function createCommand(yargs: Argv): Argv {
                 });
             } catch (error) {
                 if (error instanceof HttpError) {
-                    console.error(`Error ${error.statusCode}: ${error.message}`);
+                    console.error(
+                        t('errors.apiError', { code: error.statusCode, message: error.message })
+                    );
                 } else {
                     throw error;
                 }

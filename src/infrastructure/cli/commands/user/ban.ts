@@ -7,7 +7,7 @@ import i18n from 'i18next';
 const { t } = i18n;
 
 interface IUserBanArgs extends Arguments {
-    name: string;
+    user: string;
     days: number;
     hours: number;
     minutes: number;
@@ -18,45 +18,45 @@ interface IUserBanArgs extends Arguments {
 export function banCommand(yargs: Argv): Argv {
     return yargs.command<IUserBanArgs>(
         'ban <user>',
-        t('banCmd.describe'),
+        t('userBanCmd.describe'),
         (yargs) =>
             yargs
                 .positional('user', {
                     type: 'string',
-                    describe: t('banCmd.userOpt'),
+                    describe: t('userBanCmd.userOpt'),
                     demandOption: true,
                 })
                 .option('days', {
                     type: 'number',
-                    describe: t('banCmd.daysOpt'),
+                    describe: t('userBanCmd.daysOpt'),
                     alias: 'd',
                     demandOption: false,
                     default: 0,
                 })
                 .option('hours', {
                     type: 'number',
-                    describe: t('banCmd.hoursOpt'),
+                    describe: t('userBanCmd.hoursOpt'),
                     alias: 'h',
                     demandOption: false,
                     default: 0,
                 })
                 .option('minutes', {
                     type: 'number',
-                    describe: t('banCmd.minutesOpt'),
+                    describe: t('userBanCmd.minutesOpt'),
                     alias: 'm',
                     demandOption: false,
                     default: 0,
                 })
                 .option('reason', {
                     type: 'string',
-                    describe: t('banCmd.reasonOpt'),
+                    describe: t('userBanCmd.reasonOpt'),
                     alias: 'r',
                     demandOption: false,
                     default: '',
                 }),
         async (argv) => {
             try {
-                const user: User = await wfGet('users/name/' + argv.name);
+                const user: User = await wfGet('users/name/' + argv.user);
                 const forever: boolean = argv.days == 0 && argv.hours == 0 && argv.minutes == 0;
                 const oPayload: PutUserBanDto = {
                     reason: argv.reason,
@@ -72,7 +72,9 @@ export function banCommand(yargs: Argv): Argv {
                 await wfPut('users/' + user.id + '/ban', oPayload);
             } catch (error) {
                 if (error instanceof HttpError) {
-                    console.error(`Error ${error.statusCode}: ${error.message}`);
+                    console.error(
+                        t('errors.apiError', { code: error.statusCode, message: error.message })
+                    );
                 } else {
                     throw error;
                 }

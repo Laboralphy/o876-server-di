@@ -1,29 +1,33 @@
 import { Argv, Arguments } from 'yargs';
 import { User } from '../../../../domain/entities/User';
 import { HttpError, wfGet, wfPut } from '../../tools/web-fetcher';
+import i18n from 'i18next';
+const { t } = i18n;
 
 interface IUserUnbanArgs extends Arguments {
-    name: string;
+    user: string;
 }
 
 // Fonction pour créer la commande
 export function unbanCommand(yargs: Argv): Argv {
     return yargs.command<IUserUnbanArgs>(
-        'unban <name>',
-        'Unban a user',
+        'unban <user>',
+        t('userUnbanCmd.describe'),
         (yargs) =>
-            yargs.positional('name', {
+            yargs.positional('user', {
                 type: 'string',
-                describe: "User's name",
+                describe: t('userUnbanCmd.userOpt'),
                 demandOption: true,
             }),
         async (argv) => {
             try {
-                const user: User = await wfGet('users/name/' + argv.name);
+                const user: User = await wfGet('users/name/' + argv.user);
                 await wfPut('users/' + user.id + '/unban', {});
             } catch (error) {
                 if (error instanceof HttpError) {
-                    console.error(`Error ${error.statusCode}: ${error.message}`);
+                    console.error(
+                        t('errors.apiError', { code: error.statusCode, message: error.message })
+                    );
                 } else {
                     throw error;
                 }
