@@ -1,5 +1,5 @@
 import { Argv, Arguments } from 'yargs';
-import { wfPost } from '../../tools/web-fetcher';
+import { HttpError, wfPost } from '../../tools/web-fetcher';
 import { askPassword } from '../../../../libs/ask-password';
 
 interface IUserCreateArgs extends Arguments {
@@ -25,17 +25,25 @@ export function createCommand(yargs: Argv): Argv {
                     demandOption: true,
                 }),
         async (argv) => {
-            const password = await askPassword(`Choose a password for user ${argv.name}: `);
-            const repeatPassword = await askPassword('Repeat password: ');
-            if (password !== repeatPassword) {
-                console.error('Passwords are not matching.');
-                return;
+            try {
+                const password = await askPassword(`Choose a password for user ${argv.name}: `);
+                const repeatPassword = await askPassword('Repeat password: ');
+                if (password !== repeatPassword) {
+                    console.error('Passwords are not matching.');
+                    return;
+                }
+                await wfPost('users', {
+                    name: argv.name,
+                    password,
+                    email: argv.email,
+                });
+            } catch (error) {
+                if (error instanceof HttpError) {
+                    console.error(`Error ${error.statusCode}: ${error.message}`);
+                } else {
+                    throw error;
+                }
             }
-            await wfPost('users', {
-                name: argv.name,
-                password,
-                email: argv.email,
-            });
         }
     );
 }

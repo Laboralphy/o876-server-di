@@ -1,5 +1,5 @@
 import { Argv, Arguments } from 'yargs';
-import { wfDelete, wfGet } from '../../tools/web-fetcher';
+import { HttpError, wfDelete, wfGet } from '../../tools/web-fetcher';
 import { User } from '../../../../domain/entities/User';
 
 interface IUserDeleteArgs extends Arguments {
@@ -17,11 +17,15 @@ export function deleteCommand(yargs: Argv): Argv {
                 demandOption: true,
             }),
         async (argv) => {
-            const user: User = await wfGet('users/name/' + argv.name);
-            if (user) {
+            try {
+                const user: User = await wfGet('users/name/' + argv.name);
                 await wfDelete('users/' + user.id);
-            } else {
-                console.error(`User ${argv.name} not found.`);
+            } catch (error) {
+                if (error instanceof HttpError) {
+                    console.error(`Error ${error.statusCode}: ${error.message}`);
+                } else {
+                    throw error;
+                }
             }
         }
     );

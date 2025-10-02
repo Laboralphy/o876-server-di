@@ -1,5 +1,5 @@
 import { Argv, Arguments } from 'yargs';
-import { wfGet } from '../../tools/web-fetcher';
+import { HttpError, wfGet } from '../../tools/web-fetcher';
 import { User } from '../../../../domain/entities/User';
 import YAML from 'yaml';
 
@@ -18,12 +18,20 @@ export function infoCommand(yargs: Argv): Argv {
                 demandOption: true,
             }),
         async (argv) => {
-            const user: User = await wfGet('users/name/' + argv.name);
-            const userFull: User = await wfGet('users/' + user.id);
-            const yamlStr = YAML.stringify(userFull, {
-                indent: 2,
-            });
-            console.log(yamlStr);
+            try {
+                const user: User = await wfGet('users/name/' + argv.name);
+                const userFull: User = await wfGet('users/' + user.id);
+                const yamlStr = YAML.stringify(userFull, {
+                    indent: 2,
+                });
+                console.log(yamlStr);
+            } catch (error) {
+                if (error instanceof HttpError) {
+                    console.error(`Error ${error.statusCode}: ${error.message}`);
+                } else {
+                    throw error;
+                }
+            }
         }
     );
 }

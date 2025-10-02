@@ -7,7 +7,22 @@ function buildUrl(url: string): string {
     return `http://localhost:${port}/${url}`;
 }
 
-async function doJsonRequest(method: string, url: string, body?: JsonObject): Promise<JsonValue> {
+export class HttpError extends Error {
+    constructor(
+        public statusCode: number,
+        public message: string
+    ) {
+        super(message);
+        this.name = this.constructor.name; // Pour le débogage (ex: "HttpError")
+        Error.captureStackTrace?.(this, this.constructor); // Conserve la stack trace
+    }
+}
+
+export async function doJsonRequest(
+    method: string,
+    url: string,
+    body?: JsonObject
+): Promise<JsonValue> {
     const payload: { [key: string]: JsonValue } = {
         method,
         headers: {
@@ -28,7 +43,7 @@ async function doJsonRequest(method: string, url: string, body?: JsonObject): Pr
         }
     } else {
         const sErrorMessage = await response.text();
-        throw new Error(`error ${response.status} : ${sErrorMessage}`);
+        throw new HttpError(response.status, sErrorMessage);
     }
 }
 

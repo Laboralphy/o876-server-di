@@ -1,6 +1,6 @@
 import { Argv, Arguments } from 'yargs';
 import { User } from '../../../../domain/entities/User';
-import { wfGet, wfPut } from '../../tools/web-fetcher';
+import { HttpError, wfGet, wfPut } from '../../tools/web-fetcher';
 
 interface IUserUnbanArgs extends Arguments {
     name: string;
@@ -18,8 +18,16 @@ export function unbanCommand(yargs: Argv): Argv {
                 demandOption: true,
             }),
         async (argv) => {
-            const user: User = await wfGet('users/name/' + argv.name);
-            await wfPut('users/' + user.id + '/unban', {});
+            try {
+                const user: User = await wfGet('users/name/' + argv.name);
+                await wfPut('users/' + user.id + '/unban', {});
+            } catch (error) {
+                if (error instanceof HttpError) {
+                    console.error(`Error ${error.statusCode}: ${error.message}`);
+                } else {
+                    throw error;
+                }
+            }
         }
     );
 }

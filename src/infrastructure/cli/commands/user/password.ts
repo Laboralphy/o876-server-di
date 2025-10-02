@@ -1,5 +1,5 @@
 import { Argv, Arguments } from 'yargs';
-import { wfGet, wfPatch, wfPut } from '../../tools/web-fetcher';
+import { HttpError, wfGet, wfPatch, wfPut } from '../../tools/web-fetcher';
 import { User } from '../../../../domain/entities/User';
 import { PutUserPasswordDto } from '../../../web/dto/PutUserPasswordDto';
 import { askPassword } from '../../../../libs/ask-password';
@@ -20,17 +20,25 @@ export function passwordCommand(yargs: Argv): Argv {
                 demandOption: true,
             }),
         async (argv) => {
-            const user: User = await wfGet('users/name/' + argv.name);
-            const password = await askPassword(`Choose new password for user ${argv.name}: `);
-            const repeatPassword = await askPassword('Repeat password: ');
-            if (password !== repeatPassword) {
-                console.error('Passwords are not matching.');
-                return;
+            try {
+                const user: User = await wfGet('users/name/' + argv.name);
+                const password = await askPassword(`Choose new password for user ${argv.name}: `);
+                const repeatPassword = await askPassword('Repeat password: ');
+                if (password !== repeatPassword) {
+                    console.error('Passwords are not matching.');
+                    return;
+                }
+                const oPayload: PutUserPasswordDto = {
+                    password,
+                };
+                await wfPut('users/' + user.id + '/password', oPayload);
+            } catch (error) {
+                if (error instanceof HttpError) {
+                    console.error(`Error ${error.statusCode}: ${error.message}`);
+                } else {
+                    throw error;
+                }
             }
-            const oPayload: PutUserPasswordDto = {
-                password,
-            };
-            await wfPut('users/' + user.id + '/password', oPayload);
         }
     );
 }

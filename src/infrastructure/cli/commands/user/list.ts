@@ -1,7 +1,7 @@
 import { Argv, Arguments } from 'yargs';
 import { TableRenderer, Themes } from '../../../../libs/table-renderer';
 import { renderDate } from '../../../../libs/date-renderer';
-import { wfGet } from '../../tools/web-fetcher';
+import { HttpError, wfGet } from '../../tools/web-fetcher';
 import { User } from '../../../../domain/entities/User';
 
 interface IUserListArgs extends Arguments {
@@ -38,46 +38,54 @@ export function listCommand(yargs: Argv): Argv {
                     demandOption: false,
                 }),
         async (argv) => {
-            const userList: User[] = await wfGet('users');
-            const filteredUserList = userList.filter((user) => {
-                if (argv.filter) {
-                    return user.name.includes(argv.filter);
+            try {
+                const userList: User[] = await wfGet('users');
+                const filteredUserList = userList.filter((user) => {
+                    if (argv.filter) {
+                        return user.name.includes(argv.filter);
+                    } else {
+                        return true;
+                    }
+                });
+                const tr = new TableRenderer();
+                tr.theme = Themes.filetThin;
+                const bPaginationMode = filteredUserList.length > argv.pagesize && argv.page > 0;
+                const nStart = bPaginationMode ? (argv.page - 1) * argv.pagesize : 0;
+                const nCount = bPaginationMode ? argv.pagesize : Infinity;
+                const nPageMax = bPaginationMode
+                    ? Math.ceil(filteredUserList.length / argv.pagesize)
+                    : 1;
+                const output = filteredUserList
+                    .slice(nStart, nStart + nCount)
+                    .map((row) => [
+                        row.id,
+                        row.name,
+                        renderDate(new Date(row.tsCreation)),
+                        renderDate(new Date(row.tsLastUsed), 'ymd hm'),
+                        row.ban ? 'banned' : ' ',
+                    ]);
+                if (output.length > 0) {
+                    output.unshift(['id', 'name', 'date created', 'last login', 'banned']);
+                    console.log(tr.render(output).join('\n'));
+                    if (bPaginationMode) {
+                        console.log(
+                            `Page ${argv.page} of ${nPageMax} (Users per page: ${argv.pagesize}). Total: ${filteredUserList.length} user${filteredUserList.length > 1 ? 's' : ''}.`
+                        );
+                    } else {
+                        console.log(
+                            filteredUserList.length,
+                            `user${filteredUserList.length > 1 ? 's' : ''}`
+                        );
+                    }
                 } else {
-                    return true;
+                    console.log('No user matching filter');
                 }
-            });
-            const tr = new TableRenderer();
-            tr.theme = Themes.filetThin;
-            const bPaginationMode = filteredUserList.length > argv.pagesize && argv.page > 0;
-            const nStart = bPaginationMode ? (argv.page - 1) * argv.pagesize : 0;
-            const nCount = bPaginationMode ? argv.pagesize : Infinity;
-            const nPageMax = bPaginationMode
-                ? Math.ceil(filteredUserList.length / argv.pagesize)
-                : 1;
-            const output = filteredUserList
-                .slice(nStart, nStart + nCount)
-                .map((row) => [
-                    row.id,
-                    row.name,
-                    renderDate(new Date(row.tsCreation)),
-                    renderDate(new Date(row.tsLastUsed), 'ymd hm'),
-                    row.ban ? 'banned' : ' ',
-                ]);
-            if (output.length > 0) {
-                output.unshift(['id', 'name', 'date created', 'last login', 'banned']);
-                console.log(tr.render(output).join('\n'));
-                if (bPaginationMode) {
-                    console.log(
-                        `Page ${argv.page} of ${nPageMax} (Users per page: ${argv.pagesize}). Total: ${filteredUserList.length} user${filteredUserList.length > 1 ? 's' : ''}.`
-                    );
+            } catch (error) {
+                if (error instanceof HttpError) {
+                    console.error(`Error ${error.statusCode}: ${error.message}`);
                 } else {
-                    console.log(
-                        filteredUserList.length,
-                        `user${filteredUserList.length > 1 ? 's' : ''}`
-                    );
+                    throw error;
                 }
-            } else {
-                console.log('No user matching filter');
             }
         }
     );

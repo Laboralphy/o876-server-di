@@ -1,5 +1,5 @@
 import { Argv, Arguments } from 'yargs';
-import { wfGet, wfPut } from '../../tools/web-fetcher';
+import { wfGet, wfPut, HttpError } from '../../tools/web-fetcher';
 import { User } from '../../../../domain/entities/User';
 import { PutUserBanDto } from '../../../web/dto/PutUserBanDto';
 import i18n from 'i18next';
@@ -17,13 +17,13 @@ interface IUserBanArgs extends Arguments {
 // Fonction pour créer la commande
 export function banCommand(yargs: Argv): Argv {
     return yargs.command<IUserBanArgs>(
-        'ban <name>',
+        'ban <user>',
         t('banCmd.describe'),
         (yargs) =>
             yargs
-                .positional('name', {
+                .positional('user', {
                     type: 'string',
-                    describe: t('banCmd.nameOpt'),
+                    describe: t('banCmd.userOpt'),
                     demandOption: true,
                 })
                 .option('days', {
@@ -55,23 +55,28 @@ export function banCommand(yargs: Argv): Argv {
                     default: '',
                 }),
         async (argv) => {
-            const user: User = await wfGet('users/name/' + argv.name);
-            if (!user) {
-                throw new Error(t('errors.unknownUserErr', { name: argv.name }));
-            }
-            const forever: boolean = argv.days == 0 && argv.hours == 0 && argv.minutes == 0;
-            const oPayload: PutUserBanDto = {
-                reason: argv.reason,
-                forever,
-            };
-            if (!forever) {
-                oPayload.duration = {
-                    days: argv.days,
-                    hours: argv.hours,
-                    minutes: argv.minutes,
+            try {
+                const user: User = await wfGet('users/name/' + argv.name);
+                const forever: boolean = argv.days == 0 && argv.hours == 0 && argv.minutes == 0;
+                const oPayload: PutUserBanDto = {
+                    reason: argv.reason,
+                    forever,
                 };
+                if (!forever) {
+                    oPayload.duration = {
+                        days: argv.days,
+                        hours: argv.hours,
+                        minutes: argv.minutes,
+                    };
+                }
+                await wfPut('users/' + user.id + '/ban', oPayload);
+            } catch (error) {
+                if (error instanceof HttpError) {
+                    console.error(`Error ${error.statusCode}: ${error.message}`);
+                } else {
+                    throw error;
+                }
             }
-            await wfPut('users/' + user.id + '/ban', oPayload);
         }
     );
 }
