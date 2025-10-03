@@ -22,26 +22,63 @@ export const ST_INVERSE_OFF = 27; // Turn inverse off
 export const ST_REVEAL = 28; // Turn hidden off
 export const ST_STRIKE_OFF = 29; // Remove strike decoration
 
-export const ANSI_RESET = CSI + ST_RESET + 'm'; // Full reset code
-export const ANSI_RESET_BG = CSI + '49m'; // Reset background only
-export const ANSI_RESET_FG = CSI + '39m'; // Reset foreground only
-export const ANSI_BOLD = CSI + ST_BOLD + 'm';
-export const ANSI_DIM = CSI + ST_DIM + 'm';
-export const ANSI_ITALIC = CSI + ST_ITALIC + 'm';
-export const ANSI_UNDERLINE = CSI + ST_UNDERLINE + 'm';
-export const ANSI_BLINK = CSI + ST_BLINK + 'm';
-export const ANSI_INVERSE = CSI + ST_INVERSE + 'm';
-export const ANSI_HIDDEN = CSI + ST_HIDDEN + 'm';
-export const ANSI_STRIKE = CSI + ST_STRIKE + 'm';
-export const ANSI_BOLD_OFF = CSI + ST_BOLD_OFF + 'm';
-export const ANSI_DIM_OFF = CSI + ST_DIM_OFF + 'm';
-export const ANSI_ITALIC_OFF = CSI + ST_ITALIC_OFF + 'm';
-export const ANSI_UNDERLINE_OFF = CSI + ST_UNDERLINE_OFF + 'm';
-export const ANSI_BLINK_OFF = CSI + ST_BLINK_OFF + 'm';
-export const ANSI_INVERSE_OFF = CSI + ST_INVERSE_OFF + 'm';
-export const ANSI_REVEAL = CSI + ST_REVEAL + 'm';
-export const ANSI_STRIKE_OFF = CSI + ST_STRIKE_OFF + 'm';
+export const ANSI_TERM_CHAR = 'm';
+export const ANSI_RESET = CSI + ST_RESET + ANSI_TERM_CHAR; // Full reset code
+export const ANSI_FG8BIT = CSI + '38;5;'; // Change foreground color using 8 bits color code
+export const ANSI_BG8BIT = CSI + '48;5;'; // Change background color using 8 bits color code
+export const ANSI_RESET_BG = CSI + '49' + ANSI_TERM_CHAR; // Reset background only
+export const ANSI_RESET_FG = CSI + '39' + ANSI_TERM_CHAR; // Reset foreground only
+export const ANSI_BOLD = CSI + ST_BOLD + ANSI_TERM_CHAR;
+export const ANSI_DIM = CSI + ST_DIM + ANSI_TERM_CHAR;
+export const ANSI_ITALIC = CSI + ST_ITALIC + ANSI_TERM_CHAR;
+export const ANSI_UNDERLINE = CSI + ST_UNDERLINE + ANSI_TERM_CHAR;
+export const ANSI_BLINK = CSI + ST_BLINK + ANSI_TERM_CHAR;
+export const ANSI_INVERSE = CSI + ST_INVERSE + ANSI_TERM_CHAR;
+export const ANSI_HIDDEN = CSI + ST_HIDDEN + ANSI_TERM_CHAR;
+export const ANSI_STRIKE = CSI + ST_STRIKE + ANSI_TERM_CHAR;
+export const ANSI_BOLD_OFF = CSI + ST_BOLD_OFF + ANSI_TERM_CHAR;
+export const ANSI_DIM_OFF = CSI + ST_DIM_OFF + ANSI_TERM_CHAR;
+export const ANSI_ITALIC_OFF = CSI + ST_ITALIC_OFF + ANSI_TERM_CHAR;
+export const ANSI_UNDERLINE_OFF = CSI + ST_UNDERLINE_OFF + ANSI_TERM_CHAR;
+export const ANSI_BLINK_OFF = CSI + ST_BLINK_OFF + ANSI_TERM_CHAR;
+export const ANSI_INVERSE_OFF = CSI + ST_INVERSE_OFF + ANSI_TERM_CHAR;
+export const ANSI_REVEAL = CSI + ST_REVEAL + ANSI_TERM_CHAR;
+export const ANSI_STRIKE_OFF = CSI + ST_STRIKE_OFF + ANSI_TERM_CHAR;
 
+const ANSI_16_COLORS_MAP: Readonly<Map<string, number>> = new Map([
+    ['000000', 0],
+    ['AA0000', 1],
+    ['00AA00', 2],
+    ['AA5500', 3],
+    ['0000AA', 4],
+    ['AA00AA', 5],
+    ['00AAAA', 6],
+    ['AAAAAA', 7],
+    ['555555', 60],
+    ['FF5555', 61],
+    ['55FF55', 62],
+    ['FFFF55', 63],
+    ['5555FF', 64],
+    ['FF55FF', 65],
+    ['55FFFF', 66],
+    ['FFFFFF', 67],
+    ['000', 0],
+    ['A00', 1],
+    ['0A0', 2],
+    ['A50', 3],
+    ['00A', 4],
+    ['A0A', 5],
+    ['0AA', 6],
+    ['AAA', 7],
+    ['555', 60],
+    ['F55', 61],
+    ['5F5', 62],
+    ['FF5', 63],
+    ['55F', 64],
+    ['F5F', 65],
+    ['5FF', 66],
+    ['FFF', 67],
+]);
 /**
  * Converts a color into an ansi color code string
  * The function returns a numeric string, to be embedded in a ansi string
@@ -97,6 +134,19 @@ export function parseRGB(sColor: string) {
 }
 
 /**
+ * Return an ansi code
+ * @param sColor
+ * @param background
+ */
+function getAnsi16Code(sColor: string, background: boolean = false): number | undefined {
+    if (sColor.startsWith('#')) {
+        sColor = sColor.substring(1);
+    }
+    const c = ANSI_16_COLORS_MAP.get(sColor);
+    return c === undefined ? undefined : c + 30 + (background ? 60 : 0);
+}
+
+/**
  * Convert a color code into an ansi color code
  * @param sColor
  */
@@ -112,27 +162,11 @@ function getAnsi256Code(sColor: string): string {
 }
 
 /**
- * Returns true if given string is empty
- * @param color
- */
-function isEmpty(color: string) {
-    return color === '';
-}
-
-/**
- * Returns true if specified string is an ansi reset code (either foreground reset or background reset)
- * @param color
- */
-function isRESET(color: string) {
-    return color === ANSI_RESET || color === ANSI_RESET_FG || color === ANSI_RESET_BG;
-}
-
-/**
  * Convert hex color code into a complete ansi foreground color code
  * @param color
  */
 function fg256(color: string) {
-    return isEmpty(color) ? '' : isRESET(color) ? color : CSI + FG8BIT + color.toString() + 'm';
+    return color == '' ? ANSI_RESET_FG : CSI + FG8BIT + color.toString() + ANSI_TERM_CHAR;
 }
 
 /**
@@ -140,20 +174,31 @@ function fg256(color: string) {
  * @param color
  */
 function bg256(color: string) {
-    return isEmpty(color) ? '' : isRESET(color) ? color : CSI + BG8BIT + color.toString() + 'm';
+    return color == '' ? ANSI_RESET_BG : CSI + BG8BIT + color.toString() + ANSI_TERM_CHAR;
 }
 
 /**
- * Produces fg and bg ansi color code
- * @param sFg if empty, foreground color code is not rendered
- * @param sBg if undefined, background color code is not rendered
+ * Produces foreground ansi color code
+ * @param sColor a CSS color (3 or 6 hex digit, optionally starting with #)
  */
-export function color(sFg: string, sBg?: string): string {
-    if (sBg === undefined) {
-        return fg256(getAnsi256Code(sFg));
+export function fgcolor(sColor: string): string {
+    const color16 = getAnsi16Code(sColor);
+    if (color16 !== undefined) {
+        return CSI + color16.toString() + ANSI_TERM_CHAR;
+    } else {
+        return fg256(getAnsi256Code(sColor));
     }
-    if (sFg === '') {
-        return bg256(getAnsi256Code(sBg));
+}
+
+/**
+ * Produces foreground ansi color code
+ * @param sColor a CSS color (3 or 6 hex digit, optionally starting with #)
+ */
+export function bgcolor(sColor: string): string {
+    const color16 = getAnsi16Code(sColor, true);
+    if (color16 !== undefined) {
+        return CSI + color16.toString() + ANSI_TERM_CHAR;
+    } else {
+        return bg256(getAnsi256Code(sColor));
     }
-    return fg256(getAnsi256Code(sFg)) + bg256(getAnsi256Code(sBg));
 }
