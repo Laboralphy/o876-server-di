@@ -7,6 +7,7 @@ import { printDbg } from './libs/print-dbg';
 import { getEnv } from './config/dotenv';
 import { FsHelper } from 'o876-fs-ts';
 import { expandPath } from './libs/expand-path';
+import telnet, { TelnetClient } from '../@types/telnet2';
 
 const debugServer = printDbg('server');
 
@@ -63,7 +64,7 @@ export class Server {
         // Each route is declared as middleware
         // and receive its controller dependencies on construction
         debugServer('initializing routes');
-        app.use(userRoutes(container.resolve('userController')).routes());
+        app.use(userRoutes(container.resolve('apiUserController')).routes());
 
         return new Promise((resolve) => {
             // Start listening
@@ -72,6 +73,32 @@ export class Server {
                 resolve(true);
             });
         });
+    }
+
+    async initTelnet() {
+        debugServer('starting telnet service');
+        telnet.createServer(
+            {
+                convertLF: false,
+            },
+            () => {
+                return telnet.createServer(
+                    {
+                        convertLF: false,
+                    },
+                    (client: TelnetClient) => {
+                        try {
+                            this.connectClient(client);
+                        } catch (err) {
+                            console.error(
+                                'Error during client connection phase :',
+                                (err as Error).message
+                            );
+                            client.end();
+                        }
+                    }
+                );
+            }
     }
 
     async initTelnetService() {

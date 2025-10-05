@@ -1,24 +1,36 @@
 import { createContainer, asClass } from 'awilix';
 import { UserRepository } from '../infrastructure/persistance/json-database/UserRepository';
+
 import { Encryptor } from '../infrastructure/services/Encryptor';
 import { UIDGenerator } from '../infrastructure/services/UIDGenerator';
+import { JsonDatabase } from '../infrastructure/services/JsonDatabase';
+import { TimeVanilla } from '../infrastructure/services/TimeVanilla';
+
+import { ITime } from '../application/ports/services/ITime';
+import { IEncryptor } from '../application/ports/services/IEncryptor';
+import { IUIDGenerator } from '../application/ports/services/IUIDGenerator';
+
+import { IUserRepository } from '../application/ports/repositories/IUserRepository';
+import { IUserSecretRepository } from '../application/ports/repositories/IUserSecretRepository';
+
+import { IDatabaseAdapter } from '../domain/ports/IDatabaseAdapter';
+
 import { CreateUser } from '../application/use-cases/users/CreateUser';
 import { LoginUser } from '../application/use-cases/users/LoginUser';
-import { UserController } from '../infrastructure/web/controllers/UserController';
 import { GetUserList } from '../application/use-cases/users/GetUserList';
-import { IDatabaseAdapter } from '../domain/ports/IDatabaseAdapter';
-import { JsonDatabase } from '../infrastructure/services/JsonDatabase';
 import { ModifyUser } from '../application/use-cases/users/ModifyUser';
 import { FindUser } from '../application/use-cases/users/FindUser';
 import { DeleteUser } from '../application/use-cases/users/DeleteUser';
-import { ITime } from '../application/ports/services/ITime';
-import { TimeVanilla } from '../infrastructure/services/TimeVanilla';
 import { GetUserBan } from '../application/use-cases/users/GetUserBan';
-import { UserSecretRepository } from '../infrastructure/persistance/json-database/UserSecretRepository';
 import { SetUserPassword } from '../application/use-cases/users/SetUserPassword';
 import { GetUser } from '../application/use-cases/users/GetUser';
 import { BanUser } from '../application/use-cases/users/BanUser';
 import { UnbanUser } from '../application/use-cases/users/UnbanUser';
+
+import { UserController as ApiUserController } from '../infrastructure/web/controllers/UserController';
+import { ClientController as TelnetClientController } from '../infrastructure/telnet/controllers/ClientController';
+
+import { UserSecretRepository } from '../infrastructure/persistance/json-database/UserSecretRepository';
 
 /**
  * To as a new use case, port ...,
@@ -41,15 +53,16 @@ export interface Cradle {
     unbanUser: UnbanUser;
 
     // repositories
-    userRepository: UserRepository;
-    userSecretRepository: UserSecretRepository;
+    userRepository: IUserRepository;
+    userSecretRepository: IUserSecretRepository;
 
     // controller
-    userController: UserController;
+    apiUserController: ApiUserController;
+    telnetClientController: TelnetClientController;
 
     // services
-    encryptor: Encryptor;
-    uidGenerator: UIDGenerator;
+    encryptor: IEncryptor;
+    uidGenerator: IUIDGenerator;
     database: IDatabaseAdapter;
     time: ITime;
 }
@@ -76,8 +89,10 @@ container.register({
     userRepository: asClass(UserRepository).singleton(),
     userSecretRepository: asClass(UserSecretRepository).singleton(),
 
-    // controller
-    userController: asClass(UserController).singleton(),
+    // controllers : API
+    apiUserController: asClass(ApiUserController).singleton(),
+    // controllers : Telnet
+    telnetClientController: asClass(TelnetClientController).singleton(),
 
     // services
     encryptor: asClass(Encryptor).singleton(),

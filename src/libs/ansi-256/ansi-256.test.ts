@@ -1,4 +1,4 @@
-import { fgcolor, getColorCode, parseRGB } from './renderer';
+import { fgcolor, getColorCode, evaluateColorCode, parseRGB } from './renderer';
 
 describe('getColorCode()', () => {
     it('should return the correct color code', () => {
@@ -44,5 +44,17 @@ describe('getAnsi16Code', () => {
         expect(fgcolor('#F5F')).toBe('\x1b[95m');
         expect(fgcolor('#5FF')).toBe('\x1b[96m');
         expect(fgcolor('#FFF')).toBe('\x1b[97m');
+    });
+});
+
+describe('normalizeColorHexCode', () => {
+    it('should return a numeric value of the corresponding color code', () => {
+        expect(evaluateColorCode('#000')).toBe(0x000000);
+        expect(evaluateColorCode('#FFF')).toBe(0xffffff);
+        expect(evaluateColorCode('#fff')).toBe(0xffffff);
+        expect(evaluateColorCode('#f8f8f8')).toBe(0xf8f8f8);
+        expect(evaluateColorCode('white')).toBe(0xffffff);
+        expect(evaluateColorCode('black')).toBe(0x000000);
+        expect(evaluateColorCode('red')).toBe(0xff0000);
     });
 });

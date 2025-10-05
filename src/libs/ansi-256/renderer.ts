@@ -1,9 +1,10 @@
 // ANSI codes
+import { COLOR_CODES } from './color-codes';
+
 export const ESC = '\x1b'; // Escape code
 export const CSI = ESC + '['; // Control Sequence Introducer
 export const OUT = ESC + ']'; // Control Sequence Finisher
-export const FG8BIT = '38;5;'; // Change foreground color using 8 bits color code
-export const BG8BIT = '48;5;'; // Change background color using 8 bits color code
+
 export const ST_RESET = 0; // Resets all codes, back to default style
 export const ST_BOLD = 1; // Set font to bold
 export const ST_DIM = 2; // Set font to dim (lower brightness)
@@ -22,12 +23,16 @@ export const ST_INVERSE_OFF = 27; // Turn inverse off
 export const ST_REVEAL = 28; // Turn hidden off
 export const ST_STRIKE_OFF = 29; // Remove strike decoration
 
+export const FG8BIT = '38;5;';
+export const BG8BIT = '48;5;';
+
 export const ANSI_TERM_CHAR = 'm';
 export const ANSI_RESET = CSI + ST_RESET + ANSI_TERM_CHAR; // Full reset code
-export const ANSI_FG8BIT = CSI + '38;5;'; // Change foreground color using 8 bits color code
-export const ANSI_BG8BIT = CSI + '48;5;'; // Change background color using 8 bits color code
+export const ANSI_FG8BIT = CSI + FG8BIT; // Change foreground color using 8 bits color code
+export const ANSI_BG8BIT = CSI + BG8BIT; // Change background color using 8 bits color code
 export const ANSI_RESET_BG = CSI + '49' + ANSI_TERM_CHAR; // Reset background only
 export const ANSI_RESET_FG = CSI + '39' + ANSI_TERM_CHAR; // Reset foreground only
+
 export const ANSI_BOLD = CSI + ST_BOLD + ANSI_TERM_CHAR;
 export const ANSI_DIM = CSI + ST_DIM + ANSI_TERM_CHAR;
 export const ANSI_ITALIC = CSI + ST_ITALIC + ANSI_TERM_CHAR;
@@ -45,39 +50,39 @@ export const ANSI_INVERSE_OFF = CSI + ST_INVERSE_OFF + ANSI_TERM_CHAR;
 export const ANSI_REVEAL = CSI + ST_REVEAL + ANSI_TERM_CHAR;
 export const ANSI_STRIKE_OFF = CSI + ST_STRIKE_OFF + ANSI_TERM_CHAR;
 
-const ANSI_16_COLORS_MAP: Readonly<Map<string, number>> = new Map([
-    ['000000', 0],
-    ['AA0000', 1],
-    ['00AA00', 2],
-    ['AA5500', 3],
-    ['0000AA', 4],
-    ['AA00AA', 5],
-    ['00AAAA', 6],
-    ['AAAAAA', 7],
-    ['555555', 60],
-    ['FF5555', 61],
-    ['55FF55', 62],
-    ['FFFF55', 63],
-    ['5555FF', 64],
-    ['FF55FF', 65],
-    ['55FFFF', 66],
-    ['FFFFFF', 67],
-    ['000', 0],
-    ['A00', 1],
-    ['0A0', 2],
-    ['A50', 3],
-    ['00A', 4],
-    ['A0A', 5],
-    ['0AA', 6],
-    ['AAA', 7],
-    ['555', 60],
-    ['F55', 61],
-    ['5F5', 62],
-    ['FF5', 63],
-    ['55F', 64],
-    ['F5F', 65],
-    ['5FF', 66],
-    ['FFF', 67],
+const ANSI_16_COLOR_MAP: Readonly<Map<string, number>> = new Map([
+    ['#000000', 0],
+    ['#aa0000', 1],
+    ['#00aa00', 2],
+    ['#aa5500', 3],
+    ['#0000aa', 4],
+    ['#aa00aa', 5],
+    ['#00aaaa', 6],
+    ['#aaaaaa', 7],
+    ['#555555', 60],
+    ['#ff5555', 61],
+    ['#55ff55', 62],
+    ['#ffff55', 63],
+    ['#5555ff', 64],
+    ['#ff55ff', 65],
+    ['#55ffff', 66],
+    ['#ffffff', 67],
+    ['#000', 0],
+    ['#a00', 1],
+    ['#0a0', 2],
+    ['#a50', 3],
+    ['#00a', 4],
+    ['#a0a', 5],
+    ['#0aa', 6],
+    ['#aaa', 7],
+    ['#555', 60],
+    ['#f55', 61],
+    ['#5f5', 62],
+    ['#ff5', 63],
+    ['#55f', 64],
+    ['#f5f', 65],
+    ['#5ff', 66],
+    ['#fff', 67],
 ]);
 /**
  * Converts a color into an ansi color code string
@@ -108,15 +113,49 @@ export function getColorCode(r: number, g: number, b: number): string {
     return (r6 * 36 + g6 * 6 + b6 + 16).toString().padStart(3, '0');
 }
 
+const REGEX_CSS_COLOR = /^#[0-9a-z]{3,6}$/i;
+
+/**
+ * Transform a color code to a numeric value RGB-888
+ * @param sColor input color, can be a css code (starting with #) or a standard html color label (red, blue...)
+ */
+export function evaluateColorCode(sColor: string): number {
+    if (sColor.match(REGEX_CSS_COLOR)) {
+        const sHexColor = sColor.substring(1).toLowerCase();
+        if (sHexColor.length === 3) {
+            return parseInt(
+                '0x' +
+                    sHexColor.charAt(0) +
+                    sHexColor.charAt(0) +
+                    sHexColor.charAt(1) +
+                    sHexColor.charAt(1) +
+                    sHexColor.charAt(2) +
+                    sHexColor.charAt(2)
+            );
+        } else if (sHexColor.length === 6) {
+            return parseInt('0x' + sHexColor);
+        } else {
+            throw new Error(`Invalid color code : ${sColor}`);
+        }
+    }
+    const sColorValue = COLOR_CODES[sColor.toLowerCase()];
+    if (sColorValue) {
+        return parseInt('0x' + sColorValue.substring(1));
+    } else {
+        throw new Error(`Invalid color code : ${sColor}`);
+    }
+}
+
 /**
  * Convert a 3 hex digit string into an (r, g, b) structure
  * the input string may contain an initial # mark, as if it were a css color code
  * @param sColor
  */
 export function parseRGB(sColor: string) {
-    if (sColor.startsWith('#')) {
-        sColor = sColor.substring(1);
+    if (!sColor.startsWith('#')) {
+        sColor = COLOR_CODES[sColor.toLowerCase()];
     }
+    sColor = sColor.substring(1);
     if (sColor.length === 3) {
         sColor =
             sColor.charAt(0) +
@@ -141,8 +180,10 @@ export function parseRGB(sColor: string) {
 function getAnsi16Code(sColor: string, background: boolean = false): number | undefined {
     if (sColor.startsWith('#')) {
         sColor = sColor.substring(1);
+    } else {
+        sColor = COLOR_CODES[sColor.toLowerCase()];
     }
-    const c = ANSI_16_COLORS_MAP.get(sColor);
+    const c = ANSI_16_COLOR_MAP.get(sColor.toLowerCase());
     return c === undefined ? undefined : c + 30 + (background ? 60 : 0);
 }
 

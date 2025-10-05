@@ -7,9 +7,7 @@ const VAR_SIZE_DEFAULT = 10;
 export function getUID(nVarSize: number = VAR_SIZE_DEFAULT): string {
     // will produce an identifier of size nVarSize + 4 char until date : 2161-08-11 01:00:00
     // after this data : will produce as identifier of size nVarSize + 5
-    const timestamp = Math.floor(Date.now() / MS_IN_HOUR)
-        .toString(36)
-        .padStart(4, '0'); // Ex: "01y7" → "01y7" (4 chars at min)
+    const timestamp = Math.floor(Date.now() / MS_IN_HOUR).toString(36);
     let randomPart = '';
     const buffer = new Uint32Array(nVarSize);
     crypto.getRandomValues(buffer);
