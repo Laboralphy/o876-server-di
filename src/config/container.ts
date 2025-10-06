@@ -12,11 +12,11 @@ import { IUIDGenerator } from '../application/ports/services/IUIDGenerator';
 
 import { IUserRepository } from '../application/ports/repositories/IUserRepository';
 import { IUserSecretRepository } from '../application/ports/repositories/IUserSecretRepository';
+import { IClientRepository } from '../application/ports/repositories/IClientRepository';
 
 import { IDatabaseAdapter } from '../domain/ports/IDatabaseAdapter';
 
 import { CreateUser } from '../application/use-cases/users/CreateUser';
-import { LoginUser } from '../application/use-cases/users/LoginUser';
 import { GetUserList } from '../application/use-cases/users/GetUserList';
 import { ModifyUser } from '../application/use-cases/users/ModifyUser';
 import { FindUser } from '../application/use-cases/users/FindUser';
@@ -31,6 +31,11 @@ import { UserController as ApiUserController } from '../infrastructure/web/contr
 import { ClientController as TelnetClientController } from '../infrastructure/telnet/controllers/ClientController';
 
 import { UserSecretRepository } from '../infrastructure/persistance/json-database/UserSecretRepository';
+import { ClientRepository } from '../infrastructure/persistance/in-memory/ClientRepository';
+import { CreateClient } from '../application/use-cases/clients/CreateClient';
+import { AuthenticateClient } from '../application/use-cases/clients/AuthenticateClient';
+import { SetClientLogin } from '../application/use-cases/clients/SetClientLogin';
+import { GetClient } from '../application/use-cases/clients/GetClient';
 
 /**
  * To as a new use case, port ...,
@@ -43,7 +48,6 @@ export interface Cradle {
     createUser: CreateUser;
     modifyUser: ModifyUser;
     getUserList: GetUserList;
-    loginUser: LoginUser;
     findUser: FindUser;
     deleteUser: DeleteUser;
     getUserBan: GetUserBan;
@@ -51,10 +55,16 @@ export interface Cradle {
     setUserPassword: SetUserPassword;
     banUser: BanUser;
     unbanUser: UnbanUser;
+    // use cases clients
+    createClient: CreateClient;
+    authenticateClient: AuthenticateClient;
+    setClientLogin: SetClientLogin;
+    getClient: GetClient;
 
     // repositories
     userRepository: IUserRepository;
     userSecretRepository: IUserSecretRepository;
+    clientRepository: IClientRepository;
 
     // controller
     apiUserController: ApiUserController;
@@ -72,11 +82,10 @@ export const container = createContainer<Cradle>();
 
 // Registering dependencies
 container.register({
-    // use cases
+    // use cases : users
     createUser: asClass(CreateUser).singleton(),
     modifyUser: asClass(ModifyUser).singleton(),
     getUserList: asClass(GetUserList).singleton(),
-    loginUser: asClass(LoginUser).singleton(),
     findUser: asClass(FindUser).singleton(),
     deleteUser: asClass(DeleteUser).singleton(),
     getUserBan: asClass(GetUserBan).singleton(),
@@ -84,10 +93,16 @@ container.register({
     setUserPassword: asClass(SetUserPassword).singleton(),
     banUser: asClass(BanUser).singleton(),
     unbanUser: asClass(UnbanUser).singleton(),
+    // use cases : clients
+    createClient: asClass(CreateClient).singleton(),
+    authenticateClient: asClass(AuthenticateClient).singleton(),
+    setClientLogin: asClass(SetClientLogin).singleton(),
+    getClient: asClass(GetClient).singleton(),
 
     // repositories
     userRepository: asClass(UserRepository).singleton(),
     userSecretRepository: asClass(UserSecretRepository).singleton(),
+    clientRepository: asClass(ClientRepository).singleton(),
 
     // controllers : API
     apiUserController: asClass(ApiUserController).singleton(),

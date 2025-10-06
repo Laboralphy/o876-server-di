@@ -7,7 +7,7 @@ import { printDbg } from './libs/print-dbg';
 import { getEnv } from './config/dotenv';
 import { FsHelper } from 'o876-fs-ts';
 import { expandPath } from './libs/expand-path';
-import telnet, { TelnetClient } from '../@types/telnet2';
+import telnet, { Client as TelnetClient } from '../@types/telnet2';
 
 const debugServer = printDbg('server');
 
@@ -86,9 +86,11 @@ export class Server {
                     {
                         convertLF: false,
                     },
-                    (client: TelnetClient) => {
+                    async (client: TelnetClient) => {
                         try {
-                            this.connectClient(client);
+                            const telnetClientController =
+                                container.resolve('telnetClientController');
+                            await telnetClientController.connect(client);
                         } catch (err) {
                             console.error(
                                 'Error during client connection phase :',
@@ -99,6 +101,7 @@ export class Server {
                     }
                 );
             }
+        );
     }
 
     async initTelnetService() {
