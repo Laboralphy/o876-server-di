@@ -9,6 +9,11 @@ import { printDbg } from '../../../libs/print-dbg';
 
 const debugTelnet = printDbg('telnet');
 
+/**
+ * This class managed all inputs from client
+ * This does not manage action from server to client
+ * (example : kicking client, or sending message to client, except response)
+ */
 export class ClientController {
     private readonly createClient: CreateClient;
     private readonly getClient: GetClient;

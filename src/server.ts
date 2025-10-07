@@ -7,17 +7,21 @@ import { printDbg } from './libs/print-dbg';
 import { getEnv } from './config/dotenv';
 import { FsHelper } from 'o876-fs-ts';
 import { expandPath } from './libs/expand-path';
-import telnet, { Client as TelnetClient } from '../@types/telnet2';
+import telnet, { Server as TelnetServer, Client as TelnetClient } from 'telnet2';
 
 const debugServer = printDbg('server');
 
 export class Server {
     private readonly httpApi: Koa;
+    private telnetServer: TelnetServer;
     private readonly env = getEnv();
     private readonly fsHelper = new FsHelper();
 
     constructor() {
+        // all service are constructed during this instance construction
+        // so we dont have to declare those variables | undefined
         this.httpApi = new Koa();
+        this.telnetServer = this.initTelnetService();
     }
 
     /**
@@ -49,11 +53,7 @@ export class Server {
      */
     async initApiService() {
         debugServer('starting api service');
-        const port = parseInt(this.env.SERVER_HTTP_API_PORT ?? '8080');
         const app = this.httpApi;
-
-        // Database
-        await this.initDatabase();
 
         // Middlewares
         debugServer('initializing middlewares');
@@ -65,58 +65,51 @@ export class Server {
         // and receive its controller dependencies on construction
         debugServer('initializing routes');
         app.use(userRoutes(container.resolve('apiUserController')).routes());
-
         return new Promise((resolve) => {
             // Start listening
-            app.listen(port, '127.0.0.1', () => {
+            const port = parseInt(this.env.SERVER_HTTP_API_PORT ?? '8080');
+            this.httpApi.listen(port, '127.0.0.1', () => {
                 debugServer('http api service is now listening on port %d', port);
-                resolve(true);
+                resolve(undefined);
             });
         });
     }
 
-    async initTelnet() {
+    initTelnetService(): TelnetServer {
         debugServer('starting telnet service');
-        telnet.createServer(
-            {
-                convertLF: false,
-            },
-            () => {
-                return telnet.createServer(
-                    {
-                        convertLF: false,
-                    },
-                    async (client: TelnetClient) => {
-                        try {
-                            const telnetClientController =
-                                container.resolve('telnetClientController');
-                            await telnetClientController.connect(client);
-                        } catch (err) {
-                            console.error(
-                                'Error during client connection phase :',
-                                (err as Error).message
-                            );
-                            client.end();
-                        }
-                    }
-                );
-            }
-        );
-    }
-
-    async initTelnetService() {
-        debugServer('initializing telnet service');
     }
 
     async initWebsocketService() {
         debugServer('initializing websocket service');
     }
 
+    async gracefulShutdown() {
+        // Graceful shutdown telnet service
+        const pTelnetClose = new Promise((resolve) => {
+            debugServer('shutting down telnet service');
+            this.telnetServer.close(() => {
+                resolve(undefined);
+            });
+        });
+        await pTelnetClose;
+        debugServer('all services gracefully shut down');
+    }
+
     async run() {
         await this.initDataDirectory();
         await this.initDatabase();
         await this.initApiService();
-        await this.initTelnetService();
         await this.initWebsocketService();
+
+        process.on('SIGTERM', async () => {
+            debugServer('receiving SIGTERM');
+            await this.gracefulShutdown();
+        });
+
+        process.on('SIGINT', async () => {
+            debugServer('receiving SIGINT');
+            await this.gracefulShutdown();
+            process.exit();
+        });
     }
 }
