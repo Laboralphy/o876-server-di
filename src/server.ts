@@ -21,7 +21,7 @@ export class Server {
         // all service are constructed during this instance construction
         // so we dont have to declare those variables | undefined
         this.httpApi = new Koa();
-        this.telnetServer = this.initTelnetService();
+        this.telnetServer = telnet.createServer({ convertLF: false });
     }
 
     /**
@@ -75,8 +75,24 @@ export class Server {
         });
     }
 
-    initTelnetService(): TelnetServer {
+    initTelnetService(): Promise<void> {
         debugServer('starting telnet service');
+        this.telnetServer.on('client', async (client: TelnetClient) => {
+            try {
+                const telnetClientController = container.resolve('telnetClientController');
+                await telnetClientController.connect(client);
+            } catch (err) {
+                console.error('Error during client connection phase :', (err as Error).message);
+                client.end();
+            }
+        });
+        return new Promise((resolve) => {
+            const port = parseInt(this.env.SERVER_TELNET_PORT ?? '8080');
+            this.telnetServer.listen(port, () => {
+                debugServer('telnet service is now listening on port %d', port);
+                resolve(undefined);
+            });
+        });
     }
 
     async initWebsocketService() {
@@ -99,6 +115,7 @@ export class Server {
         await this.initDataDirectory();
         await this.initDatabase();
         await this.initApiService();
+        await this.initTelnetService();
         await this.initWebsocketService();
 
         process.on('SIGTERM', async () => {

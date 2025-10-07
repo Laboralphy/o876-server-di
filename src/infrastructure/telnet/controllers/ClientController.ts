@@ -4,6 +4,9 @@ import { CreateClient } from '../../../application/use-cases/clients/CreateClien
 import { CLIENT_PROTOCOL, CLIENT_STAGES } from '../../../domain/entities/Client';
 import { AuthenticateClient } from '../../../application/use-cases/clients/AuthenticateClient';
 import { printDbg } from '../../../libs/print-dbg';
+import { ICommunicationLayer } from '../../../application/ports/services/ICommunicationLayer';
+import { TelnetClientSocket } from '../../services/TelnetClientSocket';
+import { DestroyClient } from '../../../application/use-cases/clients/DestroyClient';
 
 const debugTelnet = printDbg('telnet');
 
@@ -15,10 +18,14 @@ const debugTelnet = printDbg('telnet');
 export class ClientController {
     private readonly createClient: CreateClient;
     private readonly authenticateClient: AuthenticateClient;
+    private readonly destroyClient: DestroyClient;
+    private readonly communicationLayer: ICommunicationLayer;
 
     constructor(cradle: Cradle) {
         this.createClient = cradle.createClient;
         this.authenticateClient = cradle.authenticateClient;
+        this.destroyClient = cradle.destroyClient;
+        this.communicationLayer = cradle.communicationLayer;
     }
     /**
      * One client is connecting to telnet server.
@@ -30,15 +37,24 @@ export class ClientController {
         const domainClient = await this.createClient.execute(CLIENT_PROTOCOL.TELNET);
         const idClient = domainClient.id;
         debugTelnet('client %s connexion', idClient);
-        // firsts messages are expected to be credentials
-        // login (first message), then password (second message)
-        socket.on('data', async (message: Buffer) => {
+
+        const vsocket = new TelnetClientSocket(socket);
+        this.communicationLayer.linkClientSocket(idClient, vsocket);
+
+        vsocket.onDisconnect(() => {
+            this.destroyClient.execute(idClient);
+        });
+
+        vsocket.onMessage(async (message: string) => {
+            // in telnet
+            // the first two messages are used to receive credentials
+            // the subsequent messages must be parsed
             let login = '';
             switch (domainClient.stage) {
                 case CLIENT_STAGES.LOGIN: {
                     // here the message should be a login
-                    login = message.toString();
-                    debugTelnet('client %s sending login : %s', domainClient.id, login);
+                    login = message;
+                    debugTelnet('client %s sending login : %s', idClient, login);
                     break;
                 }
 
@@ -54,7 +70,7 @@ export class ClientController {
                     break;
                 }
 
-                case CLIENT_STAGES.CONNECTED: {
+                case CLIENT_STAGES.AUTHENTICATED: {
                     // here the message should be interpreted as a command
                     debugTelnet('user %s : %s', login, message.toString());
                     break;
@@ -64,12 +80,6 @@ export class ClientController {
                     throw new Error(`client stage value invalid ${domainClient.stage}`);
                 }
             }
-        });
-        socket.on('close', () => {
-            debugTelnet('client %s : connection closed', idClient ?? '<unknown>');
-        });
-        socket.on('error', (err) => {
-            debugTelnet('socket error emitted : %s', err.message);
         });
     }
 }

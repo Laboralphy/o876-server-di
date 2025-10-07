@@ -2,10 +2,12 @@ import z from 'zod';
 import { EntityId } from '../types';
 
 export enum CLIENT_STAGES {
-    NOT_CONNECTED,
-    LOGIN,
-    PASSWORD,
-    CONNECTED,
+    NOT_CONNECTED, // not connected
+    LOGIN, // connected and expected to send login part of credentials
+    PASSWORD, // connected and expected to send password part of credentials
+    AUTHENTICATED, // connected and fully authenticated
+    DESTROYING, // is going to be destroyed very soon
+    DESTROYED, // has been destroyed, must be removed from in memory registry
 }
 
 export enum CLIENT_PROTOCOL {

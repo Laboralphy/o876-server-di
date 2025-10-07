@@ -35,6 +35,9 @@ import { ClientRepository } from '../infrastructure/persistance/in-memory/Client
 import { CreateClient } from '../application/use-cases/clients/CreateClient';
 import { AuthenticateClient } from '../application/use-cases/clients/AuthenticateClient';
 import { GetClient } from '../application/use-cases/clients/GetClient';
+import { ICommunicationLayer } from '../application/ports/services/ICommunicationLayer';
+import { CommunicationLayer } from '../infrastructure/services/CommunicationLayer';
+import { DestroyClient } from '../application/use-cases/clients/DestroyClient';
 
 /**
  * To as a new use case, port ...,
@@ -58,6 +61,7 @@ export interface Cradle {
     createClient: CreateClient;
     authenticateClient: AuthenticateClient;
     getClient: GetClient;
+    destroyClient: DestroyClient;
 
     // repositories
     userRepository: IUserRepository;
@@ -73,6 +77,7 @@ export interface Cradle {
     uidGenerator: IUIDGenerator;
     database: IDatabaseAdapter;
     time: ITime;
+    communicationLayer: ICommunicationLayer;
 }
 
 // Container creation
@@ -95,6 +100,7 @@ container.register({
     createClient: asClass(CreateClient).singleton(),
     authenticateClient: asClass(AuthenticateClient).singleton(),
     getClient: asClass(GetClient).singleton(),
+    destroyClient: asClass(DestroyClient).singleton(),
 
     // repositories
     userRepository: asClass(UserRepository).singleton(),
@@ -111,4 +117,5 @@ container.register({
     uidGenerator: asClass(UIDGenerator).singleton(),
     database: asClass(JsonDatabase).singleton(),
     time: asClass(TimeVanilla).singleton(),
+    communicationLayer: asClass(CommunicationLayer).singleton(),
 });

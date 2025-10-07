@@ -47,7 +47,7 @@ export class AuthenticateClient {
         }
         user.tsLastUsed = this.time.now();
         client.user = user.id;
-        client.stage = CLIENT_STAGES.CONNECTED;
+        client.stage = CLIENT_STAGES.AUTHENTICATED;
         await this.userRepository.save(user);
         await this.clientRepository.save(client);
         return user;
