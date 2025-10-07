@@ -34,7 +34,6 @@ import { UserSecretRepository } from '../infrastructure/persistance/json-databas
 import { ClientRepository } from '../infrastructure/persistance/in-memory/ClientRepository';
 import { CreateClient } from '../application/use-cases/clients/CreateClient';
 import { AuthenticateClient } from '../application/use-cases/clients/AuthenticateClient';
-import { SetClientLogin } from '../application/use-cases/clients/SetClientLogin';
 import { GetClient } from '../application/use-cases/clients/GetClient';
 
 /**
@@ -58,7 +57,6 @@ export interface Cradle {
     // use cases clients
     createClient: CreateClient;
     authenticateClient: AuthenticateClient;
-    setClientLogin: SetClientLogin;
     getClient: GetClient;
 
     // repositories
@@ -96,7 +94,6 @@ container.register({
     // use cases : clients
     createClient: asClass(CreateClient).singleton(),
     authenticateClient: asClass(AuthenticateClient).singleton(),
-    setClientLogin: asClass(SetClientLogin).singleton(),
     getClient: asClass(GetClient).singleton(),
 
     // repositories

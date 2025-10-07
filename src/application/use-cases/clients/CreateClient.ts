@@ -1,4 +1,4 @@
-import { Client, CLIENT_STAGES } from '../../../domain/entities/Client';
+import { Client, CLIENT_PROTOCOL, CLIENT_STAGES } from '../../../domain/entities/Client';
 import { Cradle } from '../../../config/container';
 import { IUIDGenerator } from '../../ports/services/IUIDGenerator';
 import { IClientRepository } from '../../ports/repositories/IClientRepository';
@@ -16,11 +16,12 @@ export class CreateClient {
         this.clientRepository = cradle.clientRepository;
     }
 
-    async execute(): Promise<Client> {
+    async execute(protocol: CLIENT_PROTOCOL): Promise<Client> {
         const client: Client = {
             id: this.uidGenerator.getUID(),
-            login: null,
             stage: CLIENT_STAGES.LOGIN,
+            user: null,
+            protocol,
         };
         return this.clientRepository.save(client);
     }

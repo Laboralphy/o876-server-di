@@ -8,11 +8,17 @@ export enum CLIENT_STAGES {
     CONNECTED,
 }
 
+export enum CLIENT_PROTOCOL {
+    NONE,
+    TELNET,
+    WEBSOCKET,
+}
+
 export const ClientSchema = z.object({
     id: EntityId,
-    login: z.string().nullable(),
     stage: z.enum(CLIENT_STAGES),
-    user: EntityId,
+    user: EntityId.nullable(),
+    protocol: z.enum(CLIENT_PROTOCOL),
 });
 
 export type Client = z.infer<typeof ClientSchema>;

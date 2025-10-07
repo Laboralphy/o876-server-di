@@ -28,21 +28,15 @@ export class AuthenticateClient {
         this.time = cradle.time;
     }
 
-    async execute(clientId: string, password: string): Promise<User> {
+    async execute(clientId: string, login: string, password: string): Promise<User> {
         const encryptedPassword = this.encryptor.encryptPassword(password);
         const client: Client | undefined = await this.clientRepository.get(clientId);
         if (!client) {
             throw new Error(`invalid client id ${clientId}`);
         }
-        if (client.stage !== CLIENT_STAGES.PASSWORD) {
-            throw new Error(`invalid client stage. expected PASSWORD, got ${client.stage}`);
-        }
-        if (client.login === null) {
-            throw new Error(`incoherent client state : should have login property set`);
-        }
-        const user: User | undefined = await this.userRepository.findByName(client.login);
+        const user: User | undefined = await this.userRepository.findByName(login);
         if (!user) {
-            throw new Error(`user not found ${client.login}`);
+            throw new Error(`user not found ${login}`);
         }
         const userSecret = await this.userSecretRepository.get(user.id);
         if (!userSecret) {
