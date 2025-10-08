@@ -1,0 +1,6 @@
+{
+  "welcome": {
+    "server": "Plasmud 1 - Serveur multi-protocole",
+    "user": "Bienvenue {{ user }}."
+  }
+}

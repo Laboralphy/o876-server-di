@@ -1,11 +1,12 @@
-import { IClientRepository } from '../../ports/repositories/IClientRepository';
+import { IClientRepository } from '../../../domain/ports/repositories/IClientRepository';
 import { Cradle } from '../../../config/container';
-import { IUserSecretRepository } from '../../ports/repositories/IUserSecretRepository';
-import { IUserRepository } from '../../ports/repositories/IUserRepository';
+import { IUserSecretRepository } from '../../../domain/ports/repositories/IUserSecretRepository';
+import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
 import { IEncryptor } from '../../ports/services/IEncryptor';
 import { User } from '../../../domain/entities/User';
 import { Client, CLIENT_STAGES } from '../../../domain/entities/Client';
 import { ITime } from '../../ports/services/ITime';
+import { GetUserBan } from '../users/GetUserBan';
 
 /**
  * This use case will check if specified client-login & password
@@ -19,6 +20,7 @@ export class AuthenticateClient {
     private readonly userSecretRepository: IUserSecretRepository;
     private readonly encryptor: IEncryptor;
     private readonly time: ITime;
+    private readonly getUserBan: GetUserBan;
 
     constructor(cradle: Cradle) {
         this.clientRepository = cradle.clientRepository;
@@ -26,9 +28,10 @@ export class AuthenticateClient {
         this.userSecretRepository = cradle.userSecretRepository;
         this.encryptor = cradle.encryptor;
         this.time = cradle.time;
+        this.getUserBan = cradle.getUserBan;
     }
 
-    async execute(clientId: string, login: string, password: string): Promise<User> {
+    async execute(clientId: string, login: string, password: string): Promise<Client> {
         const encryptedPassword = this.encryptor.encryptPassword(password);
         const client: Client | undefined = await this.clientRepository.get(clientId);
         if (!client) {
@@ -47,9 +50,10 @@ export class AuthenticateClient {
         }
         user.tsLastUsed = this.time.now();
         client.user = user.id;
-        client.stage = CLIENT_STAGES.AUTHENTICATED;
+        const ban = await this.getUserBan.execute(user.id);
+        client.stage = ban ? CLIENT_STAGES.BANNED : CLIENT_STAGES.AUTHENTICATED;
         await this.userRepository.save(user);
         await this.clientRepository.save(client);
-        return user;
+        return client;
     }
 }

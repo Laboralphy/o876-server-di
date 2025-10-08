@@ -8,20 +8,27 @@ import { getEnv } from './config/dotenv';
 import { FsHelper } from 'o876-fs-ts';
 import { expandPath } from './libs/expand-path';
 import telnet, { Server as TelnetServer, Client as TelnetClient } from 'telnet2';
+import { initI18n } from './libs/i18n-string-loader';
 
 const debugServer = printDbg('server');
 
 export class Server {
     private readonly httpApi: Koa;
-    private telnetServer: TelnetServer;
+    private readonly telnetServer: TelnetServer;
     private readonly env = getEnv();
     private readonly fsHelper = new FsHelper();
 
     constructor() {
         // all service are constructed during this instance construction
-        // so we dont have to declare those variables | undefined
+        // so we don't have to declare those variables | undefined
         this.httpApi = new Koa();
         this.telnetServer = telnet.createServer({ convertLF: false });
+    }
+
+    async initI18n() {
+        const lng = this.env.I18N_LANGUAGE ?? 'en';
+        debugServer('loading i18n strings (%s)', lng);
+        return initI18n(lng, ['general']);
     }
 
     /**
@@ -103,6 +110,8 @@ export class Server {
         // Graceful shutdown telnet service
         const pTelnetClose = new Promise((resolve) => {
             debugServer('shutting down telnet service');
+            const telnetClientController = container.resolve('telnetClientController');
+            telnetClientController.expelClients();
             this.telnetServer.close(() => {
                 resolve(undefined);
             });
@@ -112,6 +121,7 @@ export class Server {
     }
 
     async run() {
+        await this.initI18n();
         await this.initDataDirectory();
         await this.initDatabase();
         await this.initApiService();

@@ -1,5 +1,5 @@
 /**
- * Will be use to bi-communicate with clients
+ * Will be used to handle socket of different protocol (websocket, ssh, telnet...)
  */
 export interface IClientSocket {
     /**

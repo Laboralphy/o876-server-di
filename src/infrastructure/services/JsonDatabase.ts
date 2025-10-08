@@ -2,7 +2,7 @@ import {
     DatabaseInitOptions,
     ForEachCallback,
     IDatabaseAdapter,
-} from '../../domain/ports/IDatabaseAdapter';
+} from '../../domain/ports/adapters/IDatabaseAdapter';
 import path from 'node:path';
 import {
     Collection,
@@ -12,7 +12,7 @@ import {
     IStorage,
     MemoryStorage,
 } from 'o876-json-db';
-import { JsonObject, ScalarValue } from '../../domain/types';
+import { JsonObject, ScalarValue } from '../../domain/types/JsonStruct';
 import { printDbg } from '../../libs/print-dbg';
 import { expandPath } from '../../libs/expand-path';
 

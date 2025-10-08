@@ -1,4 +1,4 @@
-import { IClientSocket } from '../../domain/ports/IClientSocket';
+import { IClientSocket } from '../../domain/ports/adapters/IClientSocket';
 import { Client as TelnetClient } from 'telnet2';
 
 export class TelnetClientSocket implements IClientSocket {
@@ -10,7 +10,9 @@ export class TelnetClientSocket implements IClientSocket {
 
     onMessage(callback: (message: string) => void): void {
         this.socket.on('data', (data: Buffer) => {
-            callback(data.toString());
+            callback(data.toString().trimEnd());
+            // trim CR/LF at the end.
+            // watch out for binary data
         });
     }
 

@@ -1,5 +1,5 @@
 import z from 'zod';
-import { EntityId } from '../types';
+import { EntityId } from '../schemas/EntityId';
 
 export const BanSchema = z.object({
     tsBegin: z.number(),

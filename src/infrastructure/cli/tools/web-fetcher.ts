@@ -1,4 +1,4 @@
-import { JsonObject, JsonValue } from '../../../domain/types';
+import { JsonObject, JsonValue } from '../../../domain/types/JsonStruct';
 import { getEnv } from '../../../config/dotenv';
 import { HttpStatus } from '../../../domain/enums';
 

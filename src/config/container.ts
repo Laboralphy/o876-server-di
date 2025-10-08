@@ -10,11 +10,11 @@ import { ITime } from '../application/ports/services/ITime';
 import { IEncryptor } from '../application/ports/services/IEncryptor';
 import { IUIDGenerator } from '../application/ports/services/IUIDGenerator';
 
-import { IUserRepository } from '../application/ports/repositories/IUserRepository';
-import { IUserSecretRepository } from '../application/ports/repositories/IUserSecretRepository';
-import { IClientRepository } from '../application/ports/repositories/IClientRepository';
+import { IUserRepository } from '../domain/ports/repositories/IUserRepository';
+import { IUserSecretRepository } from '../domain/ports/repositories/IUserSecretRepository';
+import { IClientRepository } from '../domain/ports/repositories/IClientRepository';
 
-import { IDatabaseAdapter } from '../domain/ports/IDatabaseAdapter';
+import { IDatabaseAdapter } from '../domain/ports/adapters/IDatabaseAdapter';
 
 import { CreateUser } from '../application/use-cases/users/CreateUser';
 import { GetUserList } from '../application/use-cases/users/GetUserList';
@@ -35,9 +35,11 @@ import { ClientRepository } from '../infrastructure/persistance/in-memory/Client
 import { CreateClient } from '../application/use-cases/clients/CreateClient';
 import { AuthenticateClient } from '../application/use-cases/clients/AuthenticateClient';
 import { GetClient } from '../application/use-cases/clients/GetClient';
-import { ICommunicationLayer } from '../application/ports/services/ICommunicationLayer';
+import { ICommunicationManager } from '../application/ports/services/ICommunicationManager';
 import { CommunicationLayer } from '../infrastructure/services/CommunicationLayer';
 import { DestroyClient } from '../application/use-cases/clients/DestroyClient';
+import { IStringRepository } from '../application/ports/services/IStringRepository';
+import { I18nRepository } from '../infrastructure/services/I18nRepository';
 
 /**
  * To as a new use case, port ...,
@@ -77,7 +79,8 @@ export interface Cradle {
     uidGenerator: IUIDGenerator;
     database: IDatabaseAdapter;
     time: ITime;
-    communicationLayer: ICommunicationLayer;
+    communicationLayer: ICommunicationManager;
+    stringRepository: IStringRepository;
 }
 
 // Container creation
@@ -118,4 +121,5 @@ container.register({
     database: asClass(JsonDatabase).singleton(),
     time: asClass(TimeVanilla).singleton(),
     communicationLayer: asClass(CommunicationLayer).singleton(),
+    stringRepository: asClass(I18nRepository).singleton(),
 });

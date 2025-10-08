@@ -1,7 +1,7 @@
 import { UserSecret, UserSecretSchema } from '../../../domain/entities/UserSecret';
 import { Cradle } from '../../../config/container';
-import { ForEachCallback, IDatabaseAdapter } from '../../../domain/ports/IDatabaseAdapter';
-import { IUserSecretRepository } from '../../../application/ports/repositories/IUserSecretRepository';
+import { ForEachCallback, IDatabaseAdapter } from '../../../domain/ports/adapters/IDatabaseAdapter';
+import { IUserSecretRepository } from '../../../domain/ports/repositories/IUserSecretRepository';
 
 const COLLECTION_NAME = 'user-secrets';
 

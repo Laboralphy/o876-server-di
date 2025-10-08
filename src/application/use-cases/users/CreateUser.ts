@@ -1,11 +1,11 @@
-import { IUserRepository } from '../../ports/repositories/IUserRepository';
+import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
 import { CreateUserDto } from '../../dto/CreateUserDto';
 import { IEncryptor } from '../../ports/services/IEncryptor';
 import { IUIDGenerator } from '../../ports/services/IUIDGenerator';
 import { UserSchema, User } from '../../../domain/entities/User';
 import { Cradle } from '../../../config/container';
 import { UserSecretSchema } from '../../../domain/entities/UserSecret';
-import { IUserSecretRepository } from '../../ports/repositories/IUserSecretRepository';
+import { IUserSecretRepository } from '../../../domain/ports/repositories/IUserSecretRepository';
 
 /**
  * Creates a new User

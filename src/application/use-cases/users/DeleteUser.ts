@@ -1,8 +1,8 @@
-import { IUserRepository } from '../../ports/repositories/IUserRepository';
+import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
 import { ModifyUserDto } from '../../dto/ModifyUserDto';
 import { Cradle } from '../../../config/container';
 import { IEncryptor } from '../../ports/services/IEncryptor';
-import { IUserSecretRepository } from '../../ports/repositories/IUserSecretRepository';
+import { IUserSecretRepository } from '../../../domain/ports/repositories/IUserSecretRepository';
 
 export class DeleteUser {
     private readonly userRepository: IUserRepository;

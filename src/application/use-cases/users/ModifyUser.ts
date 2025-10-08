@@ -1,4 +1,4 @@
-import { IUserRepository } from '../../ports/repositories/IUserRepository';
+import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
 import { ModifyUserDto } from '../../dto/ModifyUserDto';
 import { Cradle } from '../../../config/container';
 

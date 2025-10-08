@@ -1,12 +1,12 @@
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { initI18n } from './infrastructure/cli/tools/i18n-strings';
+import { initI18nStrings } from './infrastructure/cli/tools/i18n-strings';
 import { user } from './infrastructure/cli/commands/user';
 import { getEnv } from './config/dotenv';
 
 async function main() {
     const sLang = getEnv().I18N_LANGUAGE ?? 'en';
-    await initI18n(sLang);
+    await initI18nStrings(sLang);
     yargs(hideBin(process.argv))
         .locale(sLang)
         .command('user', 'User management', user)

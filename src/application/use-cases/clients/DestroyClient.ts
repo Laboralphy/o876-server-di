@@ -1,7 +1,6 @@
-import { CLIENT_STAGES } from '../../../domain/entities/Client';
 import { Cradle } from '../../../config/container';
-import { IClientRepository } from '../../ports/repositories/IClientRepository';
-import { ICommunicationLayer } from '../../ports/services/ICommunicationLayer';
+import { IClientRepository } from '../../../domain/ports/repositories/IClientRepository';
+import { ICommunicationManager } from '../../ports/services/ICommunicationManager';
 
 /**
  * This use case destroys a registered client, because its connection has been close.
@@ -11,7 +10,7 @@ import { ICommunicationLayer } from '../../ports/services/ICommunicationLayer';
  */
 export class DestroyClient {
     private readonly clientRepository: IClientRepository;
-    private readonly communicationLayer: ICommunicationLayer;
+    private readonly communicationLayer: ICommunicationManager;
 
     constructor(cradle: Cradle) {
         this.clientRepository = cradle.clientRepository;
@@ -20,29 +19,12 @@ export class DestroyClient {
 
     async execute(idClient: string): Promise<void> {
         const client = await this.clientRepository.get(idClient);
-        // if client is connected then we must tell the communication layer that we want this client
-        // to be disconnected.
-        // if client stage is DESTROYING then the communication layer tells us that the client
-        // has disconnected by its initiative, and it must be removed from the registry
+        // If this use case is initiated by the server, then the client socket dropping will certainly
+        // trigger the use case a second time, but as the client will be dropped, nothing serious will occur.
         if (client) {
-            switch (client.stage) {
-                case CLIENT_STAGES.DESTROYING: {
-                    // the client connection is about to be closed
-                    // we must remove the client from registry
-                    return this.clientRepository.delete(client);
-                }
-
-                default: {
-                    // we kick this client, but the communication layer is unaware
-                    // so we tell the communication layer to close its connection
-                    // hopefully the communication layer will change client stage to DESTROYING
-                    // and will re call DestroyClient use case to finish the job
-                    this.communicationLayer.dropClientSocket(idClient);
-                    client.stage = CLIENT_STAGES.DESTROYING;
-                    await this.clientRepository.save(client);
-                    break;
-                }
-            }
+            this.communicationLayer.dropClient(idClient);
+            // drop client socket, this use case will not do anything the next time it is called.
+            await this.clientRepository.delete(client);
         }
     }
 }

@@ -1,4 +1,4 @@
-import { JsonObject, ScalarValue } from '../types';
+import { JsonObject, ScalarValue } from '../../types/JsonStruct';
 
 export type DatabaseInitOptions = {
     host: string;

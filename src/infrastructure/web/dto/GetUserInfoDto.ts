@@ -1,5 +1,5 @@
 import z from 'zod';
-import { EntityId } from '../../../domain/types';
+import { EntityId } from '../../../domain/schemas/EntityId';
 
 const BanSchema = z.object({
     reason: z.string(),

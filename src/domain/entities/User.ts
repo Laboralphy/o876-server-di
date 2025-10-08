@@ -1,6 +1,6 @@
 import z from 'zod';
 import { Roles } from '../enums';
-import { EntityId } from '../types';
+import { EntityId } from '../schemas/EntityId';
 import { BanSchema } from './Ban';
 
 export const UserSchema = z.object({

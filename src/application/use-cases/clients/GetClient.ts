@@ -1,4 +1,4 @@
-import { IClientRepository } from '../../ports/repositories/IClientRepository';
+import { IClientRepository } from '../../../domain/ports/repositories/IClientRepository';
 import { Cradle } from '../../../config/container';
 import { Client } from '../../../domain/entities/Client';
 

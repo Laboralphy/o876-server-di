@@ -1,0 +1,5 @@
+{
+  "login": {
+    "banned": "Bannissement actif jusqu'au : {{ date }}"
+  }
+}

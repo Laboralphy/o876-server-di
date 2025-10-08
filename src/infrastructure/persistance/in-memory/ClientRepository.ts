@@ -1,6 +1,6 @@
-import { IClientRepository } from '../../../application/ports/repositories/IClientRepository';
+import { IClientRepository } from '../../../domain/ports/repositories/IClientRepository';
 import { Client } from '../../../domain/entities/Client';
-import { ForEachCallback } from '../../../domain/ports/IDatabaseAdapter';
+import { ForEachCallback } from '../../../domain/ports/adapters/IDatabaseAdapter';
 
 export class ClientRepository implements IClientRepository {
     private clients = new Map<string, Client>();

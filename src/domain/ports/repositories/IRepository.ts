@@ -1,4 +1,4 @@
-import { ForEachCallback } from '../../../domain/ports/IDatabaseAdapter';
+import { ForEachCallback } from '../adapters/IDatabaseAdapter';
 
 /**
  * This is the base repository interface for low level entity access

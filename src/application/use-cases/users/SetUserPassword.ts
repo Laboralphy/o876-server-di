@@ -1,6 +1,6 @@
 import { Cradle } from '../../../config/container';
 import { IEncryptor } from '../../ports/services/IEncryptor';
-import { IUserSecretRepository } from '../../ports/repositories/IUserSecretRepository';
+import { IUserSecretRepository } from '../../../domain/ports/repositories/IUserSecretRepository';
 import { UserSecretSchema } from '../../../domain/entities/UserSecret';
 import { id } from 'zod/locales';
 
