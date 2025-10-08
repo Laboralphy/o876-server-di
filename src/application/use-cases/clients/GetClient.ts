@@ -9,12 +9,12 @@ export class GetClient {
         this.clientRepository = cradle.clientRepository;
     }
 
-    async execute(id: string): Promise<Client | undefined> {
+    async execute(id: string): Promise<Client> {
         const client = await this.clientRepository.get(id);
         if (client) {
             return client;
         } else {
-            return undefined;
+            throw new Error(`client ${id} not found`);
         }
     }
 }

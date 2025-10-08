@@ -40,6 +40,9 @@ import { CommunicationLayer } from '../infrastructure/services/CommunicationLaye
 import { DestroyClient } from '../application/use-cases/clients/DestroyClient';
 import { IStringRepository } from '../application/ports/services/IStringRepository';
 import { I18nRepository } from '../infrastructure/services/I18nRepository';
+import { SendClientString } from '../application/use-cases/clients/SendClientString';
+import { HbsTemplateRepository } from '../infrastructure/services/HbsTemplateRepository';
+import { ITemplateRepository } from '../application/ports/services/ITemplateRepository';
 
 /**
  * To as a new use case, port ...,
@@ -64,6 +67,7 @@ export interface Cradle {
     authenticateClient: AuthenticateClient;
     getClient: GetClient;
     destroyClient: DestroyClient;
+    sendClientString: SendClientString;
 
     // repositories
     userRepository: IUserRepository;
@@ -81,6 +85,7 @@ export interface Cradle {
     time: ITime;
     communicationLayer: ICommunicationManager;
     stringRepository: IStringRepository;
+    templateRepository: ITemplateRepository;
 }
 
 // Container creation
@@ -104,6 +109,7 @@ container.register({
     authenticateClient: asClass(AuthenticateClient).singleton(),
     getClient: asClass(GetClient).singleton(),
     destroyClient: asClass(DestroyClient).singleton(),
+    sendClientString: asClass(SendClientString).singleton(),
 
     // repositories
     userRepository: asClass(UserRepository).singleton(),
@@ -122,4 +128,5 @@ container.register({
     time: asClass(TimeVanilla).singleton(),
     communicationLayer: asClass(CommunicationLayer).singleton(),
     stringRepository: asClass(I18nRepository).singleton(),
+    templateRepository: asClass(HbsTemplateRepository).singleton(),
 });

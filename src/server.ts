@@ -9,6 +9,9 @@ import { FsHelper } from 'o876-fs-ts';
 import { expandPath } from './libs/expand-path';
 import telnet, { Server as TelnetServer, Client as TelnetClient } from 'telnet2';
 import { initI18n } from './libs/i18n-string-loader';
+import path from 'node:path';
+import { initHandlebars } from './libs/template-loader';
+import i18n from 'i18next';
 
 const debugServer = printDbg('server');
 
@@ -27,8 +30,16 @@ export class Server {
 
     async initI18n() {
         const lng = this.env.I18N_LANGUAGE ?? 'en';
-        debugServer('loading i18n strings (%s)', lng);
-        return initI18n(lng, ['general']);
+        debugServer('loading i18n strings (language: %s)', lng);
+
+        await initI18n(path.join(__dirname, 'assets/locales'), lng, ['errors', 'general']);
+        const { t } = i18n;
+        debugServer('**************** ' + t('healthcheck'));
+    }
+
+    async initHbs() {
+        debugServer('loading templates');
+        await initHandlebars(path.join(__dirname, 'assets/templates'));
     }
 
     /**
@@ -122,6 +133,7 @@ export class Server {
 
     async run() {
         await this.initI18n();
+        await this.initHbs();
         await this.initDataDirectory();
         await this.initDatabase();
         await this.initApiService();

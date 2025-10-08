@@ -11,19 +11,6 @@ export interface ICommunicationManager {
     linkClientSocket(idClient: string, clientSocket: IClientSocket): void;
 
     /**
-     * Associates a user with a clientSession
-     * @param idClient
-     * @param idUser
-     */
-    bindClientUser(idClient: string, idUser: string): void;
-
-    /**
-     * Get user previously associated with client with the method `bindClientUser`
-     * @param idUser
-     */
-    findUserClient(idUser: string): ClientSession;
-
-    /**
      * Get session data from a connected client. Returns undefined if client does not exist
      * @param idClient
      */

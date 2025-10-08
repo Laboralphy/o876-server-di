@@ -72,7 +72,7 @@ export function listCommand(yargs: Argv): Argv {
                     output.unshift([
                         t('userListCmd.listLabelId'),
                         t('userListCmd.listLabelName'),
-                        t('userListCmd.listLabelDateCreate'),
+                        t('userListCmd.listLabelDateCreated'),
                         t('userListCmd.listLabelLastLogin'),
                         t('userListCmd.listLabelBanned'),
                     ]);

@@ -19,21 +19,6 @@ export class CommunicationLayer implements ICommunicationManager {
         });
     }
 
-    bindClientUser(idClient: string, idUser: string): void {
-        const csd = this.getClientSession(idClient);
-        csd.user = idUser;
-        this.userClients.set(idUser, idClient);
-    }
-
-    findUserClient(idUser: string): ClientSession {
-        const idClient = this.userClients.get(idUser);
-        if (idClient) {
-            return this.getClientSession(idClient);
-        } else {
-            throw new Error(`could not find user ${idUser} client session`);
-        }
-    }
-
     getClientSession(idClient: string): ClientSession {
         const cs = this.clientSessions.get(idClient);
         if (cs) {

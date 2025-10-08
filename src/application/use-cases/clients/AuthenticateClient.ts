@@ -7,6 +7,7 @@ import { User } from '../../../domain/entities/User';
 import { Client, CLIENT_STAGES } from '../../../domain/entities/Client';
 import { ITime } from '../../ports/services/ITime';
 import { GetUserBan } from '../users/GetUserBan';
+import { SendClientString } from './SendClientString';
 
 /**
  * This use case will check if specified client-login & password
@@ -21,6 +22,7 @@ export class AuthenticateClient {
     private readonly encryptor: IEncryptor;
     private readonly time: ITime;
     private readonly getUserBan: GetUserBan;
+    private readonly sendClientString: SendClientString;
 
     constructor(cradle: Cradle) {
         this.clientRepository = cradle.clientRepository;
@@ -29,6 +31,7 @@ export class AuthenticateClient {
         this.encryptor = cradle.encryptor;
         this.time = cradle.time;
         this.getUserBan = cradle.getUserBan;
+        this.sendClientString = cradle.sendClientString;
     }
 
     async execute(clientId: string, login: string, password: string): Promise<Client> {
@@ -51,7 +54,16 @@ export class AuthenticateClient {
         user.tsLastUsed = this.time.now();
         client.user = user.id;
         const ban = await this.getUserBan.execute(user.id);
-        client.stage = ban ? CLIENT_STAGES.BANNED : CLIENT_STAGES.AUTHENTICATED;
+
+        if (ban) {
+            client.stage = CLIENT_STAGES.BANNED;
+            await this.sendClientString.execute(client.id, 'user-banned', {
+                date: this.time.renderDate(ban?.tsEnd, 'ymd hm'),
+                reason: ban.reason,
+            });
+        } else {
+            client.stage = CLIENT_STAGES.AUTHENTICATED;
+        }
         await this.userRepository.save(user);
         await this.clientRepository.save(client);
         return client;
