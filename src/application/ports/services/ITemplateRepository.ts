@@ -1,8 +1,10 @@
-import { JsonValue } from '../../../domain/types/JsonStruct';
+import { JsonObject } from '../../../domain/types/JsonStruct';
 
 /**
  * This class is aimed at retrieving a string asset, with its key, and some optional parameters.
  */
 export interface ITemplateRepository {
-    renderTemplate(key: string, parameters: Record<string, JsonValue>): string | undefined;
+    init(location: string): Promise<void>;
+    render(key: string, parameters?: JsonObject): string | undefined;
+    loadTemplates(sLocation: string): Promise<void>;
 }

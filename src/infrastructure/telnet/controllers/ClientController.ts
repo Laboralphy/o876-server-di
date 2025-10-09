@@ -51,6 +51,7 @@ export class ClientController {
             await this.destroyClient.execute(idClient);
         });
 
+        await this.sendClientString.execute(domainClient.id, 'welcome.password', { _nolf: true });
         clientSocket.onMessage(async (message: string) => {
             // in telnet
             // the first two messages are used to receive credentials
@@ -62,11 +63,13 @@ export class ClientController {
                 debugTelnet('user %s : %s', csd.login, message);
             } else if (csd.login !== '') {
                 // here the message should be a password
+                await csd.clientSocket.send(Buffer.from([0xff, 0xfc, 0x01])); // Réactive l'écho (DONT WONT ECHO)
+                await csd.clientSocket.send('\n');
                 debugTelnet('client %s sending password', idClient);
                 try {
                     await this.authenticateClient.execute(idClient, csd.login, message);
                     if (client.stage === CLIENT_STAGES.BANNED) {
-                        debugTelnet('user %s is banned', csd.user);
+                        debugTelnet('user %s is banned - disconnecting user', csd.login);
                         await this.destroyClient.execute(client.id);
                         return;
                     }
@@ -80,6 +83,8 @@ export class ClientController {
             } else {
                 // here the message should be a user login name
                 csd.login = message;
+                await this.sendClientString.execute(client.id, 'welcome.password', { _nolf: true });
+                await csd.clientSocket.send(Buffer.from([0xff, 0xfb, 0x01])); // Désactive l'écho (DO WONT ECHO)
                 debugTelnet('client %s sending login : %s', idClient, csd.login);
             }
         });

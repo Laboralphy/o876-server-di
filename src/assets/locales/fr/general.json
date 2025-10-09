@@ -1,8 +1,7 @@
 {
-  "healthcheck": "i18n translation engine active",
   "welcome": {
-    "server": "Serveur multi-protocole",
-    "user": "Bienvenue {{ user }}."
+    "login": "Login:",
+    "password": "Mot de passe:"
   },
   "userBanned": {
     "forever": "Bannissement permanent",

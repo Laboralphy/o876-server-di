@@ -16,7 +16,7 @@ export class TelnetClientSocket implements IClientSocket {
         });
     }
 
-    send(message: string): Promise<void> {
+    send(message: string | Buffer): Promise<void> {
         return new Promise((resolve) => {
             const socket = this.socket;
             if (!message) {

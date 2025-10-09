@@ -8,9 +8,7 @@ import { getEnv } from './config/dotenv';
 import { FsHelper } from 'o876-fs-ts';
 import { expandPath } from './libs/expand-path';
 import telnet, { Server as TelnetServer, Client as TelnetClient } from 'telnet2';
-import { initI18n } from './libs/i18n-loader';
 import path from 'node:path';
-import { initHandlebars } from './libs/template-loader';
 
 const debugServer = printDbg('server');
 
@@ -38,7 +36,8 @@ export class Server {
 
     async initHbs() {
         debugServer('loading templates');
-        await initHandlebars(path.join(__dirname, 'assets/templates'));
+        const oTemplateRepository = container.resolve('templateRepository');
+        await oTemplateRepository.init(path.join(__dirname, 'assets/templates'));
     }
 
     /**

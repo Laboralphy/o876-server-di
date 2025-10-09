@@ -39,6 +39,5 @@ export function render(key: string, parameters?: JsonObject) {
     } else {
         parameters = { interpolation: { escapeValue: false } };
     }
-    console.log('***********', parameters);
     return i18n.t(key, parameters);
 }

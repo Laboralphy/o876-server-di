@@ -6,7 +6,7 @@ export interface IClientSocket {
      * Sends a message to the client
      * @param message
      */
-    send(message: string): Promise<void>;
+    send(message: string | Buffer): Promise<void>;
 
     /**
      * Listen to message from client

@@ -16,7 +16,6 @@ export class I18nRepository implements IStringRepository {
     }
 
     render(key: string, parameters?: JsonObject): string {
-        console.log('key, parameters');
         return render(key, parameters);
     }
 }
