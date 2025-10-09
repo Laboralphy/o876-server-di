@@ -51,7 +51,7 @@ export class ClientController {
             await this.destroyClient.execute(idClient);
         });
 
-        await this.sendClientString.execute(domainClient.id, 'welcome.password', { _nolf: true });
+        await this.sendClientString.execute(domainClient.id, 'welcome.login', { _nolf: true });
         clientSocket.onMessage(async (message: string) => {
             // in telnet
             // the first two messages are used to receive credentials

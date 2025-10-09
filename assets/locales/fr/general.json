@@ -1,11 +1,11 @@
 {
   "welcome": {
-    "login": "Login:",
-    "password": "Mot de passe:"
+    "login": "Login: ",
+    "password": "Mot de passe: "
   },
   "userBanned": {
     "forever": "Bannissement permanent",
-    "date": "Bannissement actif jusqu'au : {{ date }}",
+    "date": "Connexion refusée : Bannissement actif jusqu'au {{ date }}",
     "reason": "Raison : {{ reason }}",
     "noReason": "Raison non spécifiée"
   }

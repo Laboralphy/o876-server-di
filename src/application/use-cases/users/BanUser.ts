@@ -1,5 +1,4 @@
 import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
-import { ModifyUserDto } from '../../dto/ModifyUserDto';
 import { Cradle } from '../../../config/container';
 import { BanUserDto } from '../../dto/BanUserDto';
 import { ITime } from '../../ports/services/ITime';

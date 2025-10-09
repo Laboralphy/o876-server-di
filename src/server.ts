@@ -31,13 +31,13 @@ export class Server {
         const oStringRepository = container.resolve('stringRepository');
         await oStringRepository.init();
         await oStringRepository.setLanguage(lng);
-        await oStringRepository.loadFolder(path.join(__dirname, 'assets/locales'));
+        await oStringRepository.loadFolder(path.join(__dirname, '../assets/locales'));
     }
 
     async initHbs() {
         debugServer('loading templates');
         const oTemplateRepository = container.resolve('templateRepository');
-        await oTemplateRepository.init(path.join(__dirname, 'assets/templates'));
+        await oTemplateRepository.init(path.join(__dirname, '../assets/templates'));
     }
 
     /**

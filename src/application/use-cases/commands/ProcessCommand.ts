@@ -1,5 +1,5 @@
 class ProcessCommand {
-    async execute(client: Client) {
-        //
+    async execute(idClient: string, command: string) {
+        // a command has an opcode and several operands
     }
 }
