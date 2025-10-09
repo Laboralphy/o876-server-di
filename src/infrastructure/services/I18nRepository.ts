@@ -1,8 +1,22 @@
-import i18n from 'i18next';
 import { IStringRepository } from '../../application/ports/services/IStringRepository';
+import { loadFolder, init, setLang, render } from '../../libs/i18n-loader';
+import { JsonObject } from '../../domain/types/JsonStruct';
 
 export class I18nRepository implements IStringRepository {
-    getString(key: string, parameters: Record<string, string | number> = {}): string {
-        return i18n.t(key, parameters);
+    async init() {
+        await init();
+    }
+
+    async setLanguage(language: string) {
+        await setLang(language);
+    }
+
+    async loadFolder(path: string) {
+        await loadFolder(path);
+    }
+
+    render(key: string, parameters?: JsonObject): string {
+        console.log('key, parameters');
+        return render(key, parameters);
     }
 }

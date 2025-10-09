@@ -1,7 +1,7 @@
 {
   "healthcheck": "i18n translation engine active",
   "welcome": {
-    "server": "Plasmud 1 - Serveur multi-protocole",
+    "server": "Serveur multi-protocole",
     "user": "Bienvenue {{ user }}."
   },
   "userBanned": {

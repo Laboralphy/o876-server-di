@@ -1,4 +1,7 @@
 {
+  "userCmd": {
+    "describe": "Gestion des utilisateurs"
+  },
   "userBanCmd": {
     "describe": "Bannir un utilisateur",
     "userOpt": "Nom de l'utilisateur à bannir",

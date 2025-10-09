@@ -8,10 +8,9 @@ import { getEnv } from './config/dotenv';
 import { FsHelper } from 'o876-fs-ts';
 import { expandPath } from './libs/expand-path';
 import telnet, { Server as TelnetServer, Client as TelnetClient } from 'telnet2';
-import { initI18n } from './libs/i18n-string-loader';
+import { initI18n } from './libs/i18n-loader';
 import path from 'node:path';
 import { initHandlebars } from './libs/template-loader';
-import i18n from 'i18next';
 
 const debugServer = printDbg('server');
 
@@ -28,13 +27,13 @@ export class Server {
         this.telnetServer = telnet.createServer({ convertLF: false });
     }
 
-    async initI18n() {
+    async initStringAssets() {
         const lng = this.env.I18N_LANGUAGE ?? 'en';
         debugServer('loading i18n strings (language: %s)', lng);
-
-        await initI18n(path.join(__dirname, 'assets/locales'), lng, ['errors', 'general']);
-        const { t } = i18n;
-        debugServer('**************** ' + t('healthcheck'));
+        const oStringRepository = container.resolve('stringRepository');
+        await oStringRepository.init();
+        await oStringRepository.setLanguage(lng);
+        await oStringRepository.loadFolder(path.join(__dirname, 'assets/locales'));
     }
 
     async initHbs() {
@@ -132,7 +131,7 @@ export class Server {
     }
 
     async run() {
-        await this.initI18n();
+        await this.initStringAssets();
         await this.initHbs();
         await this.initDataDirectory();
         await this.initDatabase();

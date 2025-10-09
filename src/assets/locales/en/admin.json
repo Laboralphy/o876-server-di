@@ -1,4 +1,7 @@
 {
+  "userCmd": {
+    "describe": "User management"
+  },
   "userBanCmd": {
     "describe": "Ban a user",
     "userOpt": "Name of user to ban",

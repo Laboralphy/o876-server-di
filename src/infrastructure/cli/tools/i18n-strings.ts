@@ -1,6 +1,10 @@
-import { initI18n } from '../../../libs/i18n-string-loader';
+import { init, loadStrings, render, setLang } from '../../../libs/i18n-loader';
 import path from 'node:path';
 
-export function initI18nStrings(lng: string) {
-    return initI18n(path.join(__dirname, '../../../assets/locales/'), lng, ['admin']);
+export async function initI18nStrings(lng: string) {
+    await init();
+    await loadStrings(path.join(__dirname, '../../../assets/locales/en/admin.json'), 'en');
+    await loadStrings(path.join(__dirname, '../../../assets/locales/fr/admin.json'), 'fr');
+    await setLang(lng);
+    return render;
 }

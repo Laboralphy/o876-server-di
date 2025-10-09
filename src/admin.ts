@@ -6,10 +6,10 @@ import { getEnv } from './config/dotenv';
 
 async function main() {
     const sLang = getEnv().I18N_LANGUAGE ?? 'en';
-    await initI18nStrings(sLang);
+    const t = await initI18nStrings(sLang);
     yargs(hideBin(process.argv))
         .locale(sLang)
-        .command('user', 'User management', user)
+        .command('user', t('userCmd.describe'), user)
         .help()
         .parseAsync()
         .catch((err) => {

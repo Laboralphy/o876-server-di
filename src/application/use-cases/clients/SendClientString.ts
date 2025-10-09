@@ -25,7 +25,7 @@ export class SendClientString {
             }
             return;
         }
-        const sMessage = this.stringRepository.getString(key, parameters);
+        const sMessage = this.stringRepository.render(key, parameters);
         await this.communicationLayer.sendMessage(idClient, sMessage + '\n');
     }
 }
