@@ -2,6 +2,11 @@ import i18n from 'i18next';
 import fs from 'node:fs/promises';
 import { JsonObject } from '../../domain/types/JsonStruct';
 
+/**
+ * Initialize i18n with one namespace : "translation", and no resources.
+ * Use loadString/loadFolder to add resources before rendering anything
+ * All is global here ; no separated instance.
+ */
 export async function init() {
     return i18n.init({
         lng: 'en',
@@ -12,11 +17,31 @@ export async function init() {
     });
 }
 
+/**
+ * Adds a JSON files to the resources. Loads the Json from the file system
+ * @param location json file full location
+ * @param lng languge of the json file ('fr', 'en', ...)
+ * @param ns namespace (by default "translation") you should not change that before setting a full namespace support.
+ */
 export async function loadStrings(location: string, lng: string, ns: string = 'translation') {
     const data = await fs.readFile(location, 'utf8');
     return i18n.addResourceBundle(lng, ns, JSON.parse(data));
 }
 
+/**
+ * load an entire folder of json files as resources.
+ * The folder sub directory structure must be :
+ * 📁 location
+ * ├── 📁 fr
+ * │   ├── 📄 file1.json
+ * │   └── 📄 file2.json
+ * └── 📁 en
+ *     ├── 📄 file1.json
+ *     └── 📄 file2.json
+ *
+ * @param location
+ * @param aNamespaces should be left empty or undefined, no namespace support at the moment
+ */
 export async function loadFolder(location: string, aNamespaces: string[] = []) {
     const aFiles = await fs.readdir(location, { recursive: true });
     return Promise.all(
@@ -29,10 +54,19 @@ export async function loadFolder(location: string, aNamespaces: string[] = []) {
     );
 }
 
+/**
+ * Change i18n language
+ * @param lang fr, en ...
+ */
 export function setLang(lang: string) {
     return i18n.changeLanguage(lang);
 }
 
+/**
+ * Renders a string
+ * @param key string identifier in i18n notation
+ * @param parameters rendering parameters
+ */
 export function render(key: string, parameters?: JsonObject) {
     if (parameters) {
         parameters = { ...parameters, interpolation: { escapeValue: false } };
