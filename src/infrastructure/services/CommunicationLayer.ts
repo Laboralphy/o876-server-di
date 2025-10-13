@@ -14,8 +14,8 @@ export class CommunicationLayer implements ICommunicationManager {
     linkClientSocket(idClient: string, clientSocket: IClientSocket): void {
         this.clientSessions.set(idClient, {
             clientSocket,
-            login: '',
-            user: '',
+            userName: '',
+            userId: '',
         });
     }
 
@@ -31,7 +31,7 @@ export class CommunicationLayer implements ICommunicationManager {
     dropClient(idClient: string): void {
         const cs = this.getClientSession(idClient);
         cs.clientSocket.close();
-        this.userClients.delete(cs.user);
+        this.userClients.delete(cs.userId);
         this.clientSessions.delete(idClient);
     }
 

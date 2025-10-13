@@ -60,21 +60,21 @@ export class ClientController {
             const client = await this.getClient.execute(idClient);
             if (client.stage === CLIENT_STAGES.AUTHENTICATED) {
                 // here the message should be interpreted as a command
-                debugTelnet('user %s : %s', csd.login, message);
-            } else if (csd.login !== '') {
+                debugTelnet('user %s : %s', csd.userName, message);
+            } else if (csd.userName !== '') {
                 // here the message should be a password
                 await csd.clientSocket.send(Buffer.from([0xff, 0xfc, 0x01])); // Réactive l'écho (DONT WONT ECHO)
                 await csd.clientSocket.send('\n');
                 debugTelnet('client %s sending password', idClient);
                 try {
-                    await this.authenticateClient.execute(idClient, csd.login, message);
+                    await this.authenticateClient.execute(idClient, csd.userName, message);
                     if (client.stage === CLIENT_STAGES.BANNED) {
-                        debugTelnet('user %s is banned - disconnecting user', csd.login);
+                        debugTelnet('user %s is banned - disconnecting user', csd.userName);
                         await this.destroyClient.execute(client.id);
                         return;
                     }
-                    csd.user = client.user ?? '';
-                    debugTelnet('client %s is now authenticated as user', csd.user);
+                    csd.userId = client.user ?? '';
+                    debugTelnet('client %s is now authenticated as user', csd.userId);
                 } catch (e) {
                     const error = e as Error;
                     debugTelnet('client %s authentication error: %s', idClient, error.message);
@@ -82,10 +82,10 @@ export class ClientController {
                 }
             } else {
                 // here the message should be a user login name
-                csd.login = message;
+                csd.userName = message;
                 await this.sendClientString.execute(client.id, 'welcome.password', { _nolf: true });
                 await csd.clientSocket.send(Buffer.from([0xff, 0xfb, 0x01])); // Désactive l'écho (DO WONT ECHO)
-                debugTelnet('client %s sending login : %s', idClient, csd.login);
+                debugTelnet('client %s sending login : %s', idClient, csd.userName);
             }
         });
     }

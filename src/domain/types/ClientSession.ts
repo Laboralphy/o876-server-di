@@ -1,7 +1,7 @@
 import { IClientSocket } from '../ports/adapters/IClientSocket';
 
 export type ClientSession = {
-    clientSocket: IClientSocket;
-    login: string;
-    user: string;
+    clientSocket: IClientSocket; // Instance to socket level
+    userName: string; // user name
+    userId: string; // user identifier
 };
