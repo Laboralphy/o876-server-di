@@ -1,4 +1,5 @@
-import { createContainer, asClass } from 'awilix';
+import { FsHelper } from 'o876-fs-ts';
+import { createContainer, asClass, asFunction } from 'awilix';
 import { UserRepository } from '../infrastructure/persistance/json-database/UserRepository';
 
 import { Encryptor } from '../infrastructure/services/Encryptor';
@@ -89,7 +90,7 @@ export interface Cradle {
 }
 
 // Container creation
-export const container = createContainer<Cradle>();
+const container = createContainer<Cradle>();
 
 // Registering dependencies
 container.register({
