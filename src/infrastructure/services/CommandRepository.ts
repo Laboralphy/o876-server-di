@@ -5,10 +5,5 @@ export class CommandRepository {
 
     constructor() {}
 
-    async runCommand(command: string, idUser: string, args: string[]) {
-        const script = this.scriptFactory.getModule(command);
-        if (script) {
-            return script.main();
-        }
-    }
+    async runCommand(command: string, idUser: string, args: string[]) {}
 }

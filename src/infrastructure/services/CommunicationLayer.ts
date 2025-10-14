@@ -1,6 +1,7 @@
 import { IClientSocket } from '../../domain/ports/adapters/IClientSocket';
 import { ICommunicationManager } from '../../application/ports/services/ICommunicationManager';
 import { ClientSession } from '../../domain/types/ClientSession';
+import { ClientContext } from '../client-context/ClientContext';
 
 /**
  * This class is used by the use-case application layer to easily perform low level network operations
@@ -12,11 +13,13 @@ export class CommunicationLayer implements ICommunicationManager {
     private readonly userClients: Map<string, string> = new Map();
 
     linkClientSocket(idClient: string, clientSocket: IClientSocket): void {
-        this.clientSessions.set(idClient, {
+        const clientSession: ClientSession = {
             clientSocket,
             userName: '',
             userId: '',
-        });
+        };
+        this.clientSessions.set(idClient, clientSession);
+        const clientContext = new ClientContext(clientSession);
     }
 
     getClientSession(idClient: string): ClientSession {
