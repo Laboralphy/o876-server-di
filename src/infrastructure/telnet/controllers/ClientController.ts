@@ -1,14 +1,14 @@
 import { Client as TelnetClient } from '../../../../@types/telnet2';
 import { Cradle } from '../../../config/container';
-import { CreateClient } from '../../../application/use-cases/clients/CreateClient';
-import { CLIENT_PROTOCOL, CLIENT_STAGES } from '../../../domain/entities/Client';
-import { AuthenticateClient } from '../../../application/use-cases/clients/AuthenticateClient';
+import { AuthenticateUser } from '../../../application/use-cases/users/AuthenticateUser';
 import { printDbg } from '../../../libs/print-dbg';
-import { ICommunicationManager } from '../../../application/ports/services/ICommunicationManager';
+import { ICommunicationLayer } from '../../../application/ports/services/ICommunicationLayer';
 import { TelnetClientSocket } from '../../services/TelnetClientSocket';
 import { DestroyClient } from '../../../application/use-cases/clients/DestroyClient';
-import { GetClient } from '../../../application/use-cases/clients/GetClient';
 import { SendClientString } from '../../../application/use-cases/clients/SendClientString';
+import { GetUserBan } from '../../../application/use-cases/users/GetUserBan';
+import { ITime } from '../../../application/ports/services/ITime';
+import { IUIDGenerator } from '../../../application/ports/services/IUIDGenerator';
 
 const debugTelnet = printDbg('telnet');
 
@@ -18,20 +18,22 @@ const debugTelnet = printDbg('telnet');
  * (example : kicking client, or sending message to client, except response)
  */
 export class ClientController {
-    private readonly createClient: CreateClient;
-    private readonly authenticateClient: AuthenticateClient;
+    private readonly authenticateUser: AuthenticateUser;
     private readonly destroyClient: DestroyClient;
-    private readonly communicationLayer: ICommunicationManager;
-    private readonly getClient: GetClient;
+    private readonly communicationLayer: ICommunicationLayer;
     private readonly sendClientString: SendClientString;
+    private readonly getUserBan: GetUserBan;
+    private readonly time: ITime;
+    private readonly uidGenerator: IUIDGenerator;
 
     constructor(cradle: Cradle) {
-        this.createClient = cradle.createClient;
-        this.authenticateClient = cradle.authenticateClient;
+        this.authenticateUser = cradle.authenticateUser;
         this.destroyClient = cradle.destroyClient;
         this.communicationLayer = cradle.communicationLayer;
-        this.getClient = cradle.getClient;
         this.sendClientString = cradle.sendClientString;
+        this.getUserBan = cradle.getUserBan;
+        this.time = cradle.time;
+        this.uidGenerator = cradle.uidGenerator;
     }
     /**
      * One client is connecting to telnet server.
@@ -40,9 +42,8 @@ export class ClientController {
      */
     async connect(socket: TelnetClient) {
         const clientSocket = new TelnetClientSocket(socket);
-        // create new client
-        const domainClient = await this.createClient.execute(clientSocket, CLIENT_PROTOCOL.TELNET);
-        const idClient = domainClient.id;
+        // create new client session
+        const idClient = this.uidGenerator.getUID();
         debugTelnet('client %s connexion', idClient);
 
         this.communicationLayer.linkClientSocket(idClient, clientSocket);
@@ -51,30 +52,45 @@ export class ClientController {
             await this.destroyClient.execute(idClient);
         });
 
-        await this.sendClientString.execute(domainClient.id, 'welcome.login', { _nolf: true });
+        await this.sendClientString.execute(idClient, 'welcome.login', { _nolf: true });
         clientSocket.onMessage(async (message: string) => {
             // in telnet
             // the first two messages are used to receive credentials
             // the subsequent messages must be parsed
             const csd = this.communicationLayer.getClientSession(idClient);
-            const client = await this.getClient.execute(idClient);
-            if (client.stage === CLIENT_STAGES.AUTHENTICATED) {
+            if (csd.user) {
                 // here the message should be interpreted as a command
-                debugTelnet('user %s : %s', csd.userName, message);
-            } else if (csd.userName !== '') {
+                debugTelnet('client %s has been authenticated as user %s', idClient, csd.user.name);
+            } else if (csd.login !== '') {
                 // here the message should be a password
                 await csd.clientSocket.send(Buffer.from([0xff, 0xfc, 0x01])); // Réactive l'écho (DONT WONT ECHO)
                 await csd.clientSocket.send('\n');
                 debugTelnet('client %s sending password', idClient);
                 try {
-                    await this.authenticateClient.execute(idClient, csd.userName, message);
-                    if (client.stage === CLIENT_STAGES.BANNED) {
-                        debugTelnet('user %s is banned - disconnecting user', csd.userName);
-                        await this.destroyClient.execute(client.id);
+                    csd.user = await this.authenticateUser.execute(csd.login, message);
+                    const ban = await this.getUserBan.execute(csd.user.id);
+                    if (ban) {
+                        // this user is banned
+                        // send a notification
+                        await this.sendClientString.execute(idClient, 'user-banned', {
+                            date: this.time.renderDate(ban?.tsEnd, 'ymd hm'),
+                            reason: ban.reason,
+                        });
+                        // print a debug line
+                        debugTelnet(
+                            'user %s was banned on %s until %s because : `%s` - disconnecting user',
+                            csd.user.name,
+                            this.time.renderDate(ban.tsBegin, 'ymd'),
+                            ban.forever
+                                ? 'the end of time'
+                                : this.time.renderDate(ban.tsEnd, 'ymd hm'),
+                            ban.reason
+                        );
+                        // destroy client socket, then exit function
+                        await this.destroyClient.execute(idClient);
                         return;
                     }
-                    csd.userId = client.user ?? '';
-                    debugTelnet('client %s is now authenticated as user', csd.userId);
+                    debugTelnet('client %s is now authenticated as user', csd.login);
                 } catch (e) {
                     const error = e as Error;
                     debugTelnet('client %s authentication error: %s', idClient, error.message);
@@ -82,10 +98,10 @@ export class ClientController {
                 }
             } else {
                 // here the message should be a user login name
-                csd.userName = message;
-                await this.sendClientString.execute(client.id, 'welcome.password', { _nolf: true });
+                csd.login = message;
+                await this.sendClientString.execute(idClient, 'welcome.password', { _nolf: true });
                 await csd.clientSocket.send(Buffer.from([0xff, 0xfb, 0x01])); // Désactive l'écho (DO WONT ECHO)
-                debugTelnet('client %s sending login : %s', idClient, csd.userName);
+                debugTelnet('client %s sending login : %s', idClient, csd.login);
             }
         });
     }

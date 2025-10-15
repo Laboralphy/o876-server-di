@@ -10,8 +10,8 @@ export class TelnetClientSocket implements IClientSocket {
 
     onMessage(callback: (message: string) => void): void {
         this.socket.on('data', (data: Buffer) => {
-            callback(data.toString().trimEnd());
             // trim CR/LF at the end.
+            callback(data.toString().trimEnd());
             // watch out for binary data
         });
     }

@@ -7,7 +7,6 @@ export enum CLIENT_STAGES {
     AUTHENTICATED, // connected and fully authenticated
     DESTROYING, // is going to be destroyed very soon
     DESTROYED, // has been destroyed, must be removed from in memory registry
-    BANNED, // has been banned, and ban is still active
 }
 
 export enum CLIENT_PROTOCOL {

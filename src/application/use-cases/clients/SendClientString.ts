@@ -1,7 +1,7 @@
 import { Cradle } from '../../../config/container';
 import { IStringRepository } from '../../ports/services/IStringRepository';
 import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
-import { ICommunicationManager } from '../../ports/services/ICommunicationManager';
+import { ICommunicationLayer } from '../../ports/services/ICommunicationLayer';
 import { ITemplateRepository } from '../../ports/services/ITemplateRepository';
 import { JsonObject } from '../../../domain/types/JsonStruct';
 
@@ -11,7 +11,7 @@ import { JsonObject } from '../../../domain/types/JsonStruct';
 export class SendClientString {
     private readonly stringRepository: IStringRepository;
     private readonly templateRepository: ITemplateRepository;
-    private readonly communicationLayer: ICommunicationManager;
+    private readonly communicationLayer: ICommunicationLayer;
 
     constructor(cradle: Cradle) {
         this.stringRepository = cradle.stringRepository;

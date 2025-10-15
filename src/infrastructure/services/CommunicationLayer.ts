@@ -1,25 +1,22 @@
 import { IClientSocket } from '../../domain/ports/adapters/IClientSocket';
-import { ICommunicationManager } from '../../application/ports/services/ICommunicationManager';
+import { ICommunicationLayer } from '../../application/ports/services/ICommunicationLayer';
 import { ClientSession } from '../../domain/types/ClientSession';
-import { ClientContext } from '../client-context/ClientContext';
 
 /**
  * This class is used by the use-case application layer to easily perform low level network operations
  * regardless of the type of socket owned by the user.
  * The use cases must be agnostic of the socket type.
  */
-export class CommunicationLayer implements ICommunicationManager {
+export class CommunicationLayer implements ICommunicationLayer {
     private readonly clientSessions: Map<string, ClientSession> = new Map();
-    private readonly userClients: Map<string, string> = new Map();
 
     linkClientSocket(idClient: string, clientSocket: IClientSocket): void {
         const clientSession: ClientSession = {
             clientSocket,
-            userName: '',
-            userId: '',
+            login: '',
+            user: null,
         };
         this.clientSessions.set(idClient, clientSession);
-        const clientContext = new ClientContext(clientSession);
     }
 
     getClientSession(idClient: string): ClientSession {
@@ -32,9 +29,10 @@ export class CommunicationLayer implements ICommunicationManager {
     }
 
     dropClient(idClient: string): void {
-        const cs = this.getClientSession(idClient);
-        cs.clientSocket.close();
-        this.userClients.delete(cs.userId);
+        const cs = this.clientSessions.get(idClient);
+        if (cs) {
+            cs.clientSocket.close(); // will cause a "onDisconnect" event
+        }
         this.clientSessions.delete(idClient);
     }
 

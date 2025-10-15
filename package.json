@@ -18,6 +18,7 @@
     "awilix": "^12.0.5",
     "awilix-koa": "^11.1.0",
     "dotenv": "^17.2.2",
+    "fengari": "^0.1.4",
     "handlebars": "^4.7.8",
     "i18next": "^25.5.3",
     "koa": "^3.0.1",
@@ -26,7 +27,6 @@
     "o876-json-db": "github:Laboralphy/o876-json-db#v1.4.1",
     "reflect-metadata": "^0.2.2",
     "telnet2": "^0.0.1",
-    "vm2": "^3.9.19",
     "yaml": "^2.8.1",
     "yargs": "^18.0.0",
     "zod": "^4.1.9"

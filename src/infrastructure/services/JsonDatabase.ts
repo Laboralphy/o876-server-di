@@ -7,7 +7,6 @@ import path from 'node:path';
 import {
     Collection,
     DiskStorage,
-    INDEX_TYPES,
     IndexCreationOptions,
     IStorage,
     MemoryStorage,
@@ -15,6 +14,7 @@ import {
 import { JsonObject, ScalarValue } from '../../domain/types/JsonStruct';
 import { printDbg } from '../../libs/print-dbg';
 import { expandPath } from '../../libs/expand-path';
+import { JsonDatabaseConfig } from '../../config/json-database.config';
 
 const debugDb = printDbg('database');
 
@@ -49,17 +49,9 @@ export class JsonDatabase implements IDatabaseAdapter {
     async init(options: DatabaseInitOptions): Promise<void> {
         debugDb('json-database management system : json json-database');
         // Users
-        await this.initCollection('users', this.diskStorage, options, {
-            name: {
-                type: INDEX_TYPES.HASH,
-                caseInsensitive: true,
-            },
-            ban: {
-                type: INDEX_TYPES.TRUTHY,
-                nullable: true,
-            },
-        });
-        await this.initCollection('user-secrets', this.diskStorage, options, {});
+        for (const { name, indexes } of JsonDatabaseConfig.collections) {
+            await this.initCollection(name, this.diskStorage, options, indexes);
+        }
         debugDb('json-database initialization complete');
     }
 

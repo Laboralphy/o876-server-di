@@ -1,5 +1,4 @@
-import { FsHelper } from 'o876-fs-ts';
-import { createContainer, asClass, asFunction } from 'awilix';
+import { createContainer, asClass } from 'awilix';
 import { UserRepository } from '../infrastructure/persistance/json-database/UserRepository';
 
 import { Encryptor } from '../infrastructure/services/Encryptor';
@@ -32,11 +31,8 @@ import { UserController as ApiUserController } from '../infrastructure/web/contr
 import { ClientController as TelnetClientController } from '../infrastructure/telnet/controllers/ClientController';
 
 import { UserSecretRepository } from '../infrastructure/persistance/json-database/UserSecretRepository';
-import { ClientRepository } from '../infrastructure/persistance/in-memory/ClientRepository';
-import { CreateClient } from '../application/use-cases/clients/CreateClient';
-import { AuthenticateClient } from '../application/use-cases/clients/AuthenticateClient';
-import { GetClient } from '../application/use-cases/clients/GetClient';
-import { ICommunicationManager } from '../application/ports/services/ICommunicationManager';
+import { AuthenticateUser } from '../application/use-cases/users/AuthenticateUser';
+import { ICommunicationLayer } from '../application/ports/services/ICommunicationLayer';
 import { CommunicationLayer } from '../infrastructure/services/CommunicationLayer';
 import { DestroyClient } from '../application/use-cases/clients/DestroyClient';
 import { IStringRepository } from '../application/ports/services/IStringRepository';
@@ -64,16 +60,13 @@ export interface Cradle {
     banUser: BanUser;
     unbanUser: UnbanUser;
     // use cases clients
-    createClient: CreateClient;
-    authenticateClient: AuthenticateClient;
-    getClient: GetClient;
+    authenticateUser: AuthenticateUser;
     destroyClient: DestroyClient;
     sendClientString: SendClientString;
 
     // repositories
     userRepository: IUserRepository;
     userSecretRepository: IUserSecretRepository;
-    clientRepository: IClientRepository;
 
     // controller
     apiUserController: ApiUserController;
@@ -84,13 +77,13 @@ export interface Cradle {
     uidGenerator: IUIDGenerator;
     database: IDatabaseAdapter;
     time: ITime;
-    communicationLayer: ICommunicationManager;
+    communicationLayer: ICommunicationLayer;
     stringRepository: IStringRepository;
     templateRepository: ITemplateRepository;
 }
 
 // Container creation
-const container = createContainer<Cradle>();
+export const container = createContainer<Cradle>();
 
 // Registering dependencies
 container.register({
@@ -105,17 +98,14 @@ container.register({
     setUserPassword: asClass(SetUserPassword).singleton(),
     banUser: asClass(BanUser).singleton(),
     unbanUser: asClass(UnbanUser).singleton(),
+    authenticateUser: asClass(AuthenticateUser).singleton(),
     // use cases : clients
-    createClient: asClass(CreateClient).singleton(),
-    authenticateClient: asClass(AuthenticateClient).singleton(),
-    getClient: asClass(GetClient).singleton(),
     destroyClient: asClass(DestroyClient).singleton(),
     sendClientString: asClass(SendClientString).singleton(),
 
     // repositories
     userRepository: asClass(UserRepository).singleton(),
     userSecretRepository: asClass(UserSecretRepository).singleton(),
-    clientRepository: asClass(ClientRepository).singleton(),
 
     // controllers : API
     apiUserController: asClass(ApiUserController).singleton(),

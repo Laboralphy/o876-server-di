@@ -1,7 +1,7 @@
 import { IClientSocket } from '../../../domain/ports/adapters/IClientSocket';
 import { ClientSession } from '../../../domain/types/ClientSession';
 
-export interface ICommunicationManager {
+export interface ICommunicationLayer {
     /**
      * Associates a client with a clientSocket.
      * This method is usually called by a controller

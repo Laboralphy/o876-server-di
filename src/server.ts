@@ -119,12 +119,13 @@ export class Server {
         // Graceful shutdown telnet service
         const pTelnetClose = new Promise((resolve) => {
             debugServer('shutting down telnet service');
-            const telnetClientController = container.resolve('telnetClientController');
-            telnetClientController.expelClients();
             this.telnetServer.close(() => {
                 resolve(undefined);
             });
         });
+        debugServer('expelling all clients');
+        const communicationLayer = container.resolve('communicationLayer');
+        communicationLayer.dropAllClients();
         await pTelnetClose;
         debugServer('all services gracefully shut down');
     }
