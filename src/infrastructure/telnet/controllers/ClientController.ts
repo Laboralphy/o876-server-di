@@ -107,7 +107,7 @@ export class ClientController {
     }
 
     /**
-     * Called when the service is shutting down
+     * Called when the service is shutting down : disconnects all clients immediately
      */
     async expelClients() {
         debugTelnet('disconnecting all clients');

@@ -12,7 +12,6 @@ import { IUIDGenerator } from '../application/ports/services/IUIDGenerator';
 
 import { IUserRepository } from '../domain/ports/repositories/IUserRepository';
 import { IUserSecretRepository } from '../domain/ports/repositories/IUserSecretRepository';
-import { IClientRepository } from '../domain/ports/repositories/IClientRepository';
 
 import { IDatabaseAdapter } from '../domain/ports/adapters/IDatabaseAdapter';
 
