@@ -60,7 +60,6 @@ export class ClientController {
             const csd = this.communicationLayer.getClientSession(idClient);
             if (csd.user) {
                 // here the message should be interpreted as a command
-                debugTelnet('client %s has been authenticated as user %s', idClient, csd.user.name);
             } else if (csd.login !== '') {
                 // here the message should be a password
                 await csd.clientSocket.send(Buffer.from([0xff, 0xfc, 0x01])); // Réactive l'écho (DONT WONT ECHO)
@@ -90,7 +89,11 @@ export class ClientController {
                         await this.destroyClient.execute(idClient);
                         return;
                     }
-                    debugTelnet('client %s is now authenticated as user', csd.login);
+                    debugTelnet(
+                        'client %s has been authenticated as user %s',
+                        idClient,
+                        csd.user.name
+                    );
                 } catch (e) {
                     const error = e as Error;
                     debugTelnet('client %s authentication error: %s', idClient, error.message);
