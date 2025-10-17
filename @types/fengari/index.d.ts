@@ -30,13 +30,13 @@ declare module 'fengari' {
         register(name: string, fn: (L: LuaState) => number): void;
 
         /**
-         * Stacks a new strings
+         * Push a string on top of the stack, this is used to call function with parameters
          * @param value
          */
         pushString(value: string): void;
 
         /**
-         * Stacks a new number
+         * Push a string on top of the stack, this is used to call function with parameters
          * @param value
          */
         pushNumber(value: number): void;
