@@ -15,10 +15,10 @@
   },
   "dependencies": {
     "@koa/router": "^14.0.0",
+    "@nyariv/sandboxjs": "^0.8.25",
     "awilix": "^12.0.5",
     "awilix-koa": "^11.1.0",
     "dotenv": "^17.2.2",
-    "fengari": "^0.1.4",
     "handlebars": "^4.7.8",
     "i18next": "^25.5.3",
     "koa": "^3.0.1",
