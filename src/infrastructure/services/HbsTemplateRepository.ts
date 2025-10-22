@@ -5,9 +5,9 @@ import { Cradle } from '../../config/container';
 import path from 'node:path';
 import { FsHelper } from 'o876-fs-ts';
 import handlebars, { HelperOptions } from 'handlebars';
-import { printDbg } from '../../libs/print-dbg';
+import { debuglog as debug } from 'node:util';
 
-const debugHbs = printDbg('hbs');
+const debugHbs = debug('hbs');
 
 export class HbsTemplateRepository implements ITemplateRepository {
     private readonly stringRepository: IStringRepository;

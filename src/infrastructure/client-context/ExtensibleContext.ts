@@ -1,16 +1,9 @@
-import { ClientSession } from '../../domain/types/ClientSession';
-
-type ExtensionMethod = (...args: never[]) => never;
+type ExtensionMethod = (...args: any[]) => any;
 
 type FunctionRegistry = Record<string, ExtensionMethod>;
 
-export class ClientContext {
-    private data: ClientSession;
+export class ExtensibleContext {
     private extensions: Map<string, FunctionRegistry> = new Map();
-
-    constructor(data: ClientSession) {
-        this.data = data;
-    }
 
     // Méthode pour ajouter une extension (ex: un composant Plasmud)
     public registerExtension(name: string, methods: FunctionRegistry): void {
@@ -23,8 +16,8 @@ export class ClientContext {
     }
 
     // Proxy pour accéder dynamiquement aux méthodes des extensions
-    public getContext(): Record<string, any> {
-        const context: Record<string, any> = { ...this.data };
+    public buildContext(): Record<string, ExtensionMethod> {
+        const context: Record<string, ExtensionMethod> = {};
         this.extensions.forEach((methods) => {
             Object.entries(methods).forEach(([key, value]) => {
                 context[key] = value.bind(this);

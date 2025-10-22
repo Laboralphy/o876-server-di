@@ -36,9 +36,10 @@ import { CommunicationLayer } from '../infrastructure/services/CommunicationLaye
 import { DestroyClient } from '../application/use-cases/clients/DestroyClient';
 import { IStringRepository } from '../application/ports/services/IStringRepository';
 import { I18nRepository } from '../infrastructure/services/I18nRepository';
-import { SendClientString } from '../application/use-cases/clients/SendClientString';
+import { SendClientMessage } from '../application/use-cases/clients/SendClientMessage';
 import { HbsTemplateRepository } from '../infrastructure/services/HbsTemplateRepository';
 import { ITemplateRepository } from '../application/ports/services/ITemplateRepository';
+import { ClientContextBuilder } from '../infrastructure/services/ClientContextBuilder';
 
 /**
  * To as a new use case, port ...,
@@ -61,7 +62,7 @@ export interface Cradle {
     // use cases clients
     authenticateUser: AuthenticateUser;
     destroyClient: DestroyClient;
-    sendClientString: SendClientString;
+    sendClientMessage: SendClientMessage;
 
     // repositories
     userRepository: IUserRepository;
@@ -79,6 +80,7 @@ export interface Cradle {
     communicationLayer: ICommunicationLayer;
     stringRepository: IStringRepository;
     templateRepository: ITemplateRepository;
+    clientContextBuilder: ClientContextBuilder;
 }
 
 // Container creation
@@ -100,7 +102,7 @@ container.register({
     authenticateUser: asClass(AuthenticateUser).singleton(),
     // use cases : clients
     destroyClient: asClass(DestroyClient).singleton(),
-    sendClientString: asClass(SendClientString).singleton(),
+    sendClientMessage: asClass(SendClientMessage).singleton(),
 
     // repositories
     userRepository: asClass(UserRepository).singleton(),
@@ -119,4 +121,5 @@ container.register({
     communicationLayer: asClass(CommunicationLayer).singleton(),
     stringRepository: asClass(I18nRepository).singleton(),
     templateRepository: asClass(HbsTemplateRepository).singleton(),
+    clientContextBuilder: asClass(ClientContextBuilder).singleton(),
 });

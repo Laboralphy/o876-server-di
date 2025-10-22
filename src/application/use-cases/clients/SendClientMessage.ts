@@ -1,6 +1,5 @@
 import { Cradle } from '../../../config/container';
 import { IStringRepository } from '../../ports/services/IStringRepository';
-import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
 import { ICommunicationLayer } from '../../ports/services/ICommunicationLayer';
 import { ITemplateRepository } from '../../ports/services/ITemplateRepository';
 import { JsonObject } from '../../../domain/types/JsonStruct';
@@ -8,7 +7,7 @@ import { JsonObject } from '../../../domain/types/JsonStruct';
 /**
  * This use case is used to send a single i18n string to a specific user
  */
-export class SendClientString {
+export class SendClientMessage {
     private readonly stringRepository: IStringRepository;
     private readonly templateRepository: ITemplateRepository;
     private readonly communicationLayer: ICommunicationLayer;

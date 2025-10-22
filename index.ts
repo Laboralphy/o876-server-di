@@ -1,8 +1,8 @@
 import { Server } from './src/server';
-import { printDbg } from './src/libs/print-dbg';
+import { debuglog as debug } from 'node:util';
 import { name, version, description } from './package.json';
 
-const debugMain = printDbg('main');
+const debugMain = debug('main');
 
 async function main() {
     console.log('%s - version %s', name, version);

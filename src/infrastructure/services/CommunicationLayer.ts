@@ -1,6 +1,9 @@
 import { IClientSocket } from '../../domain/ports/adapters/IClientSocket';
 import { ICommunicationLayer } from '../../application/ports/services/ICommunicationLayer';
 import { ClientSession } from '../../domain/types/ClientSession';
+import { ExtensibleContext } from '../client-context/ExtensibleContext';
+import { Cradle } from '../../config/container';
+import { ClientContextBuilder } from './ClientContextBuilder';
 
 /**
  * This class is used by the use-case application layer to easily perform low level network operations
@@ -9,6 +12,12 @@ import { ClientSession } from '../../domain/types/ClientSession';
  */
 export class CommunicationLayer implements ICommunicationLayer {
     private readonly clientSessions: Map<string, ClientSession> = new Map();
+    private readonly clientContexts: Map<string, ExtensibleContext> = new Map();
+    private readonly clientContextBuilder: ClientContextBuilder;
+
+    constructor(cradle: Cradle) {
+        this.clientContextBuilder = cradle.clientContextBuilder;
+    }
 
     linkClientSocket(idClient: string, clientSocket: IClientSocket): void {
         const clientSession: ClientSession = {
@@ -17,6 +26,21 @@ export class CommunicationLayer implements ICommunicationLayer {
             user: null,
         };
         this.clientSessions.set(idClient, clientSession);
+    }
+
+    buildClientContext(id: string): ExtensibleContext {
+        const context = this.clientContextBuilder.buildClientContext(id);
+        this.clientContexts.set(id, context);
+        return context;
+    }
+
+    getClientContext(id: string): ExtensibleContext {
+        const ctx = this.clientContexts.get(id);
+        if (ctx) {
+            return ctx;
+        } else {
+            throw new Error(`No client ${id} context`);
+        }
     }
 
     getClientSession(idClient: string): ClientSession {
@@ -34,6 +58,7 @@ export class CommunicationLayer implements ICommunicationLayer {
             cs.clientSocket.close(); // will cause a "onDisconnect" event
         }
         this.clientSessions.delete(idClient);
+        this.clientContexts.delete(idClient);
     }
 
     async sendMessage(idClient: string, message: string): Promise<void> {

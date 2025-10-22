@@ -12,11 +12,11 @@ import {
     MemoryStorage,
 } from 'o876-json-db';
 import { JsonObject, ScalarValue } from '../../domain/types/JsonStruct';
-import { printDbg } from '../../libs/print-dbg';
+import { debuglog as debug } from 'node:util';
 import { expandPath } from '../../libs/expand-path';
 import { JsonDatabaseConfig } from '../../config/json-database.config';
 
-const debugDb = printDbg('database');
+const debugDb = debug('database');
 
 export class JsonDatabase implements IDatabaseAdapter {
     private collections: Map<string, Collection> = new Map<string, Collection>();

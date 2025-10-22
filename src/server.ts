@@ -3,14 +3,14 @@ import bodyParser from 'koa-bodyparser';
 import { userRoutes } from './infrastructure/web/routes/user.routes';
 import { container } from './config/container';
 import { scopePerRequest } from 'awilix-koa';
-import { printDbg } from './libs/print-dbg';
+import { debuglog as debug } from 'node:util';
 import { getEnv } from './config/dotenv';
 import { FsHelper } from 'o876-fs-ts';
 import { expandPath } from './libs/expand-path';
 import telnet, { Server as TelnetServer, Client as TelnetClient } from 'telnet2';
 import path from 'node:path';
 
-const debugServer = printDbg('server');
+const debugServer = debug('server');
 
 export class Server {
     private readonly httpApi: Koa;

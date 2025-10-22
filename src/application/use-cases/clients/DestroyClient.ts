@@ -14,7 +14,7 @@ export class DestroyClient {
         this.communicationLayer = cradle.communicationLayer;
     }
 
-    async execute(idClient: string): Promise<void> {
+    execute(idClient: string): void {
         // If this use case is initiated by the server, then the client socket dropping will certainly
         // trigger the use case a second time, but as the client will be dropped, nothing serious will occur.
         this.communicationLayer.dropClient(idClient);

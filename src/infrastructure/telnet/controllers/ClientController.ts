@@ -1,16 +1,16 @@
 import { Client as TelnetClient } from '../../../../@types/telnet2';
 import { Cradle } from '../../../config/container';
 import { AuthenticateUser } from '../../../application/use-cases/users/AuthenticateUser';
-import { printDbg } from '../../../libs/print-dbg';
+import { debuglog as debug } from 'node:util';
 import { ICommunicationLayer } from '../../../application/ports/services/ICommunicationLayer';
 import { TelnetClientSocket } from '../../services/TelnetClientSocket';
 import { DestroyClient } from '../../../application/use-cases/clients/DestroyClient';
-import { SendClientString } from '../../../application/use-cases/clients/SendClientString';
+import { SendClientMessage } from '../../../application/use-cases/clients/SendClientMessage';
 import { GetUserBan } from '../../../application/use-cases/users/GetUserBan';
 import { ITime } from '../../../application/ports/services/ITime';
 import { IUIDGenerator } from '../../../application/ports/services/IUIDGenerator';
 
-const debugTelnet = printDbg('telnet');
+const debugTelnet = debug('telnet');
 
 /**
  * This class managed all inputs from client
@@ -21,7 +21,7 @@ export class ClientController {
     private readonly authenticateUser: AuthenticateUser;
     private readonly destroyClient: DestroyClient;
     private readonly communicationLayer: ICommunicationLayer;
-    private readonly sendClientString: SendClientString;
+    private readonly sendClientString: SendClientMessage;
     private readonly getUserBan: GetUserBan;
     private readonly time: ITime;
     private readonly uidGenerator: IUIDGenerator;
@@ -30,7 +30,7 @@ export class ClientController {
         this.authenticateUser = cradle.authenticateUser;
         this.destroyClient = cradle.destroyClient;
         this.communicationLayer = cradle.communicationLayer;
-        this.sendClientString = cradle.sendClientString;
+        this.sendClientString = cradle.sendClientMessage;
         this.getUserBan = cradle.getUserBan;
         this.time = cradle.time;
         this.uidGenerator = cradle.uidGenerator;

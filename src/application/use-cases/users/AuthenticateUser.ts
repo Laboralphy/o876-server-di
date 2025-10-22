@@ -5,7 +5,7 @@ import { IEncryptor } from '../../ports/services/IEncryptor';
 import { User } from '../../../domain/entities/User';
 import { ITime } from '../../ports/services/ITime';
 import { GetUserBan } from './GetUserBan';
-import { SendClientString } from '../clients/SendClientString';
+import { SendClientMessage } from '../clients/SendClientMessage';
 
 /**
  * This use case will check if specified client-login & password
@@ -19,7 +19,7 @@ export class AuthenticateUser {
     private readonly encryptor: IEncryptor;
     private readonly time: ITime;
     private readonly getUserBan: GetUserBan;
-    private readonly sendClientString: SendClientString;
+    private readonly sendClientString: SendClientMessage;
 
     constructor(cradle: Cradle) {
         this.userRepository = cradle.userRepository;
@@ -27,7 +27,7 @@ export class AuthenticateUser {
         this.encryptor = cradle.encryptor;
         this.time = cradle.time;
         this.getUserBan = cradle.getUserBan;
-        this.sendClientString = cradle.sendClientString;
+        this.sendClientString = cradle.sendClientMessage;
     }
 
     async execute(login: string, password: string): Promise<User> {
