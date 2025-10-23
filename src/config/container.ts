@@ -41,6 +41,7 @@ import { HbsTemplateRepository } from '../infrastructure/services/HbsTemplateRep
 import { ITemplateRepository } from '../application/ports/services/ITemplateRepository';
 import { ClientContextBuilder } from '../infrastructure/services/ClientContextBuilder';
 import { ScriptRunner } from '../infrastructure/services/ScriptRunner';
+import { ModuleManager } from '../infrastructure/services/ModuleManager';
 
 /**
  * To as a new use case, port ...,
@@ -83,6 +84,7 @@ export interface Cradle {
     templateRepository: ITemplateRepository;
     clientContextBuilder: ClientContextBuilder;
     scriptRunner: ScriptRunner;
+    moduleManager: ModuleManager;
 }
 
 // Container creation
@@ -125,4 +127,5 @@ container.register({
     templateRepository: asClass(HbsTemplateRepository).singleton(),
     clientContextBuilder: asClass(ClientContextBuilder).singleton(),
     scriptRunner: asClass(ScriptRunner).singleton(),
+    moduleManager: asClass(ModuleManager).singleton(),
 });

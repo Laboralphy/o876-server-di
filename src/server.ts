@@ -25,19 +25,25 @@ export class Server {
         this.telnetServer = telnet.createServer({ convertLF: false });
     }
 
-    async initStringAssets() {
-        const lng = this.env.I18N_LANGUAGE ?? 'en';
-        debugServer('loading i18n strings (language: %s)', lng);
-        const oStringRepository = container.resolve('stringRepository');
-        await oStringRepository.init();
-        await oStringRepository.setLanguage(lng);
-        await oStringRepository.loadFolder(path.join(__dirname, '../assets/locales'));
-    }
+    // async initStringAssets() {
+    //     const lng = this.env.I18N_LANGUAGE ?? 'en';
+    //     debugServer('loading i18n strings (language: %s)', lng);
+    //     const oStringRepository = container.resolve('stringRepository');
+    //     await oStringRepository.init();
+    //     await oStringRepository.setLanguage(lng);
+    //     await oStringRepository.loadFolder(path.join(__dirname, '../assets/locales'));
+    // }
+    //
+    // async initHbs() {
+    //     debugServer('loading templates');
+    //     const oTemplateRepository = container.resolve('templateRepository');
+    //     await oTemplateRepository.init(path.join(__dirname, '../assets/templates'));
+    // }
 
-    async initHbs() {
-        debugServer('loading templates');
-        const oTemplateRepository = container.resolve('templateRepository');
-        await oTemplateRepository.init(path.join(__dirname, '../assets/templates'));
+    async initModules() {
+        debugServer('initializing modules');
+        const mm = container.resolve('moduleManager');
+        await mm.loadModuleFromFolder(path.resolve(__dirname, '../modules/_base'));
     }
 
     /**
@@ -131,8 +137,6 @@ export class Server {
     }
 
     async run() {
-        await this.initStringAssets();
-        await this.initHbs();
         await this.initDataDirectory();
         await this.initDatabase();
         await this.initApiService();

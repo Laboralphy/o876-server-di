@@ -21,53 +21,46 @@ import { ITemplateRepository } from '../../application/ports/services/ITemplateR
 const debugmm = debug('module');
 
 type AssetStatItemFormat = { count: number; size: number };
-type AssetStat = {
-    scripts: AssetStatItemFormat;
-    strings: AssetStatItemFormat;
-    data: AssetStatItemFormat;
-    templates: AssetStatItemFormat;
-};
 
 export class ModuleManager {
     private readonly assets = new Map<string, JsonObject>();
     private readonly scriptRunner: ScriptRunner;
     private readonly stringRepository: IStringRepository;
     private readonly templateRepository: ITemplateRepository;
-    private readonly stats: AssetStat;
+    private readonly stats: Map<string, AssetStatItemFormat> = new Map();
 
     constructor(cradle: Cradle) {
         this.scriptRunner = cradle.scriptRunner;
         this.stringRepository = cradle.stringRepository;
         this.templateRepository = cradle.templateRepository;
-        this.stats = {
-            strings: {
-                count: 0,
-                size: 0,
-            },
-            templates: {
-                count: 0,
-                size: 0,
-            },
-            data: {
-                count: 0,
-                size: 0,
-            },
-            scripts: {
-                count: 0,
-                size: 0,
-            },
-        };
+
+        this.addStatCategory('strings');
+        this.addStatCategory('templates');
+        this.addStatCategory('scripts');
+        this.addStatCategory('data');
+    }
+
+    addStatCategory(name: string): void {
+        this.stats.set(name, { count: 0, size: 0 });
+    }
+
+    addStatCountSize(name: string, count: number, size: number) {
+        const category = this.stats.get(name);
+        if (category) {
+            category.count += count;
+            category.size += size;
+        } else {
+            throw new Error('Unknown StatCategory : ' + name);
+        }
     }
 
     defineAssetScript(name: string, source: string) {
-        ++this.stats.scripts.count;
-        this.stats.scripts.size += source.length;
+        this.addStatCountSize('scripts', 1, source.length);
         this.scriptRunner.compile(name, source);
     }
 
     defineAssetData(key: string, data: string) {
-        ++this.stats.data.count;
-        this.stats.data.size += data.length;
+        this.addStatCountSize('data', 1, data.length);
         this.assets.set(key, JSON.parse(data));
     }
 
@@ -87,21 +80,38 @@ export class ModuleManager {
 
     defineAssetStrings(data: string, lng: string) {
         const oStrings = JSON.parse(data);
-        this.stats.strings.count += this.getObjectValueCount(oStrings);
-        this.stats.strings.size += data.length;
+        this.addStatCountSize('strings', this.getObjectValueCount(oStrings), data.length);
         this.stringRepository.defineStrings(oStrings, lng);
     }
 
     defineAssetTemplate(key: string, data: string) {
-        ++this.stats.templates.count;
-        this.stats.templates.size += data.length;
+        this.addStatCountSize('templates', 1, data.length);
         this.templateRepository.defineTemplate(key, data);
+    }
+
+    renderSize(bytes: number): string {
+        if (bytes < 1024) {
+            return bytes.toFixed(1) + ' b';
+        } else if (bytes < Math.pow(1024, 2)) {
+            return (bytes / 1024).toFixed(1) + ' Kb';
+        } else if (bytes < Math.pow(1024, 3)) {
+            return (bytes / Math.pow(1024, 2)).toFixed(1) + ' Mb';
+        } else {
+            return (bytes / Math.pow(1024, 3)).toFixed(1) + ' Gb';
+        }
+    }
+
+    printStats() {
+        for (const [key, value] of this.stats.entries()) {
+            const { count, size } = value;
+            debugmm('- %s : %d (%s)', key, count, this.renderSize(size));
+        }
     }
 
     async loadModuleFromFolder(location: string) {
         const aFiles = await fs.readdir(location, { recursive: true });
         for (const sPath of aFiles) {
-            const sFullPath = path.normalize(path.resolve(location, sPath));
+            const sFullPath = path.normalize(path.join(location, sPath));
             const oStat = await fs.stat(sFullPath);
             if (oStat.isDirectory()) {
                 continue;
@@ -127,7 +137,7 @@ export class ModuleManager {
                     break;
                 }
                 case 'strings': {
-                    // determine langage
+                    // determine language
                     const lng = aPath.shift();
                     if (lng === undefined) {
                         continue;
@@ -149,5 +159,7 @@ export class ModuleManager {
                 }
             }
         }
+        debugmm('module loaded from location : %s', location);
+        this.printStats();
     }
 }

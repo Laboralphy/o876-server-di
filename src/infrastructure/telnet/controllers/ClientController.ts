@@ -47,9 +47,9 @@ export class ClientController {
         debugTelnet('client %s connexion', idClient);
 
         this.communicationLayer.linkClientSocket(idClient, clientSocket);
-        clientSocket.onDisconnect(async () => {
+        clientSocket.onDisconnect(() => {
             debugTelnet('client %s disconnected', idClient);
-            await this.destroyClient.execute(idClient);
+            this.destroyClient.execute(idClient);
         });
 
         await this.sendClientString.execute(idClient, 'welcome.login', { _nolf: true });

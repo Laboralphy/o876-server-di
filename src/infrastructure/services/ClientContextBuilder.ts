@@ -10,13 +10,7 @@ import { DestroyClient } from '../../application/use-cases/clients/DestroyClient
  * The use cases must be agnostic of the socket type.
  */
 export class ClientContextBuilder {
-    private sendClientMessage: SendClientMessage;
-    private destroyClient: DestroyClient;
-
-    constructor(cradle: Cradle) {
-        this.sendClientMessage = cradle.sendClientMessage;
-        this.destroyClient = cradle.destroyClient;
-    }
+    constructor(cradle: Cradle) {}
 
     buildClientContext(id: string): ExtensibleContext {
         const context = new ExtensibleContext();
