@@ -6,5 +6,5 @@ import { JsonObject } from '../../../domain/types/JsonStruct';
 export interface ITemplateRepository {
     init(location: string): Promise<void>;
     render(key: string, parameters?: JsonObject): string | undefined;
-    loadTemplates(sLocation: string): Promise<void>;
+    defineTemplate(key: string, templateContent: string): void;
 }

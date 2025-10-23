@@ -26,6 +26,7 @@ export class CommunicationLayer implements ICommunicationLayer {
             user: null,
         };
         this.clientSessions.set(idClient, clientSession);
+        this.buildClientContext(idClient);
     }
 
     buildClientContext(id: string): ExtensibleContext {

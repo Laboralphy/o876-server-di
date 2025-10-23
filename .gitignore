@@ -1,6 +1,6 @@
-dist
+dist/*
 
-node_modules
+node_modules/*
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -8,4 +8,4 @@ yarn-error.log*
 .pnp.js
 
 .vscode/*
-.idea
+.idea/*

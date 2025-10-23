@@ -17,15 +17,19 @@ export async function init() {
     });
 }
 
+export function defineStrings(data: JsonObject, lng: string, ns: string = 'translation') {
+    return i18n.addResourceBundle(lng, ns, data);
+}
+
 /**
  * Adds a JSON files to the resources. Loads the Json from the file system
  * @param location json file full location
- * @param lng languge of the json file ('fr', 'en', ...)
+ * @param lng language of the json file ('fr', 'en', ...)
  * @param ns namespace (by default "translation") you should not change that before setting a full namespace support.
  */
 export async function loadStrings(location: string, lng: string, ns: string = 'translation') {
     const data = await fs.readFile(location, 'utf8');
-    return i18n.addResourceBundle(lng, ns, JSON.parse(data));
+    return defineStrings(JSON.parse(data), lng, ns);
 }
 
 /**

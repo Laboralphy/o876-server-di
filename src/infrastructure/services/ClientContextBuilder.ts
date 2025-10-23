@@ -28,15 +28,16 @@ export class ClientContextBuilder {
              * content.
              * @param key message content, or a i18n string reference, or hbs template
              * @param parameters a plain object used to replace variables in i18n string or hbs template
+             * @async
              */
-            sendMessage: async (key: string, parameters: JsonObject = {}) => {
+            sendMessage: async (key: string, parameters: JsonObject = {}): Promise<void> => {
                 return this.sendClientMessage.execute(id, key, parameters);
             },
 
             /**
              * Close client connection to server.
              */
-            closeConnection: () => {
+            closeConnection: (): void => {
                 this.destroyClient.execute(id);
             },
         });

@@ -1,5 +1,5 @@
 import { IStringRepository } from '../../application/ports/services/IStringRepository';
-import { loadFolder, init, setLang, render } from '../../libs/i18n-loader';
+import { init, setLang, render, defineStrings } from '../../libs/i18n-loader';
 import { JsonObject } from '../../domain/types/JsonStruct';
 
 export class I18nRepository implements IStringRepository {
@@ -11,8 +11,8 @@ export class I18nRepository implements IStringRepository {
         await setLang(language);
     }
 
-    async loadFolder(path: string) {
-        await loadFolder(path);
+    defineStrings(data: JsonObject, lng: string) {
+        defineStrings(data, lng);
     }
 
     render(key: string, parameters?: JsonObject): string {

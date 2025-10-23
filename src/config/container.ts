@@ -40,6 +40,7 @@ import { SendClientMessage } from '../application/use-cases/clients/SendClientMe
 import { HbsTemplateRepository } from '../infrastructure/services/HbsTemplateRepository';
 import { ITemplateRepository } from '../application/ports/services/ITemplateRepository';
 import { ClientContextBuilder } from '../infrastructure/services/ClientContextBuilder';
+import { ScriptRunner } from '../infrastructure/services/ScriptRunner';
 
 /**
  * To as a new use case, port ...,
@@ -81,6 +82,7 @@ export interface Cradle {
     stringRepository: IStringRepository;
     templateRepository: ITemplateRepository;
     clientContextBuilder: ClientContextBuilder;
+    scriptRunner: ScriptRunner;
 }
 
 // Container creation
@@ -122,4 +124,5 @@ container.register({
     stringRepository: asClass(I18nRepository).singleton(),
     templateRepository: asClass(HbsTemplateRepository).singleton(),
     clientContextBuilder: asClass(ClientContextBuilder).singleton(),
+    scriptRunner: asClass(ScriptRunner).singleton(),
 });
