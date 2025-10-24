@@ -1,8 +1,8 @@
 import { Server } from './src/server';
-import { debuglog as debug } from 'node:util';
+import { debug } from './src/libs/o876-debug';
 import { name, version, description } from './package.json';
 
-const debugMain = debug('main');
+const debugMain = debug('srv:main');
 
 async function main() {
     console.log('%s - version %s', name, version);

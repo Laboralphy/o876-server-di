@@ -2,14 +2,23 @@ import { IUserRepository } from '../../../domain/ports/repositories/IUserReposit
 import { Cradle } from '../../../config/container';
 import { BanUserDto } from '../../dto/BanUserDto';
 import { ITime } from '../../ports/services/ITime';
+import { SendClientMessage } from '../clients/SendClientMessage';
+import { DestroyClient } from '../clients/DestroyClient';
+import { ICommunicationLayer } from '../../ports/services/ICommunicationLayer';
 
 export class BanUser {
-    private userRepository: IUserRepository;
+    private readonly userRepository: IUserRepository;
+    private readonly sendClientMessage: SendClientMessage;
+    private readonly destroyClient: DestroyClient;
+    private readonly communicationLayer: ICommunicationLayer;
     private time: ITime;
 
     constructor(cradle: Cradle) {
         this.userRepository = cradle.userRepository;
         this.time = cradle.time;
+        this.sendClientMessage = cradle.sendClientMessage;
+        this.destroyClient = cradle.destroyClient;
+        this.communicationLayer = cradle.communicationLayer;
     }
 
     async execute(idUser: string, dto: BanUserDto) {
@@ -26,14 +35,25 @@ export class BanUser {
                 }
                 bannedBy = dto.bannedBy;
             } // bannedBy should be either a valid user id or an empty string
+            const tsEnd = nNow + dto.duration;
             user.ban = {
                 tsBegin: nNow,
-                tsEnd: forever ? 0 : nNow + dto.duration,
+                tsEnd: forever ? 0 : tsEnd,
                 forever,
                 reason: dto.reason,
                 bannedBy: bannedBy == '' ? null : bannedBy,
             };
             await this.userRepository.save(user);
+            const aClients = this.communicationLayer.getUserClients(user);
+            await Promise.all(
+                aClients.map(async (client) => {
+                    await this.sendClientMessage.execute(client, 'user-banned', {
+                        date: forever ? null : this.time.renderDate(tsEnd, 'ymd hm'),
+                        reason: dto.reason,
+                    });
+                    return this.destroyClient.execute(client);
+                })
+            );
             return user;
         } else {
             throw new Error(`User does not exist: ${idUser}`);

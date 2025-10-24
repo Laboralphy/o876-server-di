@@ -5,7 +5,7 @@
   },
   "userBanned": {
     "forever": "Bannissement permanent",
-    "date": "Connexion refusée : Bannissement actif jusqu'au {{ date }}",
+    "date": "Bannissement actif jusqu'au {{ date }}",
     "reason": "Raison : {{ reason }}",
     "noReason": "Raison non spécifiée"
   }

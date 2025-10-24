@@ -11,7 +11,7 @@ export class HbsTemplateRepository implements ITemplateRepository {
         this.stringRepository = cradle.stringRepository;
     }
 
-    async init(): Promise<void> {
+    init(): void {
         handlebars.registerHelper('t', (key: string, options: HelperOptions) => {
             return this.stringRepository.render(key, { ...options.data.root, ...options.hash });
         });

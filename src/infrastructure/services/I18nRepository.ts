@@ -1,5 +1,5 @@
 import { IStringRepository } from '../../application/ports/services/IStringRepository';
-import { init, setLang, render, defineStrings } from '../../libs/i18n-loader';
+import { init, setLang, render, defineLocales } from '../../libs/i18n-loader';
 import { JsonObject } from '../../domain/types/JsonStruct';
 
 export class I18nRepository implements IStringRepository {
@@ -12,7 +12,7 @@ export class I18nRepository implements IStringRepository {
     }
 
     defineStrings(data: JsonObject, lng: string) {
-        defineStrings(data, lng);
+        defineLocales(data, lng);
     }
 
     render(key: string, parameters?: JsonObject): string {

@@ -2,7 +2,7 @@
  * Manages modules
  * A module is a set of resources including :
  * - scripts
- * - strings
+ * - locales
  * - templates
  * - json assets
  * - binary assets
@@ -14,11 +14,11 @@ import { JsonObject, JsonValue } from '../../domain/types/JsonStruct';
 import { Cradle } from '../../config/container';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { debuglog as debug } from 'node:util';
+import { debug } from '../../libs/o876-debug';
 import { IStringRepository } from '../../application/ports/services/IStringRepository';
 import { ITemplateRepository } from '../../application/ports/services/ITemplateRepository';
 
-const debugmm = debug('module');
+const debugmm = debug('srv:module');
 
 type AssetStatItemFormat = { count: number; size: number };
 
@@ -34,7 +34,7 @@ export class ModuleManager {
         this.stringRepository = cradle.stringRepository;
         this.templateRepository = cradle.templateRepository;
 
-        this.addStatCategory('strings');
+        this.addStatCategory('locales');
         this.addStatCategory('templates');
         this.addStatCategory('scripts');
         this.addStatCategory('data');
@@ -80,7 +80,7 @@ export class ModuleManager {
 
     defineAssetStrings(data: string, lng: string) {
         const oStrings = JSON.parse(data);
-        this.addStatCountSize('strings', this.getObjectValueCount(oStrings), data.length);
+        this.addStatCountSize('locales', this.getObjectValueCount(oStrings), data.length);
         this.stringRepository.defineStrings(oStrings, lng);
     }
 
@@ -104,7 +104,7 @@ export class ModuleManager {
     printStats() {
         for (const [key, value] of this.stats.entries()) {
             const { count, size } = value;
-            debugmm('- %s : %d (%s)', key, count, this.renderSize(size));
+            debugmm('> %s : %d (%s)', key, count, this.renderSize(size));
         }
     }
 
@@ -136,7 +136,7 @@ export class ModuleManager {
                     this.defineAssetScript(sId, contentBuffer.toString());
                     break;
                 }
-                case 'strings': {
+                case 'locales': {
                     // determine language
                     const lng = aPath.shift();
                     if (lng === undefined) {
@@ -161,5 +161,9 @@ export class ModuleManager {
         }
         debugmm('module loaded from location : %s', location);
         this.printStats();
+    }
+
+    runScript(idClient: string, key: string, parameters: string[]) {
+        // run command
     }
 }

@@ -3,14 +3,14 @@ import bodyParser from 'koa-bodyparser';
 import { userRoutes } from './infrastructure/web/routes/user.routes';
 import { container } from './config/container';
 import { scopePerRequest } from 'awilix-koa';
-import { debuglog as debug } from 'node:util';
+import { debug } from './libs/o876-debug';
 import { getEnv } from './config/dotenv';
 import { FsHelper } from 'o876-fs-ts';
 import { expandPath } from './libs/expand-path';
 import telnet, { Server as TelnetServer, Client as TelnetClient } from 'telnet2';
 import path from 'node:path';
 
-const debugServer = debug('server');
+const debugServer = debug('srv:main');
 
 export class Server {
     private readonly httpApi: Koa;
@@ -25,20 +25,19 @@ export class Server {
         this.telnetServer = telnet.createServer({ convertLF: false });
     }
 
-    // async initStringAssets() {
-    //     const lng = this.env.I18N_LANGUAGE ?? 'en';
-    //     debugServer('loading i18n strings (language: %s)', lng);
-    //     const oStringRepository = container.resolve('stringRepository');
-    //     await oStringRepository.init();
-    //     await oStringRepository.setLanguage(lng);
-    //     await oStringRepository.loadFolder(path.join(__dirname, '../assets/locales'));
-    // }
-    //
-    // async initHbs() {
-    //     debugServer('loading templates');
-    //     const oTemplateRepository = container.resolve('templateRepository');
-    //     await oTemplateRepository.init(path.join(__dirname, '../assets/templates'));
-    // }
+    async initLocales() {
+        const lng = this.env.I18N_LANGUAGE ?? 'en';
+        debugServer('loading i18n strings (language: %s)', lng);
+        const oStringRepository = container.resolve('stringRepository');
+        await oStringRepository.init();
+        await oStringRepository.setLanguage(lng);
+    }
+
+    async initHbs() {
+        debugServer('loading templates');
+        const oTemplateRepository = container.resolve('templateRepository');
+        oTemplateRepository.init();
+    }
 
     async initModules() {
         debugServer('initializing modules');
@@ -137,11 +136,14 @@ export class Server {
     }
 
     async run() {
+        await this.initLocales();
+        await this.initHbs();
         await this.initDataDirectory();
         await this.initDatabase();
         await this.initApiService();
         await this.initTelnetService();
         await this.initWebsocketService();
+        await this.initModules();
 
         process.on('SIGTERM', async () => {
             debugServer('receiving SIGTERM');

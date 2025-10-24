@@ -1,9 +1,7 @@
 import { IClientSocket } from '../../domain/ports/adapters/IClientSocket';
 import { ICommunicationLayer } from '../../application/ports/services/ICommunicationLayer';
 import { ClientSession } from '../../domain/types/ClientSession';
-import { ExtensibleContext } from '../client-context/ExtensibleContext';
-import { Cradle } from '../../config/container';
-import { ClientContextBuilder } from './ClientContextBuilder';
+import { User } from '../../domain/entities/User';
 
 /**
  * This class is used by the use-case application layer to easily perform low level network operations
@@ -12,36 +10,15 @@ import { ClientContextBuilder } from './ClientContextBuilder';
  */
 export class CommunicationLayer implements ICommunicationLayer {
     private readonly clientSessions: Map<string, ClientSession> = new Map();
-    private readonly clientContexts: Map<string, ExtensibleContext> = new Map();
-    private readonly clientContextBuilder: ClientContextBuilder;
 
-    constructor(cradle: Cradle) {
-        this.clientContextBuilder = cradle.clientContextBuilder;
-    }
-
-    linkClientSocket(idClient: string, clientSocket: IClientSocket): void {
+    linkClientSocket(clientSocket: IClientSocket): void {
+        const idClient: string = clientSocket.id;
         const clientSession: ClientSession = {
             clientSocket,
             login: '',
             user: null,
         };
         this.clientSessions.set(idClient, clientSession);
-        this.buildClientContext(idClient);
-    }
-
-    buildClientContext(id: string): ExtensibleContext {
-        const context = this.clientContextBuilder.buildClientContext(id);
-        this.clientContexts.set(id, context);
-        return context;
-    }
-
-    getClientContext(id: string): ExtensibleContext {
-        const ctx = this.clientContexts.get(id);
-        if (ctx) {
-            return ctx;
-        } else {
-            throw new Error(`No client ${id} context`);
-        }
     }
 
     getClientSession(idClient: string): ClientSession {
@@ -53,13 +30,32 @@ export class CommunicationLayer implements ICommunicationLayer {
         }
     }
 
+    /**
+     * Retrieve all clients id from a user instance.
+     * @param user user instance
+     */
+    getUserClients(user: User): string[] {
+        const aClients: string[] = [];
+        for (const [idClient, clientSession] of this.clientSessions.entries()) {
+            if (clientSession.user?.id === user.id) {
+                aClients.push(idClient);
+            }
+        }
+        return aClients;
+    }
+
+    /**
+     * Destroy a client session forcing socket disconnection
+     * Does nothing bad is client is already disconnected
+     * Removes clientSession if exists
+     * @param idClient client identifier
+     */
     dropClient(idClient: string): void {
         const cs = this.clientSessions.get(idClient);
         if (cs) {
             cs.clientSocket.close(); // will cause a "onDisconnect" event
         }
         this.clientSessions.delete(idClient);
-        this.clientContexts.delete(idClient);
     }
 
     async sendMessage(idClient: string, message: string): Promise<void> {

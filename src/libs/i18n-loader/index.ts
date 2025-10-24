@@ -17,7 +17,7 @@ export async function init() {
     });
 }
 
-export function defineStrings(data: JsonObject, lng: string, ns: string = 'translation') {
+export function defineLocales(data: JsonObject, lng: string, ns: string = 'translation') {
     return i18n.addResourceBundle(lng, ns, data);
 }
 
@@ -29,7 +29,7 @@ export function defineStrings(data: JsonObject, lng: string, ns: string = 'trans
  */
 export async function loadStrings(location: string, lng: string, ns: string = 'translation') {
     const data = await fs.readFile(location, 'utf8');
-    return defineStrings(JSON.parse(data), lng, ns);
+    return defineLocales(JSON.parse(data), lng, ns);
 }
 
 /**

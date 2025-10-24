@@ -1,4 +1,4 @@
-import { createContainer, asClass } from 'awilix';
+import { createContainer, asClass, asValue } from 'awilix';
 import { UserRepository } from '../infrastructure/persistance/json-database/UserRepository';
 
 import { Encryptor } from '../infrastructure/services/Encryptor';
@@ -27,7 +27,7 @@ import { BanUser } from '../application/use-cases/users/BanUser';
 import { UnbanUser } from '../application/use-cases/users/UnbanUser';
 
 import { UserController as ApiUserController } from '../infrastructure/web/controllers/UserController';
-import { ClientController as TelnetClientController } from '../infrastructure/telnet/controllers/ClientController';
+import { TelnetClientController as TelnetClientController } from '../infrastructure/controllers/TelnetClientController';
 
 import { UserSecretRepository } from '../infrastructure/persistance/json-database/UserSecretRepository';
 import { AuthenticateUser } from '../application/use-cases/users/AuthenticateUser';
@@ -39,9 +39,11 @@ import { I18nRepository } from '../infrastructure/services/I18nRepository';
 import { SendClientMessage } from '../application/use-cases/clients/SendClientMessage';
 import { HbsTemplateRepository } from '../infrastructure/services/HbsTemplateRepository';
 import { ITemplateRepository } from '../application/ports/services/ITemplateRepository';
-import { ClientContextBuilder } from '../infrastructure/services/ClientContextBuilder';
 import { ScriptRunner } from '../infrastructure/services/ScriptRunner';
 import { ModuleManager } from '../infrastructure/services/ModuleManager';
+import { RunCommand } from '../application/use-cases/commands/RunCommand';
+import { IClientContext } from '../application/ports/classes/IClientContext';
+import { ClientContext } from '../infrastructure/client-context/ClientContext';
 
 /**
  * To as a new use case, port ...,
@@ -65,6 +67,8 @@ export interface Cradle {
     authenticateUser: AuthenticateUser;
     destroyClient: DestroyClient;
     sendClientMessage: SendClientMessage;
+    // use cases command
+    runCommand: RunCommand;
 
     // repositories
     userRepository: IUserRepository;
@@ -82,11 +86,9 @@ export interface Cradle {
     communicationLayer: ICommunicationLayer;
     stringRepository: IStringRepository;
     templateRepository: ITemplateRepository;
-    clientContextBuilder: ClientContextBuilder;
     scriptRunner: ScriptRunner;
     moduleManager: ModuleManager;
 }
-
 // Container creation
 export const container = createContainer<Cradle>();
 
@@ -107,6 +109,8 @@ container.register({
     // use cases : clients
     destroyClient: asClass(DestroyClient).singleton(),
     sendClientMessage: asClass(SendClientMessage).singleton(),
+    // use cases : commands
+    runCommand: asClass(RunCommand).singleton(),
 
     // repositories
     userRepository: asClass(UserRepository).singleton(),
@@ -125,7 +129,6 @@ container.register({
     communicationLayer: asClass(CommunicationLayer).singleton(),
     stringRepository: asClass(I18nRepository).singleton(),
     templateRepository: asClass(HbsTemplateRepository).singleton(),
-    clientContextBuilder: asClass(ClientContextBuilder).singleton(),
     scriptRunner: asClass(ScriptRunner).singleton(),
     moduleManager: asClass(ModuleManager).singleton(),
 });
