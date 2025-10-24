@@ -42,8 +42,6 @@ import { ITemplateRepository } from '../application/ports/services/ITemplateRepo
 import { ScriptRunner } from '../infrastructure/services/ScriptRunner';
 import { ModuleManager } from '../infrastructure/services/ModuleManager';
 import { RunCommand } from '../application/use-cases/commands/RunCommand';
-import { IClientContext } from '../application/ports/classes/IClientContext';
-import { ClientContext } from '../infrastructure/client-context/ClientContext';
 
 /**
  * To as a new use case, port ...,

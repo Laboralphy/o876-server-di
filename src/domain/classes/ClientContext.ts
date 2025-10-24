@@ -1,6 +1,6 @@
 import { IClientContextService } from '../../application/ports/classes/IClientContextService';
 import { EventEmitter } from 'events';
-import { JsonObject } from '../../domain/types/JsonStruct';
+import { JsonObject } from '../types/JsonStruct';
 import { IClientContext } from '../../application/ports/classes/IClientContext';
 
 export class ClientContext implements IClientContext {
