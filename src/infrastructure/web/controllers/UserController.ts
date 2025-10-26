@@ -1,8 +1,8 @@
 import { Context } from 'koa';
 import { CreateUser } from '../../../application/use-cases/users/CreateUser';
-import { Cradle } from '../../../config/container';
+import { Cradle } from '../../../boot/container';
 import { GetUserList } from '../../../application/use-cases/users/GetUserList';
-import { HttpStatus } from '../../../domain/enums';
+import { HTTP_STATUS } from '../../../domain/enums';
 import { ModifyUser } from '../../../application/use-cases/users/ModifyUser';
 import { PostUserDto, PostUserDtoSchema } from '../dto/PostUserDto';
 import { PatchUserDto, PatchUserDtoSchema } from '../dto/PatchUserDto';
@@ -52,23 +52,23 @@ export class UserController {
             password: dto.password,
             email: dto.email,
         });
-        ctx.status = HttpStatus.CREATED;
+        ctx.status = HTTP_STATUS.CREATED;
         ctx.body = user;
     }
 
     async getList(ctx: Context): Promise<void> {
         const users = await this.getUserList.execute();
-        ctx.status = HttpStatus.OK;
+        ctx.status = HTTP_STATUS.OK;
         ctx.body = users;
     }
 
     async findByName(ctx: Context): Promise<void> {
         const user = await this.findUser.execute(ctx.params.name);
         if (user) {
-            ctx.status = HttpStatus.OK;
+            ctx.status = HTTP_STATUS.OK;
             ctx.body = user;
         } else {
-            ctx.status = HttpStatus.NOT_FOUND;
+            ctx.status = HTTP_STATUS.NOT_FOUND;
         }
     }
 
@@ -78,7 +78,7 @@ export class UserController {
         const user = await this.modifyUser.execute(idUser, {
             email: dto.email,
         });
-        ctx.status = HttpStatus.CREATED;
+        ctx.status = HTTP_STATUS.CREATED;
         ctx.body = user;
     }
 
@@ -95,26 +95,26 @@ export class UserController {
             duration,
             bannedBy: '',
         });
-        ctx.status = HttpStatus.NO_CONTENT;
+        ctx.status = HTTP_STATUS.NO_CONTENT;
     }
 
     async unban(ctx: Context): Promise<void> {
         const idUser = ctx.params.id;
         await this.unbanUser.execute(idUser);
-        ctx.status = HttpStatus.NO_CONTENT;
+        ctx.status = HTTP_STATUS.NO_CONTENT;
     }
 
     async setPassword(ctx: Context): Promise<void> {
         const idUser = ctx.params.id;
         const dto: PutUserPasswordDto = PutUserPasswordDtoSchema.parse(ctx.request.body);
         await this.setUserPassword.execute(idUser, dto.password);
-        ctx.status = HttpStatus.NO_CONTENT;
+        ctx.status = HTTP_STATUS.NO_CONTENT;
     }
 
     async delete(ctx: Context): Promise<void> {
         const idUser = ctx.params.id;
         await this.deleteUser.execute(idUser);
-        ctx.status = HttpStatus.NO_CONTENT;
+        ctx.status = HTTP_STATUS.NO_CONTENT;
     }
 
     async getInfo(ctx: Context): Promise<void> {
@@ -122,14 +122,14 @@ export class UserController {
         const user = await this.getUser.execute(idUser);
         const userBan = await this.getUserBan.execute(idUser);
         if (!user) {
-            ctx.status = HttpStatus.NOT_FOUND;
+            ctx.status = HTTP_STATUS.NOT_FOUND;
             return;
         }
         if (userBan) {
             const bannedByUser = userBan.bannedBy
                 ? await this.getUser.execute(userBan.bannedBy)
                 : null;
-            ctx.status = HttpStatus.OK;
+            ctx.status = HTTP_STATUS.OK;
             ctx.body = GetUserInfoDtoSchema.parse({
                 id: idUser,
                 name: user.name,
@@ -146,7 +146,7 @@ export class UserController {
                 },
             });
         } else {
-            ctx.status = HttpStatus.OK;
+            ctx.status = HTTP_STATUS.OK;
             ctx.body = GetUserInfoDtoSchema.parse({
                 id: idUser,
                 name: user.name,

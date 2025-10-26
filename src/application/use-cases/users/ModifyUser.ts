@@ -1,6 +1,6 @@
 import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
 import { ModifyUserDto } from '../../dto/ModifyUserDto';
-import { Cradle } from '../../../config/container';
+import { Cradle } from '../../../boot/container';
 
 export class ModifyUser {
     private userRepository: IUserRepository;

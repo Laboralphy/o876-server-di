@@ -1,19 +1,20 @@
 import { IClientSocket } from '../ports/adapters/IClientSocket';
 import { User } from '../entities/User';
+import { IClientContext } from '../../application/ports/classes/IClientContext';
+import { CLIENT_STATE } from '../enums';
 
 /**
  * This type store everything related to client session
  * Instances of this type are created for a user when it connects and are destroyed when the client is disconnected
  *
- * used by:
- *  - ICommunicationLayer
- *
- * uses :
- *  - IClientSocket (a representation of a network socket)
  *
  */
 export type ClientSession = {
-    clientSocket: IClientSocket; // Instance to socket level
+    id: string; // client unique identifier
+    clientContext: IClientContext; // Client context used by commands invoked by the user
+    clientSocket: IClientSocket; // Instance to socket
+    user: User | null; // Authenticated User, remains null if failed
+    state: CLIENT_STATE;
     login: string; // This is what client has typed to identify itself
-    user: User | null; // Authenticated User
+    tmpPass: string; // This temporary password is used for account creation
 };

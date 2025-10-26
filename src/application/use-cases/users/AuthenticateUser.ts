@@ -1,11 +1,9 @@
-import { Cradle } from '../../../config/container';
+import { Cradle } from '../../../boot/container';
 import { IUserSecretRepository } from '../../../domain/ports/repositories/IUserSecretRepository';
 import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
 import { IEncryptor } from '../../ports/services/IEncryptor';
 import { User } from '../../../domain/entities/User';
 import { ITime } from '../../ports/services/ITime';
-import { GetUserBan } from './GetUserBan';
-import { SendClientMessage } from '../clients/SendClientMessage';
 
 /**
  * This use case will check if specified client-login & password
@@ -18,16 +16,12 @@ export class AuthenticateUser {
     private readonly userSecretRepository: IUserSecretRepository;
     private readonly encryptor: IEncryptor;
     private readonly time: ITime;
-    private readonly getUserBan: GetUserBan;
-    private readonly sendClientString: SendClientMessage;
 
     constructor(cradle: Cradle) {
         this.userRepository = cradle.userRepository;
         this.userSecretRepository = cradle.userSecretRepository;
         this.encryptor = cradle.encryptor;
         this.time = cradle.time;
-        this.getUserBan = cradle.getUserBan;
-        this.sendClientString = cradle.sendClientMessage;
     }
 
     async execute(login: string, password: string): Promise<User> {

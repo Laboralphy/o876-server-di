@@ -1,28 +1,15 @@
-import Sandbox from '@nyariv/sandboxjs';
-import { IExecContext, IScope } from '@nyariv/sandboxjs/dist/node/utils';
+import { VM, NodeVM, VMScript } from 'vm2';
 import { IScriptRunner } from '../../application/ports/services/IScriptRunner';
 
-type ScriptReturnType = void | Promise<void>;
-
-type CompiledScript<T> = (...scopes: IScope[]) => {
-    context: IExecContext;
-    run: () => T;
-};
-
 export class ScriptRunner implements IScriptRunner {
-    private readonly scripts = new Map<string, CompiledScript<ScriptReturnType>>();
-    private readonly sandbox = new Sandbox();
-    private readonly baseContext: Record<string, never> = {};
-
-    constructor() {
-        // Script map
-    }
+    private readonly scripts = new Map<string, VMScript>();
+    private readonly baseContext: Record<string, unknown> = {};
 
     /**
      * Define base context
      * @param context
      */
-    setContext(context: Record<string, never>) {
+    setContext(context: Record<string, unknown>) {
         Object.assign(this.baseContext, context);
     }
 
@@ -32,18 +19,38 @@ export class ScriptRunner implements IScriptRunner {
      * @param sSource js source of script
      */
     compile(id: string, sSource: string) {
-        const compiled = this.sandbox.compile<ScriptReturnType>(sSource);
-        this.scripts.set(id, compiled);
+        // Avec vm2, on ne "compile" pas à l'avance comme avec SandboxJS,
+        // mais on stocke le source pour l'exécuter plus tard avec le contexte.
+        this.scripts.set(id, new VMScript(sSource));
     }
 
-    async run(id: string, context: Record<string, never>) {
+    async run(id: string, context: Record<string, any>) {
         const script = this.scripts.get(id);
         if (script) {
             const ctx = {
                 ...this.baseContext,
                 ...context,
             };
-            await script(ctx).run();
+            const vm = new NodeVM({
+                console: 'redirect', // Capture les logs
+                sandbox: ctx, // Contexte vide par défaut
+                require: {
+                    external: false, // Désactive les modules externes
+                    builtin: [], // Désactive les modules built-in
+                    root: './',
+                },
+                timeout: 1000, // Timeout en ms
+                allowAsync: true, // Autorise les opérations asynchrones si nécessaire
+                eval: false, // Désactive eval et Function
+                wasm: false, // Désactive WebAssembly
+            });
+            try {
+                // Exécute le script dans le contexte
+                await vm.run(script);
+            } catch (err) {
+                console.error(`Erreur lors de l'exécution du script ${id}:`, err);
+                throw err;
+            }
         }
     }
 }

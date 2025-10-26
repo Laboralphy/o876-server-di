@@ -1,4 +1,4 @@
-import { Cradle } from '../../../config/container';
+import { Cradle } from '../../../boot/container';
 import { IEncryptor } from '../../ports/services/IEncryptor';
 import { IUserSecretRepository } from '../../../domain/ports/repositories/IUserSecretRepository';
 import { UserSecretSchema } from '../../../domain/entities/UserSecret';

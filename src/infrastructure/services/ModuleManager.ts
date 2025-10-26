@@ -11,12 +11,13 @@
  */
 import { ScriptRunner } from './ScriptRunner';
 import { JsonObject, JsonValue } from '../../domain/types/JsonStruct';
-import { Cradle } from '../../config/container';
+import { Cradle } from '../../boot/container';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { debug } from '../../libs/o876-debug';
 import { IStringRepository } from '../../application/ports/services/IStringRepository';
 import { ITemplateRepository } from '../../application/ports/services/ITemplateRepository';
+import { IScriptRunner } from '../../application/ports/services/IScriptRunner';
 
 const debugmm = debug('srv:module');
 
@@ -24,7 +25,7 @@ type AssetStatItemFormat = { count: number; size: number };
 
 export class ModuleManager {
     private readonly assets = new Map<string, JsonObject>();
-    private readonly scriptRunner: ScriptRunner;
+    private readonly scriptRunner: IScriptRunner;
     private readonly stringRepository: IStringRepository;
     private readonly templateRepository: ITemplateRepository;
     private readonly stats: Map<string, AssetStatItemFormat> = new Map();
@@ -161,6 +162,15 @@ export class ModuleManager {
         }
         debugmm('module loaded from location : %s', location);
         this.printStats();
+    }
+
+    getAsset(name: string): JsonObject {
+        const value = this.assets.get(name);
+        if (value !== undefined) {
+            return value;
+        } else {
+            throw new ReferenceError(`Asset not found ${name}`);
+        }
     }
 
     runScript(idClient: string, key: string, parameters: string[]) {

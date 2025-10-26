@@ -1,6 +1,6 @@
 import { JsonObject, JsonValue } from '../../../domain/types/JsonStruct';
-import { getEnv } from '../../../config/dotenv';
-import { HttpStatus } from '../../../domain/enums';
+import { getEnv } from '../../../boot/dotenv';
+import { HTTP_STATUS } from '../../../domain/enums';
 
 function buildUrl(url: string): string {
     const port = getEnv().SERVER_HTTP_API_PORT;
@@ -36,7 +36,7 @@ export async function doJsonRequest(
     const sFinalUrl = buildUrl(url);
     const response = await fetch(sFinalUrl, payload);
     if (response.ok) {
-        if (response.status !== HttpStatus.NO_CONTENT) {
+        if (response.status !== HTTP_STATUS.NO_CONTENT) {
             return response.json();
         } else {
             return '';

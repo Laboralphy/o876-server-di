@@ -1,0 +1,11 @@
+# This is what you must enter as login to create a new account
+loginNewUser: new
+
+# Number of days before a mail expires and is deleted from the mailbox, unless it is kept
+mailMaxExpirationDays: 30
+
+# Number of messages a user can pin to prevent auto deletion
+mailMaxKeptMessages: 20
+
+# Maximum character in a messages
+mailMaxMessageLength: 1024

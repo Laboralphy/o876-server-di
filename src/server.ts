@@ -1,14 +1,15 @@
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import { userRoutes } from './infrastructure/web/routes/user.routes';
-import { container } from './config/container';
+import { container } from './boot/container';
 import { scopePerRequest } from 'awilix-koa';
 import { debug } from './libs/o876-debug';
-import { getEnv } from './config/dotenv';
+import { getEnv } from './boot/dotenv';
 import { FsHelper } from 'o876-fs-ts';
 import { expandPath } from './libs/expand-path';
 import telnet, { Server as TelnetServer, Client as TelnetClient } from 'telnet2';
 import path from 'node:path';
+import { JsonObject } from './domain/types/JsonStruct';
 
 const debugServer = debug('srv:main');
 
@@ -26,7 +27,7 @@ export class Server {
     }
 
     async initLocales() {
-        const lng = this.env.I18N_LANGUAGE ?? 'en';
+        const lng = this.env.SERVER_LANGUAGE ?? 'en';
         debugServer('loading i18n strings (language: %s)', lng);
         const oStringRepository = container.resolve('stringRepository');
         await oStringRepository.init();
@@ -49,10 +50,10 @@ export class Server {
      * Build directory tree, for storing json-database, modules ...
      */
     async initDataDirectory() {
-        if (!this.env.PATH_MODULES) {
-            throw new Error(`environment variable not set : PATH_MODULES`);
+        if (!this.env.SERVER_MODULE_PATH) {
+            throw new Error(`environment variable not set : SERVER_MODULE_PATH`);
         }
-        const sModuleLocation = expandPath(this.env.PATH_MODULES);
+        const sModuleLocation = expandPath(this.env.SERVER_MODULE_PATH);
         debugServer('module directory is %s', sModuleLocation);
         await this.fsHelper.mkdir(sModuleLocation);
     }
@@ -61,11 +62,11 @@ export class Server {
         debugServer('json-database init phase');
         const database = container.resolve('database');
         await database.init({
-            host: this.env.DB_HOST ?? '',
-            user: this.env.DB_USER ?? '',
-            password: this.env.DB_PASSWORD ?? '',
-            port: parseInt(this.env.DB_PORT ?? ''),
-            name: this.env.DB_NAME ?? '',
+            host: this.env.SERVER_DB_HOST ?? '',
+            user: this.env.SERVER_DB_USER ?? '',
+            password: this.env.SERVER_DB_PASSWORD ?? '',
+            port: parseInt(this.env.SERVER_DB_PORT ?? ''),
+            name: this.env.SERVER_DB_NAME ?? '',
         });
     }
 

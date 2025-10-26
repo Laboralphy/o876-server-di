@@ -1,4 +1,4 @@
-import { Cradle } from '../../../config/container';
+import { Cradle } from '../../../boot/container';
 import { ICommunicationLayer } from '../../ports/services/ICommunicationLayer';
 
 /**

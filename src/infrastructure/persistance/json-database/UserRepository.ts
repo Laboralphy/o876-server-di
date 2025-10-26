@@ -1,6 +1,6 @@
 import { User, UserSchema } from '../../../domain/entities/User';
 import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
-import { Cradle } from '../../../config/container';
+import { Cradle } from '../../../boot/container';
 import { ForEachCallback, IDatabaseAdapter } from '../../../domain/ports/adapters/IDatabaseAdapter';
 
 const COLLECTION_NAME = 'users';

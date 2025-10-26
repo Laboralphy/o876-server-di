@@ -3,5 +3,5 @@ A user has been banned and cannot log in
 @param date : for a temporary ban, this is when the ban is removed, if empty, then ban is permanent
 @param reason : the reason why ban is done, can be empty
 --}}
-{{#if date}}{{t "userBanned.date" date=date}}{{else}}{{t "userBanned.forever"}}{{/if}}
+⛔ {{#if date}}{{t "userBanned.date" date=date}}{{else}}{{t "userBanned.forever"}}{{/if}}
 {{#if reason}}{{t "userBanned.reason" reason=reason}}{{else}}{{t "userBanned.noReason"}}{{/if}}

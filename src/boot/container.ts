@@ -42,6 +42,10 @@ import { ITemplateRepository } from '../application/ports/services/ITemplateRepo
 import { ScriptRunner } from '../infrastructure/services/ScriptRunner';
 import { ModuleManager } from '../infrastructure/services/ModuleManager';
 import { RunCommand } from '../application/use-cases/commands/RunCommand';
+import { CreateClientSession } from '../application/use-cases/clients/CreateClientSession';
+import { IServerConfig } from '../application/ports/services/IServerConfig';
+import { IScriptRunner } from '../application/ports/services/IScriptRunner';
+import { IModuleManager } from '../application/ports/services/IModuleManager';
 
 /**
  * To as a new use case, port ...,
@@ -65,6 +69,7 @@ export interface Cradle {
     authenticateUser: AuthenticateUser;
     destroyClient: DestroyClient;
     sendClientMessage: SendClientMessage;
+    createClientSession: CreateClientSession;
     // use cases command
     runCommand: RunCommand;
 
@@ -84,8 +89,9 @@ export interface Cradle {
     communicationLayer: ICommunicationLayer;
     stringRepository: IStringRepository;
     templateRepository: ITemplateRepository;
-    scriptRunner: ScriptRunner;
-    moduleManager: ModuleManager;
+    scriptRunner: IScriptRunner;
+    moduleManager: IModuleManager;
+    serverConfig: IServerConfig;
 }
 // Container creation
 export const container = createContainer<Cradle>();
@@ -107,6 +113,7 @@ container.register({
     // use cases : clients
     destroyClient: asClass(DestroyClient).singleton(),
     sendClientMessage: asClass(SendClientMessage).singleton(),
+    createClientSession: asClass(CreateClientSession).singleton(),
     // use cases : commands
     runCommand: asClass(RunCommand).singleton(),
 

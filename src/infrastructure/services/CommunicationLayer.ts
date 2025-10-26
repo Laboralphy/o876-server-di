@@ -1,4 +1,3 @@
-import { IClientSocket } from '../../domain/ports/adapters/IClientSocket';
 import { ICommunicationLayer } from '../../application/ports/services/ICommunicationLayer';
 import { ClientSession } from '../../domain/types/ClientSession';
 import { User } from '../../domain/entities/User';
@@ -11,14 +10,8 @@ import { User } from '../../domain/entities/User';
 export class CommunicationLayer implements ICommunicationLayer {
     private readonly clientSessions: Map<string, ClientSession> = new Map();
 
-    linkClientSocket(clientSocket: IClientSocket): void {
-        const idClient: string = clientSocket.id;
-        const clientSession: ClientSession = {
-            clientSocket,
-            login: '',
-            user: null,
-        };
-        this.clientSessions.set(idClient, clientSession);
+    linkClientSession(clientSession: ClientSession): void {
+        this.clientSessions.set(clientSession.id, clientSession);
     }
 
     getClientSession(idClient: string): ClientSession {

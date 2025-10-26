@@ -135,7 +135,7 @@ export function evaluateColorCode(sColor: string): number {
         } else if (sHexColor.length === 6) {
             return parseInt('0x' + sHexColor);
         } else {
-            throw new Error(`Invalid color code : ${sColor}`);
+            return NaN;
         }
     }
     const sColorValue = COLOR_CODES[sColor.toLowerCase()];

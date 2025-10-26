@@ -1,5 +1,5 @@
 import { UserSecret, UserSecretSchema } from '../../../domain/entities/UserSecret';
-import { Cradle } from '../../../config/container';
+import { Cradle } from '../../../boot/container';
 import { ForEachCallback, IDatabaseAdapter } from '../../../domain/ports/adapters/IDatabaseAdapter';
 import { IUserSecretRepository } from '../../../domain/ports/repositories/IUserSecretRepository';
 

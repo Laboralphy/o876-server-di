@@ -1,5 +1,5 @@
 import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
-import { Cradle } from '../../../config/container';
+import { Cradle } from '../../../boot/container';
 import { ITime } from '../../ports/services/ITime';
 
 export class GetUserBan {

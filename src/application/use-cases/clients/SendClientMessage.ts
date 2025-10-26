@@ -1,4 +1,4 @@
-import { Cradle } from '../../../config/container';
+import { Cradle } from '../../../boot/container';
 import { IStringRepository } from '../../ports/services/IStringRepository';
 import { ICommunicationLayer } from '../../ports/services/ICommunicationLayer';
 import { ITemplateRepository } from '../../ports/services/ITemplateRepository';

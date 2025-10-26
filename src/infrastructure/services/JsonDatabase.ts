@@ -14,7 +14,7 @@ import {
 import { JsonObject, ScalarValue } from '../../domain/types/JsonStruct';
 import { debug } from '../../libs/o876-debug';
 import { expandPath } from '../../libs/expand-path';
-import { JsonDatabaseConfig } from '../../config/json-database.config';
+import { JsonDatabaseConfig } from '../../boot/json-database.config';
 
 const debugDb = debug('srv:database');
 

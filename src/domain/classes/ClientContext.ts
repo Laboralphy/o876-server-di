@@ -1,13 +1,31 @@
 import { IClientContextService } from '../../application/ports/classes/IClientContextService';
-import { EventEmitter } from 'events';
 import { JsonObject } from '../types/JsonStruct';
 import { IClientContext } from '../../application/ports/classes/IClientContext';
 
+export interface SendingClientMessageHandler {
+    (client: string, key: string, parameters?: JsonObject): Promise<void>;
+}
+
+export interface ClosingClientConnectionHandler {
+    (client: string): void;
+}
+
+export type ClientContextHandlers = {
+    onSendingMessage: SendingClientMessageHandler;
+    onClosingConnection: ClosingClientConnectionHandler;
+};
+
 export class ClientContext implements IClientContext {
     static readonly #services: Map<string, IClientContextService> = new Map();
-    readonly #events = new EventEmitter();
 
-    constructor(private readonly idClient: string) {}
+    constructor(
+        private readonly idClient: string,
+        private readonly handlers: ClientContextHandlers
+    ) {}
+
+    getClientId(): string {
+        return this.idClient;
+    }
 
     /**
      * Sends a message to client.
@@ -18,15 +36,19 @@ export class ClientContext implements IClientContext {
      * @param parameters a plain object used to replace variables in i18n string or hbs template
      * @async
      */
-    sendMessage(key: string, parameters?: JsonObject) {
-        this.#events.emit('message', { client: this.idClient, key, parameters });
+    async sendMessage(key: string, parameters?: JsonObject): Promise<void> {
+        return this.handlers.onSendingMessage(this.idClient, key, parameters);
     }
 
     /**
      * Close client connection to server.
      */
     closeConnection() {
-        this.#events.emit('close', { client: this.idClient });
+        this.handlers.onClosingConnection(this.idClient);
+    }
+
+    static addService(service: IClientContextService) {
+        ClientContext.#services.set(service.getName(), service);
     }
 
     getService(name: string): IClientContextService {
@@ -35,5 +57,14 @@ export class ClientContext implements IClientContext {
             throw new Error(`Service ${name} not registered`);
         }
         return service;
+    }
+
+    getServerTime(): { date: Date; timezone: string } {
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const date = new Date();
+        return {
+            date,
+            timezone,
+        };
     }
 }

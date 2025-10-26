@@ -1,5 +1,5 @@
 import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
-import { Cradle } from '../../../config/container';
+import { Cradle } from '../../../boot/container';
 import { User } from '../../../domain/entities/User';
 
 export class FindUser {

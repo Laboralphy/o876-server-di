@@ -1,5 +1,5 @@
 import z from 'zod';
-import { Roles } from '../enums';
+import { ROLES } from '../enums';
 import { EntityId } from '../schemas/EntityId';
 import { BanSchema } from './Ban';
 
@@ -9,7 +9,7 @@ export const UserSchema = z.object({
     email: z.email(),
     tsCreation: z.number(),
     tsLastUsed: z.number(),
-    roles: z.array(z.enum(Roles)),
+    roles: z.array(z.enum(ROLES)),
     ban: BanSchema.nullable(),
 });
 

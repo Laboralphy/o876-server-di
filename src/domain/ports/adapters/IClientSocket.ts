@@ -3,11 +3,6 @@
  */
 export interface IClientSocket {
     /**
-     * returns client socket id
-     */
-    get id(): string;
-
-    /**
      * Sends a message to the client
      * @param message
      */

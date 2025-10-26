@@ -1,15 +1,12 @@
 {
-  "healthcheck": "i18n translation engine active",
   "welcome": {
-    "server": "Plasmud 1 - Serveur multi-protocole",
-    "user": "Bienvenue {{ user }}.",
-    "login": "Login:",
-    "password": "Password:"
+    "login": "Login: ",
+    "password": "Password: "
   },
   "userBanned": {
-    "forever": "Bannissement permanent",
-    "date": "Bannissement actif jusqu'au : {{ date }}",
-    "reason": "Raison : {{ reason }}",
-    "noReason": "Raison non spécifiée"
+    "forever": "Permanent ban",
+    "date": "Ban active until : {{ date }}",
+    "reason": "Reason : {{ reason }}",
+    "noReason": "Reason : unspecified"
   }
 }

@@ -4,11 +4,10 @@ import { User } from '../../../domain/entities/User';
 
 export interface ICommunicationLayer {
     /**
-     * Associates a client with a clientSocket.
-     * This method is usually called by a controller
-     * @param clientSocket
+     * Associates a client id with a clientSocket.
+     * @param clientSession client socket instance
      */
-    linkClientSocket(clientSocket: IClientSocket): void;
+    linkClientSession(clientSession: ClientSession): void;
 
     /**
      * Get session data from a connected client. Returns undefined if client does not exist

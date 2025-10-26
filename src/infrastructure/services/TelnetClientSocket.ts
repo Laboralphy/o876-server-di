@@ -2,14 +2,7 @@ import { IClientSocket } from '../../domain/ports/adapters/IClientSocket';
 import { Client as TelnetClient } from 'telnet2';
 
 export class TelnetClientSocket implements IClientSocket {
-    constructor(
-        private readonly _id: string,
-        readonly socket: TelnetClient
-    ) {}
-
-    get id(): string {
-        return this._id;
-    }
+    constructor(private readonly socket: TelnetClient) {}
 
     close(): void {
         this.socket.destroy();

@@ -3,6 +3,11 @@ import { JsonObject } from '../../../domain/types/JsonStruct';
 
 export interface IClientContext {
     /**
+     * returns the client id
+     */
+    getClientId(): string;
+
+    /**
      * Sends a message to client.
      * The message content is usually a string reference or a template reference.
      * It is strongly recommended to use i18n for translatable text, and template to colorized or stylized
@@ -11,7 +16,7 @@ export interface IClientContext {
      * @param parameters a plain object used to replace variables in i18n string or hbs template
      * @async
      */
-    sendMessage(key: string, parameters?: JsonObject): void;
+    sendMessage(key: string, parameters?: JsonObject): Promise<void>;
 
     /**
      * Close client connection to server.
@@ -19,4 +24,6 @@ export interface IClientContext {
     closeConnection(): void;
 
     getService(name: string): IClientContextService;
+
+    getServerTime(): { date: Date; timezone: string };
 }

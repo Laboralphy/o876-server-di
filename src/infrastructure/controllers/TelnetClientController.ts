@@ -14,11 +14,12 @@ export class TelnetClientController extends AbstractClientController {
      * We listen the events fired by this socket, and we execute the corresponding use cases.
      */
     async connect(socket: TelnetClient) {
-        const clientSocket = new TelnetClientSocket(this.getNewClientId(), socket);
+        const clientSocket = new TelnetClientSocket(socket);
         // create new client session
-        this.initClientSocket(clientSocket);
-        const idClient = clientSocket.id;
-        await this.sendMessage(idClient, 'welcome.login', { _nolf: true });
+        const clientSession = this.initClientSession(clientSocket);
+        const idClient = clientSession.id;
+        const clientContext = clientSession.clientContext;
+        await clientContext.sendMessage('welcome.login', { _nolf: true });
         clientSocket.onMessage(async (message: string) => {
             // in telnet
             // the first two messages are used to receive credentials
@@ -32,11 +33,11 @@ export class TelnetClientController extends AbstractClientController {
                 // here the message should be a password
                 await clientSocket.send(Buffer.from([0xff, 0xfc, 0x01])); // Réactive l'écho (DONT WONT ECHO)
                 await clientSocket.send('\n');
-                await this.setPassword(clientSocket, message);
+                await this.setLoginPassword(idClient, message);
             } else {
                 // here the message should be a user login name
-                await this.setLogin(clientSocket, message);
-                await this.sendMessage(idClient, 'welcome.password', { _nolf: true });
+                await this.setLoginUsername(idClient, message);
+                await clientContext.sendMessage('welcome.password', { _nolf: true });
                 await clientSocket.send(Buffer.from([0xff, 0xfb, 0x01])); // Désactive l'écho (DO WONT ECHO)
             }
         });
