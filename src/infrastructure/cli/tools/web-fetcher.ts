@@ -1,6 +1,6 @@
 import { JsonObject, JsonValue } from '../../../domain/types/JsonStruct';
 import { getEnv } from '../../../boot/dotenv';
-import { HTTP_STATUS } from '../../../domain/enums';
+import { HTTP_STATUS } from '../../../domain/enums/http-status';
 
 function buildUrl(url: string): string {
     const port = getEnv().SERVER_HTTP_API_PORT;

@@ -46,6 +46,7 @@ import { CreateClientSession } from '../application/use-cases/clients/CreateClie
 import { IServerConfig } from '../application/ports/services/IServerConfig';
 import { IScriptRunner } from '../application/ports/services/IScriptRunner';
 import { IModuleManager } from '../application/ports/services/IModuleManager';
+import { ServerConfig } from '../infrastructure/services/ServerConfig';
 
 /**
  * To as a new use case, port ...,
@@ -136,4 +137,5 @@ container.register({
     templateRepository: asClass(HbsTemplateRepository).singleton(),
     scriptRunner: asClass(ScriptRunner).singleton(),
     moduleManager: asClass(ModuleManager).singleton(),
+    serverConfig: asClass(ServerConfig).singleton(),
 });

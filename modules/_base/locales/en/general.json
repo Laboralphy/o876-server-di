@@ -1,7 +1,22 @@
 {
   "welcome": {
+    "hello": [
+      "Please enter username/password.",
+      "To create a new account, enter \"{{ newAccountCode }}\"."
+    ],
     "login": "Login: ",
-    "password": "Password: "
+    "password": "Password: ",
+    "badLogin": "Invalid username or password.",
+    "authenticated": "Welcome {{ name }}."
+  },
+  "createNewAccount": {
+    "username": "New account username: ",
+    "password": "New account password: ",
+    "emptyPassword": "Empty password forbidden.",
+    "confirmPassword": "Confirm password: ",
+    "email": "New account email address: ",
+    "success": "New account {{ name }} has been successfully created. Please reconnect.",
+    "failure": "Account creation failed."
   },
   "userBanned": {
     "forever": "Permanent ban",

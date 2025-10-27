@@ -1,26 +1,3 @@
-export enum ROLES {
-    NONE,
-    USER,
-    MODERATOR,
-    GAME_MASTER,
-    ADMIN,
-}
-
-export enum CLIENT_STATE {
-    NONE, // not connected
-    LOGIN_PROMPT_USERNAME, // waiting for username or "new"
-    LOGIN_PROMPT_PASSWORD, // client has entered a username, waiting for password
-    CREATE_ACCOUNT_PROMPT_USERNAME, // client has entered "new" as username : this is the new user creation phase
-    CREATE_ACCOUNT_PROMPT_PASSWORD, // client is required to enter a password
-    CREATE_ACCOUNT_PROMPT_CONFIRM_PASSWORD, // client is asked to enter password a second time
-    CREATE_ACCOUNT_PROMPT_MAIL, // client is asked to enter a valid email address
-    AUTHENTICATED, // client has successfully authenticated
-    IN_GAME, // the client is currently playing the game
-    CHANGE_PASSWORD_PROMPT, // user has requested to change password
-    CHANGE_PASSWORD_CONFIRM, // user is asked to confirm password change
-    PAUSE, // client is temporary in pause ignoring any message
-}
-
 export enum HTTP_STATUS {
     OK = 200, // request successful
     CREATED = 201, // entity successfully created

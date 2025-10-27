@@ -1,7 +1,7 @@
 import { IClientSocket } from '../ports/adapters/IClientSocket';
 import { User } from '../entities/User';
 import { IClientContext } from '../../application/ports/classes/IClientContext';
-import { CLIENT_STATE } from '../enums';
+import { CLIENT_STATES } from '../enums/client-states';
 
 /**
  * This type store everything related to client session
@@ -14,7 +14,7 @@ export type ClientSession = {
     clientContext: IClientContext; // Client context used by commands invoked by the user
     clientSocket: IClientSocket; // Instance to socket
     user: User | null; // Authenticated User, remains null if failed
-    state: CLIENT_STATE;
+    state: CLIENT_STATES;
     login: string; // This is what client has typed to identify itself
     tmpPass: string; // This temporary password is used for account creation
 };

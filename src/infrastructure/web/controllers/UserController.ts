@@ -2,7 +2,7 @@ import { Context } from 'koa';
 import { CreateUser } from '../../../application/use-cases/users/CreateUser';
 import { Cradle } from '../../../boot/container';
 import { GetUserList } from '../../../application/use-cases/users/GetUserList';
-import { HTTP_STATUS } from '../../../domain/enums';
+import { HTTP_STATUS } from '../../../domain/enums/http-status';
 import { ModifyUser } from '../../../application/use-cases/users/ModifyUser';
 import { PostUserDto, PostUserDtoSchema } from '../dto/PostUserDto';
 import { PatchUserDto, PatchUserDtoSchema } from '../dto/PatchUserDto';

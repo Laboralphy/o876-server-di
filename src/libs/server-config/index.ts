@@ -10,7 +10,7 @@ export function serverConfig(): Record<string, number | string | undefined> {
         return CONFIG;
     } else {
         const sConfigYaml = fs
-            .readFileSync(path.join(__dirname, '/../server.config.yaml'))
+            .readFileSync(path.join(__dirname, '../../../server-config.yaml'))
             .toString();
         CONFIG = yaml.parse(sConfigYaml);
         bConfigLoaded = true;

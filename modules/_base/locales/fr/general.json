@@ -1,7 +1,23 @@
 {
   "welcome": {
+    "hello": [
+      "Veuillez vous identifier.",
+      "Pour créer un nouveau compte, tapez \"{{ newAccountCode }}\"."
+    ],
     "login": "Login: ",
-    "password": "Mot de passe: "
+    "password": "Mot de passe: ",
+    "badLogin": "Nom d'utilisateur ou mot de passe incorrect.",
+    "authenticated": "Bienvenue {{ name }}."
+  },
+  "createNewAccount": {
+    "username": "Nom du nouveau compte: ",
+    "password": "Mot de passe du nouveau compte: ",
+    "emptyPassword": "Mot de passe vide interdit.",
+    "passwordMismatch": "Les mots de passe ne correspondent pas.",
+    "confirmPassword": "Confirmez le mot de passe: ",
+    "email": "Adresse email du nouveau compte: ",
+    "success": "Création du nouveau compte {{ name }} effectuée avec succès. Veuillez vous reconnecter.",
+    "failure": "Echec de la création du compte."
   },
   "userBanned": {
     "forever": "Bannissement permanent",

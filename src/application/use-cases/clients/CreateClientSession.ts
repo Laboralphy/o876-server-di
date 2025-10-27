@@ -8,7 +8,7 @@ import { SendClientMessage } from './SendClientMessage';
 import { ICommunicationLayer } from '../../ports/services/ICommunicationLayer';
 import { ClientSession } from '../../../domain/types/ClientSession';
 import { IClientSocket } from '../../../domain/ports/adapters/IClientSocket';
-import { CLIENT_STATE } from '../../../domain/enums';
+import { CLIENT_STATES } from '../../../domain/enums/client-states';
 
 export class CreateClientSession {
     private readonly uidGenerator: IUIDGenerator;
@@ -43,7 +43,7 @@ export class CreateClientSession {
         };
         const clientSession: ClientSession = {
             id: idClient,
-            state: CLIENT_STATE.LOGIN_PROMPT_USERNAME,
+            state: CLIENT_STATES.LOGIN_PROMPT_USERNAME,
             clientSocket,
             clientContext: apiContext,
             user: null,

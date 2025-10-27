@@ -9,7 +9,6 @@ import { FsHelper } from 'o876-fs-ts';
 import { expandPath } from './libs/expand-path';
 import telnet, { Server as TelnetServer, Client as TelnetClient } from 'telnet2';
 import path from 'node:path';
-import { JsonObject } from './domain/types/JsonStruct';
 
 const debugServer = debug('srv:main');
 
@@ -23,7 +22,16 @@ export class Server {
         // all service are constructed during this instance construction
         // so we don't have to declare those variables | undefined
         this.httpApi = new Koa();
-        this.telnetServer = telnet.createServer({ convertLF: false });
+        this.telnetServer = this.createTelnetServer();
+    }
+
+    createTelnetServer(): TelnetServer {
+        // Example of creating GMCP telnet option
+        telnet.OPTIONS.GMCP = 201;
+        telnet.OPTION_NAMES['201'] = 'gmcp';
+        // at client connection :
+        // socket.do.gmcp()
+        return telnet.createServer({ convertLF: false });
     }
 
     async initLocales() {
@@ -101,6 +109,9 @@ export class Server {
         debugServer('starting telnet service');
         this.telnetServer.on('client', async (client: TelnetClient) => {
             try {
+                client.do.transmit_binary(); // easier unicode character transmission (that what the legend says)
+                client.do.window_size(); // make the client emit 'window size' events
+                client.do.gmcp(); // accept GMCP client
                 const telnetClientController = container.resolve('telnetClientController');
                 await telnetClientController.connect(client);
             } catch (err) {

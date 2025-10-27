@@ -1,6 +1,7 @@
 import { Client as TelnetClient } from '../../../@types/telnet2';
 import { TelnetClientSocket } from '../services/TelnetClientSocket';
 import { AbstractClientController } from './AbstractClientController';
+import { CLIENT_STATES } from '../../domain/enums/client-states';
 
 /**
  * This class managed all inputs from client
@@ -8,6 +9,15 @@ import { AbstractClientController } from './AbstractClientController';
  * (example : kicking client, or sending message to client, except response)
  */
 export class TelnetClientController extends AbstractClientController {
+    async echo(idClient: string, b: boolean): Promise<void> {
+        const csd = this.getClientSession(idClient);
+        const clientSocket = csd.clientSocket;
+        if (b) {
+            await clientSocket.send(Buffer.from([0xff, 0xfc, 0x01])); // reactivate echo
+        } else {
+            await clientSocket.send(Buffer.from([0xff, 0xfb, 0x01])); // deactivate echo
+        }
+    }
     /**
      * One client is connecting to telnet server.
      * The function parameter is the telnet socket
@@ -19,26 +29,141 @@ export class TelnetClientController extends AbstractClientController {
         const clientSession = this.initClientSession(clientSocket);
         const idClient = clientSession.id;
         const clientContext = clientSession.clientContext;
+        const serverConfig = this.getServerConfig();
+        const newAccountCode = serverConfig.getConfigVariableString('loginNewUser');
+        await clientContext.sendMessage('server-welcome', {
+            serverDescription: serverConfig.getConfigVariableString('description'),
+            serverVersion: serverConfig.getConfigVariableString('version'),
+            newAccountCode,
+        });
         await clientContext.sendMessage('welcome.login', { _nolf: true });
+        await this.echo(idClient, true);
+        let confirmPassword = '';
         clientSocket.onMessage(async (message: string) => {
-            // in telnet
-            // the first two messages are used to receive credentials
-            // the subsequent messages must be parsed
-            const user = this.getAuthenticatedUser(idClient);
-            const login = this.getLogin(idClient);
-            if (user) {
-                // here the message should be interpreted as a command
-                await this.execCommand(idClient, message);
-            } else if (login) {
-                // here the message should be a password
-                await clientSocket.send(Buffer.from([0xff, 0xfc, 0x01])); // Réactive l'écho (DONT WONT ECHO)
-                await clientSocket.send('\n');
-                await this.setLoginPassword(idClient, message);
-            } else {
-                // here the message should be a user login name
-                await this.setLoginUsername(idClient, message);
-                await clientContext.sendMessage('welcome.password', { _nolf: true });
-                await clientSocket.send(Buffer.from([0xff, 0xfb, 0x01])); // Désactive l'écho (DO WONT ECHO)
+            try {
+                // in telnet
+                // the first two messages are used to receive credentials
+                // the subsequent messages must be parsed
+                const csd = this.getClientSession(idClient);
+                switch (csd.state) {
+                    case CLIENT_STATES.NONE: {
+                        // Client has been disconnected or is about to be disconnected
+                        // ignore message
+                        break;
+                    }
+                    case CLIENT_STATES.PAUSE: {
+                        // Client is not supposed to send message, the process is paused for security reason
+                        // ignore message
+                        break;
+                    }
+                    case CLIENT_STATES.LOGIN_PROMPT_USERNAME: {
+                        // when client enter newAccountCode
+                        if (message == newAccountCode) {
+                            await clientContext.sendMessage('createNewAccount.username', {
+                                _nolf: true,
+                            });
+                            csd.state = CLIENT_STATES.CREATE_ACCOUNT_PROMPT_USERNAME;
+                            break;
+                        } else {
+                            // Client is expected to send login username
+                            await this.setLoginUsername(idClient, message);
+                            // Prompting for password
+                            await clientContext.sendMessage('welcome.password', { _nolf: true });
+                            await this.echo(idClient, false);
+                        }
+                        break;
+                    }
+                    case CLIENT_STATES.LOGIN_PROMPT_PASSWORD: {
+                        // client is expected to send password
+                        await this.echo(idClient, true);
+                        await clientSocket.send('\n');
+                        await this.setLoginPassword(idClient, message);
+                        const csdAfter = this.getClientSession(idClient);
+                        if (csdAfter.state == CLIENT_STATES.AUTHENTICATED) {
+                            // Here : The client is authenticated
+                            await clientContext.sendMessage('welcome.authenticated', {
+                                name: csdAfter.user!.name,
+                            });
+                        } else {
+                            await clientContext.sendMessage('welcome.badLogin');
+                            await this.pauseClient(idClient, 100);
+                            await this.dropClient(idClient);
+                            return;
+                        }
+                        break;
+                    }
+                    case CLIENT_STATES.CREATE_ACCOUNT_PROMPT_USERNAME: {
+                        // client is expected to send new account username
+                        await this.createAccountUserName(idClient, message);
+                        await clientContext.sendMessage('createNewAccount.password', {
+                            _nolf: true,
+                        });
+                        await this.echo(idClient, false);
+                        break;
+                    }
+                    case CLIENT_STATES.CREATE_ACCOUNT_PROMPT_PASSWORD: {
+                        // client is expected to send new account password
+                        // empty password are ignored
+                        await this.echo(idClient, true);
+                        await clientSocket.send('\n');
+                        if (confirmPassword == '') {
+                            // this was the first password
+                            confirmPassword = message;
+                            await clientContext.sendMessage('createNewAccount.confirmPassword', {
+                                _nolf: true,
+                            });
+                            await this.echo(idClient, false);
+                            // Now awaiting password confirmation
+                            break;
+                        }
+                        if (confirmPassword == message) {
+                            // Password is confirmed
+                            await this.createAccountPassword(idClient, message);
+                            await clientContext.sendMessage('createNewAccount.email', {
+                                _nolf: true,
+                            });
+                        } else {
+                            // password is not confirmed
+                            await clientContext.sendMessage('createNewAccount.passwordMismatch');
+                            await this.dropClient(idClient);
+                        }
+                        break;
+                    }
+                    case CLIENT_STATES.CREATE_ACCOUNT_PROMPT_EMAIL: {
+                        // client is expected to send new account email address
+                        await this.createAccountEmail(idClient, message);
+                        const user = this.getAuthenticatedUser(idClient);
+                        if (user) {
+                            await clientContext.sendMessage('createNewAccount.success', {
+                                name: user.name,
+                            });
+                            csd.state = CLIENT_STATES.LOGIN_PROMPT_USERNAME;
+                            csd.login = '';
+                            await clientContext.sendMessage('welcome.login', { _nolf: true });
+                        } else {
+                            await clientContext.sendMessage('createNewAccount.failure');
+                            await this.pauseClient(idClient, 100);
+                            await this.dropClient(idClient);
+                        }
+                        break;
+                    }
+                    case CLIENT_STATES.AUTHENTICATED: {
+                        // When client is authenticated, all message are passed to th command interpreter
+                        await this.execCommand(idClient, message);
+                        break;
+                    }
+                    default: {
+                        // Unexpected client state
+                        // Destroying client
+                        return this.dropClient(idClient);
+                    }
+                }
+            } catch (err) {
+                const error = err as Error;
+                console.error(error);
+                // any error leads to client disconnection
+                // we don't want anything suspicious here
+                await this.dropClient(idClient);
             }
         });
     }

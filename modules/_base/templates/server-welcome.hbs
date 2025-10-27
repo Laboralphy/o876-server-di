@@ -1,0 +1,10 @@
+{{!--
+This is the welcome message when client is connecting to server.
+@param serverDescription
+@param serverVersion
+@param newAccountCode
+--}}
+{{ serverDescription }}
+version {{ serverVersion }}
+{{t "welcome.hello.0" }}
+{{t "welcome.hello.1" newAccountCode=newAccountCode }}

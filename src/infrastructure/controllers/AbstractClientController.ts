@@ -11,8 +11,9 @@ import { User } from '../../domain/entities/User';
 import { RunCommand } from '../../application/use-cases/commands/RunCommand';
 import { ClientSession } from '../../domain/types/ClientSession';
 import { CreateClientSession } from '../../application/use-cases/clients/CreateClientSession';
-import { CLIENT_STATE } from '../../domain/enums';
+import { CLIENT_STATES } from '../../domain/enums/client-states';
 import { CreateUser } from '../../application/use-cases/users/CreateUser';
+import { IServerConfig } from '../../application/ports/services/IServerConfig';
 
 const debugClient = debug('srv:client');
 
@@ -31,6 +32,7 @@ export abstract class AbstractClientController {
     private readonly runCommand: RunCommand;
     private readonly createClientSession: CreateClientSession;
     private readonly createUser: CreateUser;
+    private readonly serverConfig: IServerConfig;
 
     constructor(cradle: Cradle) {
         this.authenticateUser = cradle.authenticateUser;
@@ -42,6 +44,11 @@ export abstract class AbstractClientController {
         this.runCommand = cradle.runCommand;
         this.createClientSession = cradle.createClientSession;
         this.createUser = cradle.createUser;
+        this.serverConfig = cradle.serverConfig;
+    }
+
+    getServerConfig(): IServerConfig {
+        return this.serverConfig;
     }
 
     execCommand(idClient: string, sCommand: string) {
@@ -59,14 +66,29 @@ export abstract class AbstractClientController {
         return csd.login ?? '';
     }
 
+    getClientSession(idClient: string): ClientSession {
+        return this.communicationLayer.getClientSession(idClient);
+    }
+
     /**
      * Pauses the promise for a certain amount of milliseconds
      * @param n number of milliseconds to wait
+     * @param idClient client identifier
      */
-    protected async pause(n: number) {
-        return new Promise<void>((resolve) => {
+    protected async pauseClient(idClient: string, n: number) {
+        const csd = this.getClientSession(idClient);
+        const nowState = csd.state;
+        csd.state = CLIENT_STATES.PAUSE;
+        const prom = new Promise<void>((resolve) => {
             setTimeout(resolve, n);
         });
+        prom.finally(() => {
+            const csd = this.getClientSession(idClient);
+            if (csd.state == CLIENT_STATES.PAUSE) {
+                csd.state = nowState;
+            }
+        });
+        return prom;
     }
 
     /**
@@ -74,7 +96,7 @@ export abstract class AbstractClientController {
      * @param idClient client identifier
      * @param expectedState expected client state
      */
-    notifyStateError(idClient: string, expectedState: CLIENT_STATE) {
+    notifyStateError(idClient: string, expectedState: CLIENT_STATES) {
         const csd = this.communicationLayer.getClientSession(idClient);
         debugClient(
             'client %s : Unexpected client state : %d ; expected %d',
@@ -86,19 +108,19 @@ export abstract class AbstractClientController {
 
     async setLoginUsername(idClient: string, username: string) {
         const csd = this.communicationLayer.getClientSession(idClient);
-        if (csd.state == CLIENT_STATE.LOGIN_PROMPT_USERNAME) {
+        if (csd.state == CLIENT_STATES.LOGIN_PROMPT_USERNAME) {
             csd.login = username;
             debugClient('client %s login : %s', idClient, username);
-            csd.state = CLIENT_STATE.LOGIN_PROMPT_PASSWORD;
+            csd.state = CLIENT_STATES.LOGIN_PROMPT_PASSWORD;
         } else {
-            this.notifyStateError(idClient, CLIENT_STATE.LOGIN_PROMPT_USERNAME);
+            this.notifyStateError(idClient, CLIENT_STATES.LOGIN_PROMPT_USERNAME);
         }
     }
 
     async setLoginPassword(idClient: string, password: string) {
         const csd = this.communicationLayer.getClientSession(idClient);
-        if (csd.state != CLIENT_STATE.LOGIN_PROMPT_PASSWORD) {
-            this.notifyStateError(idClient, CLIENT_STATE.LOGIN_PROMPT_PASSWORD);
+        if (csd.state != CLIENT_STATES.LOGIN_PROMPT_PASSWORD) {
+            this.notifyStateError(idClient, CLIENT_STATES.LOGIN_PROMPT_PASSWORD);
             return;
         }
         try {
@@ -121,73 +143,62 @@ export abstract class AbstractClientController {
                     ban.reason
                 );
                 // destroy client socket, then exit function
+                csd.state = CLIENT_STATES.NONE;
                 this.destroyClient.execute(idClient);
                 return;
             }
-            await this.pause(500);
+            csd.state = CLIENT_STATES.AUTHENTICATED;
             debugClient('client %s has been authenticated as user %s', idClient, csd.user.name);
         } catch (e) {
             const error = e as Error;
-            await this.pause(1500);
+            await this.pauseClient(idClient, 1500);
             debugClient('client %s authentication error: %s', idClient, error.message);
             this.communicationLayer.dropClient(idClient);
         }
     }
 
+    async initCreateAccount(idClient: string) {
+        const csd = this.communicationLayer.getClientSession(idClient);
+        csd.state = CLIENT_STATES.CREATE_ACCOUNT_PROMPT_USERNAME;
+        debugClient('client %s initCreateAccount', idClient);
+    }
+
     async createAccountUserName(idClient: string, username: string) {
         const csd = this.communicationLayer.getClientSession(idClient);
-        if (csd.state != CLIENT_STATE.CREATE_ACCOUNT_PROMPT_USERNAME) {
-            this.notifyStateError(idClient, CLIENT_STATE.CREATE_ACCOUNT_PROMPT_USERNAME);
+        if (csd.state != CLIENT_STATES.CREATE_ACCOUNT_PROMPT_USERNAME) {
+            this.notifyStateError(idClient, CLIENT_STATES.CREATE_ACCOUNT_PROMPT_USERNAME);
             return;
         }
+        debugClient('client %s creating new account : %s', idClient, username);
         csd.login = username;
-        csd.state = CLIENT_STATE.CREATE_ACCOUNT_PROMPT_PASSWORD;
+        csd.state = CLIENT_STATES.CREATE_ACCOUNT_PROMPT_PASSWORD;
     }
 
     async createAccountPassword(idClient: string, password: string) {
         const csd = this.communicationLayer.getClientSession(idClient);
-        if (csd.state != CLIENT_STATE.CREATE_ACCOUNT_PROMPT_PASSWORD) {
-            this.notifyStateError(idClient, CLIENT_STATE.CREATE_ACCOUNT_PROMPT_PASSWORD);
+        if (csd.state != CLIENT_STATES.CREATE_ACCOUNT_PROMPT_PASSWORD) {
+            this.notifyStateError(idClient, CLIENT_STATES.CREATE_ACCOUNT_PROMPT_PASSWORD);
             return;
         }
         csd.tmpPass = password;
-        csd.state = CLIENT_STATE.CREATE_ACCOUNT_PROMPT_CONFIRM_PASSWORD;
-    }
-
-    /**
-     * Called at account creation : checks if password if confirmed
-     * @param idClient
-     * @param password
-     */
-    async createAccountConfirmPassword(idClient: string, password: string) {
-        const csd = this.communicationLayer.getClientSession(idClient);
-        if (csd.state != CLIENT_STATE.CREATE_ACCOUNT_PROMPT_CONFIRM_PASSWORD) {
-            this.notifyStateError(idClient, CLIENT_STATE.CREATE_ACCOUNT_PROMPT_CONFIRM_PASSWORD);
-            return false;
-        }
-        if (csd.tmpPass == password) {
-            // The password was confirmed
-            csd.state = CLIENT_STATE.CREATE_ACCOUNT_PROMPT_MAIL;
-            return true;
-        } else {
-            // The password was not confirmed
-            return false;
-        }
+        debugClient('client %s sets password for new account : %s', idClient, csd.login);
+        csd.state = CLIENT_STATES.CREATE_ACCOUNT_PROMPT_EMAIL;
     }
 
     async createAccountEmail(idClient: string, email: string) {
         const csd = this.communicationLayer.getClientSession(idClient);
-        if (csd.state != CLIENT_STATE.CREATE_ACCOUNT_PROMPT_MAIL) {
-            this.notifyStateError(idClient, CLIENT_STATE.CREATE_ACCOUNT_PROMPT_MAIL);
+        if (csd.state != CLIENT_STATES.CREATE_ACCOUNT_PROMPT_EMAIL) {
+            this.notifyStateError(idClient, CLIENT_STATES.CREATE_ACCOUNT_PROMPT_EMAIL);
             return false;
         }
+        debugClient('client %s sets email address for new account : %s', idClient, email);
         const payload = {
             name: csd.login,
             password: csd.tmpPass,
             email,
         };
-        const user = await this.createUser.execute(payload);
-        csd.user = user;
+        csd.user = await this.createUser.execute(payload);
+        return true;
     }
 
     /**
@@ -214,6 +225,10 @@ export abstract class AbstractClientController {
     async expelClients() {
         debugClient('disconnecting all clients');
         this.communicationLayer.dropAllClients();
+    }
+
+    async dropClient(idClient: string) {
+        this.communicationLayer.dropClient(idClient);
     }
 
     /**

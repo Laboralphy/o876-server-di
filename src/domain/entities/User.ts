@@ -1,5 +1,5 @@
 import z from 'zod';
-import { ROLES } from '../enums';
+import { ROLES } from '../enums/roles';
 import { EntityId } from '../schemas/EntityId';
 import { BanSchema } from './Ban';
 
