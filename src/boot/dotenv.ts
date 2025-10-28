@@ -20,7 +20,7 @@ function checkVariables() {
         return process.env[v] === undefined;
     });
     if (aMissingVariables.length > 0) {
-        throw new Error(`List of missing environement variables : ${aMissingVariables.join(', ')}`);
+        throw new Error(`List of missing environment variables : ${aMissingVariables.join(', ')}`);
     }
     bOkVariables = true;
 }

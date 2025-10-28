@@ -20,7 +20,7 @@ async function time(ctx) {
     const st = ctx.getServerTime();
     const d = st.date;
     const timezone = st.timezone;
-    const date = [pad0(d.getFullYear(), 4), pad0(d.getMonth() + 1, 2), pad0(d.getDay(), 2)].join(
+    const date = [pad0(d.getFullYear(), 4), pad0(d.getMonth() + 1, 2), pad0(d.getDate(), 2)].join(
         '-'
     );
     const time = [pad0(d.getHours(), 2), pad0(d.getMinutes(), 2), pad0(d.getSeconds(), 2)].join(
