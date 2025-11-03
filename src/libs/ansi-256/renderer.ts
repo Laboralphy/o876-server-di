@@ -146,6 +146,19 @@ export function evaluateColorCode(sColor: string): number {
     }
 }
 
+export function parseColorCode(sColor: string): string {
+    if (sColor.startsWith('#')) {
+        return sColor;
+    } else {
+        const c = COLOR_CODES[sColor.toLowerCase()];
+        if (c === undefined) {
+            return '#777777';
+        } else {
+            return c;
+        }
+    }
+}
+
 /**
  * Convert a 3 hex digit string into an (r, g, b) structure
  * the input string may contain an initial # mark, as if it were a css color code
@@ -178,9 +191,7 @@ export function parseRGB(sColor: string) {
  * @param background
  */
 function getAnsi16Code(sColor: string, background: boolean = false): number | undefined {
-    if (sColor.startsWith('#')) {
-        sColor = sColor.substring(1);
-    } else {
+    if (!sColor.startsWith('#')) {
         sColor = COLOR_CODES[sColor.toLowerCase()];
     }
     const c = ANSI_16_COLOR_MAP.get(sColor.toLowerCase());
