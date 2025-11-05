@@ -27,7 +27,7 @@ export class CreateUser {
         const nNow = Date.now();
         const password = this.encryptor.encryptPassword(createUserDto.password);
         const user: User = UserSchema.parse({
-            id: this.uidGenerator.getUID(),
+            id: this.uidGenerator.generateUID(),
             name: createUserDto.name,
             email: createUserDto.email,
             tsCreation: nNow,

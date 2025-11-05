@@ -1,8 +1,8 @@
 import { IUIDGenerator } from '../../application/ports/services/IUIDGenerator';
-import { getUID } from '../../libs/uid-generator';
+import { generateUID } from '../../libs/uid-generator';
 
 export class UIDGenerator implements IUIDGenerator {
-    getUID(): string {
-        return getUID(10);
+    generateUID(): string {
+        return generateUID(10);
     }
 }

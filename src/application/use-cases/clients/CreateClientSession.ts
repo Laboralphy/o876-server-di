@@ -25,7 +25,7 @@ export class CreateClientSession {
 
     execute(clientSocket: IClientSocket): ClientSession {
         // Create context and associate it with client.
-        const idClient = this.uidGenerator.getUID();
+        const idClient = this.uidGenerator.generateUID();
         const clientContext = new ClientContext(idClient, {
             onClosingConnection: async (client: string) => {
                 return this.destroyClient.execute(client);

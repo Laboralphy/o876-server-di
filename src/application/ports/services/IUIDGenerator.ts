@@ -1,3 +1,3 @@
 export interface IUIDGenerator {
-    getUID(): string;
+    generateUID(): string;
 }
