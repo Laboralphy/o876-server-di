@@ -5,10 +5,10 @@ import { container } from './boot/container';
 import { scopePerRequest } from 'awilix-koa';
 import { debug } from './libs/o876-debug';
 import { getEnv } from './boot/dotenv';
-import { FsHelper } from 'o876-fs-ts';
 import { expandPath } from './libs/expand-path';
 import telnet, { Server as TelnetServer, Client as TelnetClient } from 'telnet2';
 import path from 'node:path';
+import fs from 'node:fs/promises';
 
 const debugServer = debug('srv:main');
 
@@ -16,7 +16,6 @@ export class Server {
     private readonly httpApi: Koa;
     private readonly telnetServer: TelnetServer;
     private readonly env = getEnv();
-    private readonly fsHelper = new FsHelper();
 
     constructor() {
         // all service are constructed during this instance construction
@@ -63,7 +62,7 @@ export class Server {
         }
         const sModuleLocation = expandPath(this.env.SERVER_MODULE_PATH);
         debugServer('module directory is %s', sModuleLocation);
-        await this.fsHelper.mkdir(sModuleLocation);
+        await fs.mkdir(sModuleLocation, { recursive: true });
     }
 
     async initDatabase() {
