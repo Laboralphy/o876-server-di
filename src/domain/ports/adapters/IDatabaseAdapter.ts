@@ -25,14 +25,14 @@ export interface IDatabaseAdapter {
      * @param key json document primary key
      * @param data a plain object
      */
-    store(table: string, key: string, data: JsonObject): Promise<void>;
+    store<T extends JsonObject>(table: string, key: string, data: T): Promise<void>;
 
     /**
      * Retrieve data from the specified table with the spécified key by direct access.
      * @param table table name
      * @param key json document primary key
      */
-    load(table: string, key: string): Promise<JsonObject | undefined>;
+    load<T extends JsonObject>(table: string, key: string): Promise<T | undefined>;
 
     /**
      * Deletes the specified document
@@ -46,7 +46,10 @@ export interface IDatabaseAdapter {
      * @param table
      * @param query
      */
-    find(table: string, query: { [property: string]: ScalarValue }): Promise<JsonObject[]>;
+    find<T extends JsonObject>(
+        table: string,
+        query: { [property: string]: ScalarValue }
+    ): Promise<T[]>;
 
     /**
      * A general purpose iteration mechanism

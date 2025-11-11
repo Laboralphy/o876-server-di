@@ -1,4 +1,4 @@
-import { createContainer, asClass, asValue } from 'awilix';
+import { createContainer, asClass } from 'awilix';
 import { UserRepository } from '../infrastructure/persistance/json-database/UserRepository';
 
 import { Encryptor } from '../infrastructure/services/Encryptor';

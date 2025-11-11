@@ -19,7 +19,7 @@ import { JsonDatabaseConfig } from '../../boot/json-database.config';
 const debugDb = debug('srv:database');
 
 export class JsonDatabase implements IDatabaseAdapter {
-    private collections: Map<string, Collection> = new Map<string, Collection>();
+    private collections: Map<string, Collection<JsonObject>> = new Map();
     private diskStorage = new DiskStorage();
     private memoryStorage = new MemoryStorage();
 
@@ -37,12 +37,12 @@ export class JsonDatabase implements IDatabaseAdapter {
         await collection.init();
     }
 
-    getCollection(name: string): Collection {
+    getCollection<T extends JsonObject>(name: string): Collection<T> {
         const oCollection = this.collections.get(name);
         if (oCollection) {
-            return oCollection;
+            return oCollection as Collection<T>;
         } else {
-            throw new Error(`Could not get collection "${name}"`);
+            throw new ReferenceError(`Could not get collection "${name}"`);
         }
     }
 
@@ -55,22 +55,25 @@ export class JsonDatabase implements IDatabaseAdapter {
         debugDb('json-database initialization complete');
     }
 
-    async find(table: string, query: { [p: string]: ScalarValue }): Promise<JsonObject[]> {
-        const collection = this.getCollection(table);
+    async find<T extends JsonObject>(
+        table: string,
+        query: { [p: string]: ScalarValue }
+    ): Promise<T[]> {
+        const collection: Collection<T> = this.getCollection(table);
         const cursor = await collection.find(query);
         return cursor.fetchAll();
     }
 
-    async load(table: string, key: string): Promise<JsonObject | undefined> {
-        return this.getCollection(table).load(key);
+    async load<T extends JsonObject>(table: string, key: string): Promise<T | undefined> {
+        return this.getCollection<T>(table).load(key);
     }
 
     async remove(table: string, key: string): Promise<void> {
-        return this.getCollection(table).remove(key);
+        return this.getCollection(table).delete(key);
     }
 
-    async store(table: string, key: string, data: JsonObject): Promise<void> {
-        return this.getCollection(table).save(key, data);
+    async store<T extends JsonObject>(table: string, key: string, data: T): Promise<void> {
+        return this.getCollection<T>(table).save(key, data);
     }
 
     async forEach<T>(table: string, callback: ForEachCallback<T>): Promise<void> {

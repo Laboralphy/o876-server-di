@@ -1,0 +1,14 @@
+import z from 'zod';
+import { EntityId } from '../schemas/EntityId';
+
+export const MailInboxSchema = z.object({
+    messageId: z.string(),
+    tag: z.number(),
+    userId: EntityId,
+    tsReceived: z.number(),
+    deleted: z.boolean(),
+    kept: z.boolean(),
+    read: z.boolean(),
+});
+
+export type MailInbox = z.infer<typeof MailInboxSchema>;
