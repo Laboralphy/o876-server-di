@@ -47,6 +47,8 @@ import { IServerConfig } from '../application/ports/services/IServerConfig';
 import { IScriptRunner } from '../application/ports/services/IScriptRunner';
 import { IModuleManager } from '../application/ports/services/IModuleManager';
 import { ServerConfig } from '../infrastructure/services/ServerConfig';
+import { MailInboxRepository } from '../infrastructure/persistance/json-database/MailInboxRepository';
+import { MailMessageRepository } from '../infrastructure/persistance/json-database/MailMessageRepository';
 
 /**
  * To as a new use case, port ...,
@@ -77,6 +79,8 @@ export interface Cradle {
     // repositories
     userRepository: IUserRepository;
     userSecretRepository: IUserSecretRepository;
+    mailInboxRepository: MailInboxRepository;
+    mailMessageRepository: MailMessageRepository;
 
     // controller
     apiUserController: ApiUserController;
@@ -121,6 +125,8 @@ container.register({
     // repositories
     userRepository: asClass(UserRepository).singleton(),
     userSecretRepository: asClass(UserSecretRepository).singleton(),
+    mailInboxRepository: asClass(MailInboxRepository).singleton(),
+    mailMessageRepository: asClass(MailMessageRepository).singleton(),
 
     // controllers : API
     apiUserController: asClass(ApiUserController).singleton(),

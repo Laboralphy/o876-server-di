@@ -30,7 +30,7 @@ export class UserSecretRepository implements IUserSecretRepository {
         }
     }
 
-    async forEach(callback: ForEachCallback<any>): Promise<void> {
+    async forEach(callback: ForEachCallback<UserSecret>): Promise<void> {
         await this.database.forEach(COLLECTION_NAME, callback);
     }
 }
