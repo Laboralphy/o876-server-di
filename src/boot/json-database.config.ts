@@ -11,6 +11,11 @@ export const JsonDatabaseConfig: {
                     type: INDEX_TYPES.HASH,
                     caseInsensitive: true,
                 },
+                displayName: {
+                    type: INDEX_TYPES.HASH,
+                    caseInsensitive: false,
+                    nullable: true,
+                },
                 ban: {
                     type: INDEX_TYPES.TRUTHY,
                     nullable: true,

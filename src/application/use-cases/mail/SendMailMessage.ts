@@ -8,6 +8,8 @@ import { MailMessage } from '../../../domain/entities/MailMessage';
 import { IIdGenerator } from '../../ports/services/IIdGenerator';
 import { User } from '../../../domain/entities/User';
 import { MailInbox } from '../../../domain/entities/MailInbox';
+import { UseCaseError } from '../../error/UseCaseError';
+import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
 
 /**
  * Sends a message to a user
@@ -52,7 +54,7 @@ export class SendMailMessage {
         }
         if (notFoundUserSet.size > 0) {
             const sNotFoundUsers = Array.from(notFoundUserSet).join(', ');
-            throw new Error(`user(s) not found (${notFoundUserSet.size}) : ${sNotFoundUsers}`);
+            throw new Error(USE_CASE_ERRORS.ENTITY_NOT_FOUND + ` User : ${sNotFoundUsers}`);
         }
         const tsCreation = this.time.now();
         const message: MailMessage = {

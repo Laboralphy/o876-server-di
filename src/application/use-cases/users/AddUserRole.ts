@@ -1,6 +1,8 @@
 import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
 import { Cradle } from '../../../boot/container';
 import { ModifyUserRolesDto } from '../../dto/ModifyUserRolesDto';
+import { UseCaseError } from '../../error/UseCaseError';
+import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
 
 export class AddUserRole {
     private userRepository: IUserRepository;
@@ -20,7 +22,7 @@ export class AddUserRole {
             await this.userRepository.save(user);
             return user;
         } else {
-            throw new Error(`User does not exist: ${idUser}`);
+            throw new Error(USE_CASE_ERRORS.ENTITY_NOT_FOUND + ` User : ${idUser}`);
         }
     }
 }

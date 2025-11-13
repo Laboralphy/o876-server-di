@@ -16,7 +16,9 @@
         "confirmPassword": "Confirm password: ",
         "email": "New account email address: ",
         "success": "New account {{ name }} has been successfully created. Please reconnect.",
-        "failure": "Account creation failed."
+        "failure": "Account creation failed.",
+        "displayNameInfo": "Display name is visible too all, and should be different from your account username (for security reason).",
+        "displayName": "New account display name: "
     },
     "userBanned": {
         "forever": "Permanent ban",

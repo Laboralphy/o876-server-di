@@ -3,4 +3,5 @@ import { IRepository } from './IRepository';
 
 export interface IUserRepository extends IRepository<User> {
     findByName(name: string): Promise<User | undefined>;
+    findByDisplayName(name: string): Promise<User | undefined>;
 }

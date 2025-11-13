@@ -42,4 +42,13 @@ export class UserRepository implements IUserRepository {
             return undefined;
         }
     }
+
+    async findByDisplayName(name: string): Promise<User | undefined> {
+        const aUsers = await this.database.find(COLLECTION_NAME, { displayName: name });
+        if (aUsers.length > 0) {
+            return UserSchema.parse(aUsers.shift());
+        } else {
+            return undefined;
+        }
+    }
 }

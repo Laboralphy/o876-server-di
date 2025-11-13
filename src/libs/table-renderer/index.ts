@@ -28,7 +28,7 @@ export class TableRenderer {
         if (id in THEMES) {
             this._theme = id;
         } else {
-            throw new Error(`unknown table theme : ${id}`);
+            throw new Error(`Unknown table theme : ${id}`);
         }
     }
 
@@ -40,7 +40,7 @@ export class TableRenderer {
         if (this._theme in THEMES) {
             return THEMES[this._theme];
         } else {
-            throw new Error(`unknown table theme : ${this._theme}`);
+            throw new Error(`Unknown table theme : ${this._theme}`);
         }
     }
 
@@ -78,10 +78,10 @@ export class TableRenderer {
             if (typeof n === 'number') {
                 return n;
             } else {
-                throw new TypeError('object.length is not a number');
+                throw new TypeError('Object.length is not a number');
             }
         } else {
-            throw new TypeError('parameters should be displayable type only');
+            throw new TypeError('Parameters should be displayable type only');
         }
     }
 

@@ -3,6 +3,7 @@ import { ModifyUserDto } from '../../dto/ModifyUserDto';
 import { Cradle } from '../../../boot/container';
 import { IEncryptor } from '../../ports/services/IEncryptor';
 import { IUserSecretRepository } from '../../../domain/ports/repositories/IUserSecretRepository';
+import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
 
 export class DeleteUser {
     private readonly userRepository: IUserRepository;
@@ -22,7 +23,7 @@ export class DeleteUser {
             }
             await this.userRepository.delete(user);
         } else {
-            throw new Error(`User does not exist: ${idUser}`);
+            throw new Error(USE_CASE_ERRORS.ENTITY_NOT_FOUND + ` User : ${idUser}`);
         }
     }
 }

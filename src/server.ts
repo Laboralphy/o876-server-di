@@ -58,7 +58,7 @@ export class Server {
      */
     async initDataDirectory() {
         if (!this.env.SERVER_MODULE_PATH) {
-            throw new Error(`environment variable not set : SERVER_MODULE_PATH`);
+            throw new Error(`Environment variable not set : SERVER_MODULE_PATH`);
         }
         const sModuleLocation = expandPath(this.env.SERVER_MODULE_PATH);
         debugServer('module directory is %s', sModuleLocation);

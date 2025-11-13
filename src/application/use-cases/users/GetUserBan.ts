@@ -1,6 +1,7 @@
 import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
 import { Cradle } from '../../../boot/container';
 import { ITime } from '../../ports/services/ITime';
+import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
 
 export class GetUserBan {
     private userRepository: IUserRepository;
@@ -47,7 +48,7 @@ export class GetUserBan {
             // at this point, user.ban is either non-inexistent or expired
             return null;
         } else {
-            throw new Error(`User does not exist: ${idUser}`);
+            throw new Error(USE_CASE_ERRORS.ENTITY_NOT_FOUND + ` User : ${idUser}`);
         }
     }
 }

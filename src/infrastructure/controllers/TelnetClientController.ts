@@ -2,6 +2,7 @@ import { Client as TelnetClient } from '../../../@types/telnet2';
 import { TelnetClientSocket } from '../services/TelnetClientSocket';
 import { AbstractClientController } from './AbstractClientController';
 import { CLIENT_STATES } from '../../domain/enums/client-states';
+import { CreateUserDto } from '../../application/dto/CreateUserDto';
 
 /**
  * This class managed all inputs from client
@@ -38,7 +39,12 @@ export class TelnetClientController extends AbstractClientController {
         });
         await clientContext.sendMessage('welcome.login', { _nolf: true });
         await this.echo(idClient, true);
-        let confirmPassword = '';
+        const accountCreation: CreateUserDto = {
+            name: '',
+            email: '',
+            displayName: '',
+            password: '',
+        };
         clientSocket.onMessage(async (message: string) => {
             try {
                 // in telnet
@@ -82,7 +88,7 @@ export class TelnetClientController extends AbstractClientController {
                         if (csdAfter.state == CLIENT_STATES.AUTHENTICATED) {
                             // Here : The client is authenticated
                             await clientContext.sendMessage('welcome.authenticated', {
-                                name: csdAfter.user!.name,
+                                name: csdAfter.user!.displayName,
                             });
                         } else {
                             await clientContext.sendMessage('welcome.badLogin');
@@ -94,10 +100,11 @@ export class TelnetClientController extends AbstractClientController {
                     }
                     case CLIENT_STATES.CREATE_ACCOUNT_PROMPT_USERNAME: {
                         // client is expected to send new account username
-                        await this.createAccountUserName(idClient, message);
+                        accountCreation.name = message;
                         await clientContext.sendMessage('createNewAccount.password', {
                             _nolf: true,
                         });
+                        csd.state = CLIENT_STATES.CREATE_ACCOUNT_PROMPT_PASSWORD;
                         await this.echo(idClient, false);
                         break;
                     }
@@ -106,22 +113,23 @@ export class TelnetClientController extends AbstractClientController {
                         // empty password are ignored
                         await this.echo(idClient, true);
                         await clientSocket.send('\n');
-                        if (confirmPassword == '') {
+                        if (accountCreation.password == '') {
                             // this was the first password
-                            confirmPassword = message;
+                            accountCreation.password = message;
                             await clientContext.sendMessage('createNewAccount.confirmPassword', {
                                 _nolf: true,
                             });
+                            // remain in the same state, waiting for password confirmation
                             await this.echo(idClient, false);
                             // Now awaiting password confirmation
                             break;
                         }
-                        if (confirmPassword == message) {
+                        if (accountCreation.password == message) {
                             // Password is confirmed
-                            await this.createAccountPassword(idClient, message);
                             await clientContext.sendMessage('createNewAccount.email', {
                                 _nolf: true,
                             });
+                            csd.state = CLIENT_STATES.CREATE_ACCOUNT_PROMPT_EMAIL;
                         } else {
                             // password is not confirmed
                             await clientContext.sendMessage('createNewAccount.passwordMismatch');
@@ -131,11 +139,19 @@ export class TelnetClientController extends AbstractClientController {
                     }
                     case CLIENT_STATES.CREATE_ACCOUNT_PROMPT_EMAIL: {
                         // client is expected to send new account email address
-                        await this.createAccountEmail(idClient, message);
+                        accountCreation.email = message;
+                        await clientContext.sendMessage('createNewAccount.displayName');
+                        csd.state = CLIENT_STATES.CREATE_ACCOUNT_PROMPT_DISPLAYNAME;
+                        break;
+                    }
+                    case CLIENT_STATES.CREATE_ACCOUNT_PROMPT_DISPLAYNAME: {
+                        // client is expected to send new account display name
+                        accountCreation.displayName = message;
+                        await this.createNewAccount(idClient, accountCreation);
                         const user = this.getAuthenticatedUser(idClient);
                         if (user) {
                             await clientContext.sendMessage('createNewAccount.success', {
-                                name: user.name,
+                                name: user.displayName,
                             });
                             csd.state = CLIENT_STATES.LOGIN_PROMPT_USERNAME;
                             csd.login = '';

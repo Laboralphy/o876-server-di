@@ -6,6 +6,10 @@ import { UserSchema, User } from '../../../domain/entities/User';
 import { Cradle } from '../../../boot/container';
 import { UserSecretSchema } from '../../../domain/entities/UserSecret';
 import { IUserSecretRepository } from '../../../domain/ports/repositories/IUserSecretRepository';
+import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
+import { IServerConfig } from '../../ports/services/IServerConfig';
+
+const REGEX_DISPLAYNAME = /^[a-zA-Z](?:[a-zA-Z-]*[a-zA-Z])?$/;
 
 /**
  * Creates a new User
@@ -15,12 +19,46 @@ export class CreateUser {
     private readonly userSecretRepository: IUserSecretRepository;
     private readonly encryptor: IEncryptor;
     private readonly idGenerator: IIdGenerator;
+    private readonly serverConfig: IServerConfig;
 
     constructor(cradle: Cradle) {
         this.userRepository = cradle.userRepository;
         this.userSecretRepository = cradle.userSecretRepository;
         this.encryptor = cradle.encryptor;
         this.idGenerator = cradle.idGenerator;
+        this.serverConfig = cradle.serverConfig;
+    }
+
+    async checkDisplayName(displayName: string) {
+        // checks displayName
+        // 1 - must match REGEX_DISPLAYNAME
+        // 2 - must e unique among users
+        if (displayName.length > 24) {
+            throw new Error(
+                USE_CASE_ERRORS.VALUE_TOO_LONG + ' Display name is too long, 24 characters max'
+            );
+        }
+        if (!displayName.match(REGEX_DISPLAYNAME)) {
+            throw new Error(
+                USE_CASE_ERRORS.VALUE_INVALID +
+                    ' Display name may only contain dashes and alphabetic characters)'
+            );
+        }
+        // May not be like "new"
+        if (
+            displayName.toLowerCase() === this.serverConfig.getConfigVariableString('loginNewUser')
+        ) {
+            throw new Error(
+                USE_CASE_ERRORS.VALUE_RESERVED + ' Display name : this value is reserved'
+            );
+        }
+        // Check unicity
+        const oUserWithThisName = await this.userRepository.findByDisplayName(displayName);
+        if (oUserWithThisName) {
+            throw new Error(
+                USE_CASE_ERRORS.VALUE_ALREADY_EXISTS + ` Display name : ${displayName} `
+            );
+        }
     }
 
     async execute(createUserDto: CreateUserDto): Promise<User> {
@@ -30,6 +68,7 @@ export class CreateUser {
             id: this.idGenerator.generateUID(),
             name: createUserDto.name,
             email: createUserDto.email,
+            displayName: createUserDto.displayName,
             tsCreation: nNow,
             tsLastUsed: nNow,
             roles: [],
@@ -41,11 +80,12 @@ export class CreateUser {
         });
         await this.userSecretRepository.save(userSecret);
         if (await this.userRepository.findByName(user.name)) {
-            throw new Error(`User with name "${user.name}" already exists`);
+            throw new Error(USE_CASE_ERRORS.VALUE_ALREADY_EXISTS + ` ${user.name}`);
         }
         if (await this.userRepository.get(user.id)) {
-            throw new Error(`User with id "${user.id}" already exists`);
+            throw new Error(USE_CASE_ERRORS.VALUE_ALREADY_EXISTS + ` ${user.id}`);
         }
+        await this.checkDisplayName(user.displayName);
         await this.userRepository.save(user);
         return user;
     }

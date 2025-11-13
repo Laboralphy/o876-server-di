@@ -19,7 +19,7 @@ export class CommunicationLayer implements ICommunicationLayer {
         if (cs) {
             return cs;
         } else {
-            throw new Error(`could not find client ${idClient} session`);
+            throw new Error(`Could not find client ${idClient} session`);
         }
     }
 

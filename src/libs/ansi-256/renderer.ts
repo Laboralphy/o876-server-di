@@ -94,7 +94,7 @@ const ANSI_16_COLOR_MAP: Readonly<Map<string, number>> = new Map([
  */
 export function getColorCode(r: number, g: number, b: number): string {
     if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
-        throw new RangeError('all rgb color components must be between 0 and 255');
+        throw new RangeError('All rgb color components must be between 0 and 255');
     }
     if (r === g && r === b) {
         // grayscale

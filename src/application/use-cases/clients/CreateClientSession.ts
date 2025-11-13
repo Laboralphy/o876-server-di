@@ -48,7 +48,6 @@ export class CreateClientSession {
             clientContext: apiContext,
             user: null,
             login: '',
-            tmpPass: '',
         };
         this.communicationLayer.linkClientSession(clientSession);
         return clientSession;

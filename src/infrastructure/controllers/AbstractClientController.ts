@@ -14,6 +14,7 @@ import { CreateClientSession } from '../../application/use-cases/clients/CreateC
 import { CLIENT_STATES } from '../../domain/enums/client-states';
 import { CreateUser } from '../../application/use-cases/users/CreateUser';
 import { IServerConfig } from '../../application/ports/services/IServerConfig';
+import { CreateUserDto } from '../../application/dto/CreateUserDto';
 
 const debugClient = debug('srv:client');
 
@@ -157,48 +158,10 @@ export abstract class AbstractClientController {
         }
     }
 
-    async initCreateAccount(idClient: string) {
+    async createNewAccount(idClient: string, accountCreation: CreateUserDto) {
         const csd = this.communicationLayer.getClientSession(idClient);
-        csd.state = CLIENT_STATES.CREATE_ACCOUNT_PROMPT_USERNAME;
-        debugClient('client %s initCreateAccount', idClient);
-    }
-
-    async createAccountUserName(idClient: string, username: string) {
-        const csd = this.communicationLayer.getClientSession(idClient);
-        if (csd.state != CLIENT_STATES.CREATE_ACCOUNT_PROMPT_USERNAME) {
-            this.notifyStateError(idClient, CLIENT_STATES.CREATE_ACCOUNT_PROMPT_USERNAME);
-            return;
-        }
-        debugClient('client %s creating new account : %s', idClient, username);
-        csd.login = username;
-        csd.state = CLIENT_STATES.CREATE_ACCOUNT_PROMPT_PASSWORD;
-    }
-
-    async createAccountPassword(idClient: string, password: string) {
-        const csd = this.communicationLayer.getClientSession(idClient);
-        if (csd.state != CLIENT_STATES.CREATE_ACCOUNT_PROMPT_PASSWORD) {
-            this.notifyStateError(idClient, CLIENT_STATES.CREATE_ACCOUNT_PROMPT_PASSWORD);
-            return;
-        }
-        csd.tmpPass = password;
-        debugClient('client %s sets password for new account : %s', idClient, csd.login);
-        csd.state = CLIENT_STATES.CREATE_ACCOUNT_PROMPT_EMAIL;
-    }
-
-    async createAccountEmail(idClient: string, email: string) {
-        const csd = this.communicationLayer.getClientSession(idClient);
-        if (csd.state != CLIENT_STATES.CREATE_ACCOUNT_PROMPT_EMAIL) {
-            this.notifyStateError(idClient, CLIENT_STATES.CREATE_ACCOUNT_PROMPT_EMAIL);
-            return false;
-        }
-        debugClient('client %s sets email address for new account : %s', idClient, email);
-        const payload = {
-            name: csd.login,
-            password: csd.tmpPass,
-            email,
-        };
-        csd.user = await this.createUser.execute(payload);
-        return true;
+        csd.user = await this.createUser.execute(accountCreation);
+        return csd.user;
     }
 
     /**
