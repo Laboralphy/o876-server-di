@@ -9,3 +9,6 @@ mailMaxKeptMessages: 20
 
 # Maximum character in a messages
 mailMaxMessageLength: 1024
+
+# Maximum mail message preview length
+mailMaxMessagePreviewLength: 32

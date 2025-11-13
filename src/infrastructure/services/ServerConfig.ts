@@ -19,7 +19,7 @@ export class ServerConfig implements IServerConfig {
         if (value !== undefined) {
             return value.toString();
         } else {
-            throw new Error(`Required config variable ${name}`);
+            throw new ReferenceError(`Required config variable ${name}`);
         }
     }
 
@@ -33,7 +33,19 @@ export class ServerConfig implements IServerConfig {
         } else if (typeof value == 'number') {
             return value;
         } else {
-            throw new Error(`Required config variable ${name}`);
+            throw new ReferenceError(`Required config variable ${name}`);
+        }
+    }
+
+    getConfigVariableBoolean(name: string): boolean {
+        if (BUILTINS.has(name)) {
+            return Boolean(BUILTINS.get(name) ?? false);
+        }
+        const value = serverConfig()[name];
+        if (typeof value === 'boolean') {
+            return Boolean(value);
+        } else {
+            throw new ReferenceError(`Required config variable ${name}`);
         }
     }
 }

@@ -8,7 +8,7 @@ import { TimeVanilla } from '../infrastructure/services/TimeVanilla';
 
 import { ITime } from '../application/ports/services/ITime';
 import { IEncryptor } from '../application/ports/services/IEncryptor';
-import { IUIDGenerator } from '../application/ports/services/IUIDGenerator';
+import { IIdGenerator } from '../application/ports/services/IIdGenerator';
 
 import { IUserRepository } from '../domain/ports/repositories/IUserRepository';
 import { IUserSecretRepository } from '../domain/ports/repositories/IUserSecretRepository';
@@ -88,7 +88,7 @@ export interface Cradle {
 
     // services
     encryptor: IEncryptor;
-    uidGenerator: IUIDGenerator;
+    idGenerator: IIdGenerator;
     database: IDatabaseAdapter;
     time: ITime;
     communicationLayer: ICommunicationLayer;
@@ -135,7 +135,7 @@ container.register({
 
     // services
     encryptor: asClass(Encryptor).singleton(),
-    uidGenerator: asClass(UIDGenerator).singleton(),
+    idGenerator: asClass(UIDGenerator).singleton(),
     database: asClass(JsonDatabase).singleton(),
     time: asClass(TimeVanilla).singleton(),
     communicationLayer: asClass(CommunicationLayer).singleton(),

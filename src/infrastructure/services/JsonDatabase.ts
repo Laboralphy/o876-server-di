@@ -4,13 +4,7 @@ import {
     IDatabaseAdapter,
 } from '../../domain/ports/adapters/IDatabaseAdapter';
 import path from 'node:path';
-import {
-    Collection,
-    DiskStorage,
-    IndexCreationOptions,
-    IStorage,
-    MemoryStorage,
-} from 'o876-json-db';
+import { Collection, DiskStorage, IndexCreationOptions, IStorage } from 'o876-json-db';
 import { JsonObject, ScalarValue } from '../../domain/types/JsonStruct';
 import { debug } from '../../libs/o876-debug';
 import { expandPath } from '../../libs/expand-path';
@@ -21,7 +15,6 @@ const debugDb = debug('srv:database');
 export class JsonDatabase implements IDatabaseAdapter {
     private collections: Map<string, Collection<JsonObject>> = new Map();
     private diskStorage = new DiskStorage();
-    private memoryStorage = new MemoryStorage();
 
     async initCollection(
         name: string,
@@ -37,7 +30,7 @@ export class JsonDatabase implements IDatabaseAdapter {
         await collection.init();
     }
 
-    getCollection<T extends JsonObject>(name: string): Collection<T> {
+    private getCollection<T extends JsonObject>(name: string): Collection<T> {
         const oCollection = this.collections.get(name);
         if (oCollection) {
             return oCollection as Collection<T>;
@@ -76,9 +69,12 @@ export class JsonDatabase implements IDatabaseAdapter {
         return this.getCollection<T>(table).save(key, data);
     }
 
-    async forEach<T>(table: string, callback: ForEachCallback<T>): Promise<void> {
-        await this.getCollection(table).filter((data: JsonObject, key: string) => {
-            callback(data as T, key);
+    async forEach<T extends JsonObject>(
+        table: string,
+        callback: ForEachCallback<T>
+    ): Promise<void> {
+        await this.getCollection<T>(table).filter((data, key: string) => {
+            callback(data, key);
             return false;
         });
     }

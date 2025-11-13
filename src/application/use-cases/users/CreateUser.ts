@@ -1,7 +1,7 @@
 import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
 import { CreateUserDto } from '../../dto/CreateUserDto';
 import { IEncryptor } from '../../ports/services/IEncryptor';
-import { IUIDGenerator } from '../../ports/services/IUIDGenerator';
+import { IIdGenerator } from '../../ports/services/IIdGenerator';
 import { UserSchema, User } from '../../../domain/entities/User';
 import { Cradle } from '../../../boot/container';
 import { UserSecretSchema } from '../../../domain/entities/UserSecret';
@@ -14,20 +14,20 @@ export class CreateUser {
     private readonly userRepository: IUserRepository;
     private readonly userSecretRepository: IUserSecretRepository;
     private readonly encryptor: IEncryptor;
-    private readonly uidGenerator: IUIDGenerator;
+    private readonly idGenerator: IIdGenerator;
 
     constructor(cradle: Cradle) {
         this.userRepository = cradle.userRepository;
         this.userSecretRepository = cradle.userSecretRepository;
         this.encryptor = cradle.encryptor;
-        this.uidGenerator = cradle.uidGenerator;
+        this.idGenerator = cradle.idGenerator;
     }
 
     async execute(createUserDto: CreateUserDto): Promise<User> {
         const nNow = Date.now();
         const password = this.encryptor.encryptPassword(createUserDto.password);
         const user: User = UserSchema.parse({
-            id: this.uidGenerator.generateUID(),
+            id: this.idGenerator.generateUID(),
             name: createUserDto.name,
             email: createUserDto.email,
             tsCreation: nNow,

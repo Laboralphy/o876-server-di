@@ -2,6 +2,19 @@ import { Cradle } from '../../../boot/container';
 import { IMailInboxRepository } from '../../../domain/ports/repositories/IMailInboxRepository';
 import { IMailMessageRepository } from '../../../domain/ports/repositories/IMailMessageRepository';
 import { MailInbox } from '../../../domain/entities/MailInbox';
+import { ITime } from '../../ports/services/ITime';
+import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
+import { IServerConfig } from '../../ports/services/IServerConfig';
+import { IIdGenerator } from '../../ports/services/IIdGenerator';
+
+type CheckMailInboxEntry = {
+    tag: number;
+    message: string;
+    date: string;
+    sender: string;
+    kept: boolean;
+    read: boolean;
+};
 
 /**
  * Reads all inbox entries for the specified user.
@@ -12,30 +25,18 @@ import { MailInbox } from '../../../domain/entities/MailInbox';
 export class CheckMailInbox {
     private readonly mailInboxRepository: IMailInboxRepository;
     private readonly mailMessageRepository: IMailMessageRepository;
+    private readonly userRepository: IUserRepository;
+    private readonly time: ITime;
+    private readonly serverConfig: IServerConfig;
+    private readonly idGenerator: IIdGenerator;
 
     constructor(cradle: Cradle) {
         this.mailInboxRepository = cradle.mailInboxRepository;
         this.mailMessageRepository = cradle.mailMessageRepository;
-    }
-
-    getMinimalMissingValue(aValues: number[], minValue = 1) {
-        const aSortedValues = [
-            ...new Set(aValues.filter((x) => Number.isInteger(x) && x >= minValue)),
-        ].sort((a, b) => a - b);
-        if (aSortedValues.length == 0) {
-            return minValue;
-        }
-        if (minValue > aSortedValues[aSortedValues.length - 1]) {
-            return minValue;
-        }
-        let nExpectedValue = minValue;
-        for (let i = 0, l = aSortedValues.length; i < l; ++i) {
-            if (aSortedValues[i] > nExpectedValue) {
-                return nExpectedValue;
-            }
-            ++nExpectedValue;
-        }
-        return nExpectedValue;
+        this.userRepository = cradle.userRepository;
+        this.time = cradle.time;
+        this.serverConfig = cradle.serverConfig;
+        this.idGenerator = cradle.idGenerator;
     }
 
     async checkInbox(userId: string): Promise<MailInbox[]> {
@@ -47,7 +48,7 @@ export class CheckMailInbox {
         const aUntagged = aInbox.filter((mib) => mib.tag == 0);
         // Tags all untagged inbox entries with auto incremental tag
         for (const untaggedMib of aUntagged) {
-            const nTag = this.getMinimalMissingValue(aTags, 1);
+            const nTag = this.idGenerator.getMinimalMissingValue(aTags, 1);
             aTags.push(nTag);
             // save those newly tagged inbox entries
             const m2: MailInbox = {
@@ -68,5 +69,47 @@ export class CheckMailInbox {
             });
     }
 
-    execute() {}
+    async execute(userId: string): Promise<CheckMailInboxEntry[]> {
+        const tsNow = this.time.now();
+        const tsExpirationDuration =
+            this.serverConfig.getConfigVariableNumber('mailMaxExpirationDays') * 24 * 3600 * 1000;
+        const tsExpired = tsNow - tsExpirationDuration;
+        // get raw inbox entries
+        const aInbox = await this.checkInbox(userId);
+        // get message extracts
+        const aMessages = await Promise.all(
+            aInbox.map((mib) => this.mailMessageRepository.get(mib.messageId))
+        );
+        const nMaxMessageLength = this.serverConfig.getConfigVariableNumber(
+            'mailMaxMessagePreviewLength'
+        );
+        const aResult: CheckMailInboxEntry[] = [];
+        const aDelete: Promise<void>[] = [];
+        for (let i = 0; i < aInbox.length; i += 1) {
+            const mib = aInbox[i];
+            const msg = aMessages[i];
+            // delete message if expired
+            if (mib.tsReceived < tsExpired) {
+                aDelete.push(this.mailInboxRepository.delete(mib));
+                continue;
+            }
+            if (msg) {
+                const senderUser = await this.userRepository.get(msg.senderId);
+                const entry: CheckMailInboxEntry = {
+                    tag: mib.tag,
+                    message:
+                        msg.content.length > nMaxMessageLength
+                            ? msg.content.substring(0, nMaxMessageLength - 3) + '...'
+                            : msg.content,
+                    date: this.time.renderDate(mib.tsReceived, 'ymd hm'),
+                    read: mib.read,
+                    kept: mib.kept,
+                    sender: senderUser?.name ?? '???',
+                };
+                aResult.push(entry);
+            }
+        }
+        await Promise.all(aDelete);
+        return aResult;
+    }
 }

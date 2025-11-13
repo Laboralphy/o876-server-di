@@ -1,6 +1,6 @@
 import { Cradle } from '../../../boot/container';
 import { ClientContext } from '../../../domain/classes/ClientContext';
-import { IUIDGenerator } from '../../ports/services/IUIDGenerator';
+import { IIdGenerator } from '../../ports/services/IIdGenerator';
 import { IClientContext } from '../../ports/classes/IClientContext';
 import { JsonObject } from '../../../domain/types/JsonStruct';
 import { DestroyClient } from './DestroyClient';
@@ -11,13 +11,13 @@ import { IClientSocket } from '../../../domain/ports/adapters/IClientSocket';
 import { CLIENT_STATES } from '../../../domain/enums/client-states';
 
 export class CreateClientSession {
-    private readonly uidGenerator: IUIDGenerator;
+    private readonly idGenerator: IIdGenerator;
     private readonly destroyClient: DestroyClient;
     private readonly sendClientMessage: SendClientMessage;
     private readonly communicationLayer: ICommunicationLayer;
 
     constructor(cradle: Cradle) {
-        this.uidGenerator = cradle.uidGenerator;
+        this.idGenerator = cradle.idGenerator;
         this.destroyClient = cradle.destroyClient;
         this.sendClientMessage = cradle.sendClientMessage;
         this.communicationLayer = cradle.communicationLayer;
@@ -25,7 +25,7 @@ export class CreateClientSession {
 
     execute(clientSocket: IClientSocket): ClientSession {
         // Create context and associate it with client.
-        const idClient = this.uidGenerator.generateUID();
+        const idClient = this.idGenerator.generateUID();
         const clientContext = new ClientContext(idClient, {
             onClosingConnection: async (client: string) => {
                 return this.destroyClient.execute(client);

@@ -58,5 +58,5 @@ export interface IDatabaseAdapter {
      * @param table
      * @param callback
      */
-    forEach<T>(table: string, callback: ForEachCallback<T>): Promise<void>;
+    forEach<T extends JsonObject>(table: string, callback: ForEachCallback<T>): Promise<void>;
 }
