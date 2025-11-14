@@ -15,6 +15,7 @@ import { CLIENT_STATES } from '../../domain/enums/client-states';
 import { CreateUser } from '../../application/use-cases/users/CreateUser';
 import { IServerConfig } from '../../application/ports/services/IServerConfig';
 import { CreateUserDto } from '../../application/dto/CreateUserDto';
+import { FindUser } from '../../application/use-cases/users/FindUser';
 
 const debugClient = debug('srv:client');
 
@@ -34,6 +35,7 @@ export abstract class AbstractClientController {
     private readonly createClientSession: CreateClientSession;
     private readonly createUser: CreateUser;
     private readonly serverConfig: IServerConfig;
+    private readonly findUser: FindUser;
 
     constructor(cradle: Cradle) {
         this.authenticateUser = cradle.authenticateUser;
@@ -45,6 +47,7 @@ export abstract class AbstractClientController {
         this.runCommand = cradle.runCommand;
         this.createClientSession = cradle.createClientSession;
         this.createUser = cradle.createUser;
+        this.findUser = cradle.findUser;
         this.serverConfig = cradle.serverConfig;
     }
 
@@ -180,6 +183,14 @@ export abstract class AbstractClientController {
         });
 
         return clientSession;
+    }
+
+    findUserByName(name: string): Promise<User | undefined> {
+        return this.findUser.execute({ name });
+    }
+
+    findUserByDisplayName(name: string): Promise<User | undefined> {
+        return this.findUser.execute({ displayName: name });
     }
 
     /**

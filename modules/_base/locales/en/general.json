@@ -13,10 +13,13 @@
         "username": "New account username: ",
         "password": "New account password: ",
         "emptyPassword": "Empty password forbidden.",
+        "passwordMismatch": "Passwords are not matching.",
         "confirmPassword": "Confirm password: ",
         "email": "New account email address: ",
         "success": "New account {{ name }} has been successfully created. Please reconnect.",
         "failure": "Account creation failed.",
+        "nameTaken": "Name already in use",
+        "displayNameTaken": "Display name already in use",
         "displayNameInfo": "Display name is visible too all, and should be different from your account username (for security reason).",
         "displayName": "New account display name: "
     },
@@ -27,7 +30,7 @@
         "noReason": "Reason : unspecified"
     },
     "mail": {
-        "mailReceived": "Received mail from {{ sender }}.",
+        "mailReceived": "Received mail from : {{ sender }}.",
         "youHaveMail": "You have mail : {{ count }} unread message.",
         "youHaveMail_plural": "You have mail : {{ count }} unread messages."
     }

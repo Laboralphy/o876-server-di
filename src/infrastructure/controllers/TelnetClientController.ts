@@ -100,6 +100,15 @@ export class TelnetClientController extends AbstractClientController {
                     }
                     case CLIENT_STATES.CREATE_ACCOUNT_PROMPT_USERNAME: {
                         // client is expected to send new account username
+                        // first : check if user name is already taken
+                        const userTestDN = await this.findUserByName(message);
+                        if (userTestDN !== undefined) {
+                            await clientContext.sendMessage('createNewAccount.nameTaken');
+                            await clientContext.sendMessage('createNewAccount.username', {
+                                _nolf: true,
+                            });
+                            return;
+                        }
                         accountCreation.name = message;
                         await clientContext.sendMessage('createNewAccount.password', {
                             _nolf: true,
@@ -133,6 +142,7 @@ export class TelnetClientController extends AbstractClientController {
                         } else {
                             // password is not confirmed
                             await clientContext.sendMessage('createNewAccount.passwordMismatch');
+                            await this.pauseClient(idClient, 100);
                             await this.dropClient(idClient);
                         }
                         break;
@@ -140,12 +150,22 @@ export class TelnetClientController extends AbstractClientController {
                     case CLIENT_STATES.CREATE_ACCOUNT_PROMPT_EMAIL: {
                         // client is expected to send new account email address
                         accountCreation.email = message;
-                        await clientContext.sendMessage('createNewAccount.displayName');
+                        await clientContext.sendMessage('createNewAccount.displayName', {
+                            _nolf: true,
+                        });
                         csd.state = CLIENT_STATES.CREATE_ACCOUNT_PROMPT_DISPLAYNAME;
                         break;
                     }
                     case CLIENT_STATES.CREATE_ACCOUNT_PROMPT_DISPLAYNAME: {
                         // client is expected to send new account display name
+                        const userTestDN = await this.findUserByDisplayName(message);
+                        if (userTestDN !== undefined) {
+                            await clientContext.sendMessage('createNewAccount.displayNameTaken');
+                            await clientContext.sendMessage('createNewAccount.displayName', {
+                                _nolf: true,
+                            });
+                            return;
+                        }
                         accountCreation.displayName = message;
                         await this.createNewAccount(idClient, accountCreation);
                         const user = this.getAuthenticatedUser(idClient);
