@@ -2,6 +2,7 @@ import { Argv, Arguments } from 'yargs';
 import { HttpError, wfDelete, wfGet } from '../../tools/web-fetcher';
 import { User } from '../../../../domain/entities/User';
 import i18n from 'i18next';
+import { render } from '../../../../libs/i18n-loader';
 const { t } = i18n;
 
 interface IUserDeleteArgs extends Arguments {
@@ -11,11 +12,11 @@ interface IUserDeleteArgs extends Arguments {
 export function deleteCommand(yargs: Argv): Argv {
     return yargs.command<IUserDeleteArgs>(
         'delete <user>',
-        t('userDeleteCmd.describe'),
+        render('userDeleteCmd.describe'),
         (yargs) =>
             yargs.positional('user', {
                 type: 'string',
-                describe: t('userDeleteCmd.nameOpt'),
+                describe: render('userDeleteCmd.nameOpt'),
                 demandOption: true,
             }),
         async (argv) => {
@@ -25,7 +26,10 @@ export function deleteCommand(yargs: Argv): Argv {
             } catch (error) {
                 if (error instanceof HttpError) {
                     console.error(
-                        t('errors.apiError', { code: error.statusCode, message: error.message })
+                        render('errors.apiError', {
+                            code: error.statusCode,
+                            message: error.message,
+                        })
                     );
                 } else {
                     throw error;

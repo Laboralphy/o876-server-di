@@ -1,9 +1,10 @@
 import z from 'zod';
+import { String1k } from '../../domain/schemas/String1k';
 
 export const FindUserDtoSchema = z
     .object({
-        name: z.string().optional(),
-        displayName: z.string().optional(),
+        name: String1k.optional(),
+        displayName: String1k.optional(),
     })
     .strict();
 

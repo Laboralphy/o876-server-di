@@ -1,10 +1,9 @@
 import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
 import { Cradle } from '../../../boot/container';
 import { ModifyUserRolesDto } from '../../dto/ModifyUserRolesDto';
-import { UseCaseError } from '../../error/UseCaseError';
 import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
 
-export class AddUserRole {
+export class AddUserRoles {
     private userRepository: IUserRepository;
 
     constructor(cradle: Cradle) {

@@ -5,7 +5,6 @@ import { ITime } from '../../ports/services/ITime';
 import { SendClientMessage } from '../clients/SendClientMessage';
 import { DestroyClient } from '../clients/DestroyClient';
 import { ICommunicationLayer } from '../../ports/services/ICommunicationLayer';
-import { UseCaseError } from '../../error/UseCaseError';
 import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
 
 export class BanUser {

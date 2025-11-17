@@ -2,36 +2,61 @@ import { Argv, Arguments } from 'yargs';
 import { HttpError, wfGet, wfPatch } from '../../tools/web-fetcher';
 import { User } from '../../../../domain/entities/User';
 import { PatchUserDto } from '../../../web/dto/PatchUserDto';
-import i18n from 'i18next';
-const { t } = i18n;
+import { render } from '../../../../libs/i18n-loader';
+import { ROLES } from '../../../../domain/enums/roles';
+import YAML from 'yaml';
+import { fetchUserInfo } from './info';
 
 interface IUserModifyArgs extends Arguments {
     user: string;
     email?: string;
     name?: string;
+    displayName?: string;
+    grant?: string;
+    revoke?: string;
 }
 
 export function modifyCommand(yargs: Argv): Argv {
     return yargs.command<IUserModifyArgs>(
         'modify <user>',
-        t('userModifyCmd.describe'),
+        render('userModifyCmd.describe'),
         (yargs) =>
             yargs
                 .positional('user', {
                     type: 'string',
-                    describe: t('userModifyCmd.userOpt'),
+                    describe: render('userModifyCmd.userOpt'),
                     demandOption: true,
                 })
                 .option('name', {
                     type: 'string',
-                    describe: t('userModifyCmd.nameOpt'),
+                    describe: render('userModifyCmd.nameOpt'),
                     alias: 'n',
                     demandOption: false,
                 })
                 .option('email', {
                     type: 'string',
-                    describe: t('userModifyCmd.emailOpt'),
+                    describe: render('userModifyCmd.emailOpt'),
                     alias: 'm',
+                    demandOption: false,
+                })
+                .option('display-name', {
+                    type: 'string',
+                    describe: render('userModifyCmd.displayNameOpt'),
+                    alias: 'd',
+                    demandOption: false,
+                })
+                .option('grant', {
+                    type: 'string',
+                    choices: ['m', 'g', 'a'],
+                    describe: render('userModifyCmd.grantOpt'),
+                    alias: 'g',
+                    demandOption: false,
+                })
+                .option('revoke', {
+                    type: 'string',
+                    choices: ['m', 'g', 'a'],
+                    describe: render('userModifyCmd.revokeOpt'),
+                    alias: 'r',
                     demandOption: false,
                 }),
         async (argv) => {
@@ -41,11 +66,54 @@ export function modifyCommand(yargs: Argv): Argv {
                 if (argv.email) {
                     oPayload.email = argv.email;
                 }
+                if (argv.displayName) {
+                    oPayload.displayName = argv.displayName;
+                }
+                const roles = new Set<ROLES>(user.roles);
+                switch (argv.grant) {
+                    case 'a': {
+                        roles.add(ROLES.ADMIN);
+                        break;
+                    }
+                    case 'g': {
+                        roles.add(ROLES.GAME_MASTER);
+                        break;
+                    }
+                    case 'm': {
+                        roles.add(ROLES.MODERATOR);
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+                switch (argv.revoke) {
+                    case 'a': {
+                        roles.delete(ROLES.ADMIN);
+                        break;
+                    }
+                    case 'g': {
+                        roles.delete(ROLES.GAME_MASTER);
+                        break;
+                    }
+                    case 'm': {
+                        roles.delete(ROLES.MODERATOR);
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+                oPayload.roles = Array.from(roles);
                 await wfPatch('users/' + user.id, oPayload);
+                console.log(await fetchUserInfo(argv.user));
             } catch (error) {
                 if (error instanceof HttpError) {
                     console.error(
-                        t('errors.apiError', { code: error.statusCode, message: error.message })
+                        render('errors.apiError', {
+                            code: error.statusCode,
+                            message: error.message,
+                        })
                     );
                 } else {
                     throw error;

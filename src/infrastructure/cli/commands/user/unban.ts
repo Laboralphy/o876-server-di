@@ -2,7 +2,7 @@ import { Argv, Arguments } from 'yargs';
 import { User } from '../../../../domain/entities/User';
 import { HttpError, wfGet, wfPut } from '../../tools/web-fetcher';
 import i18n from 'i18next';
-const { t } = i18n;
+import { render } from '../../../../libs/i18n-loader';
 
 interface IUserUnbanArgs extends Arguments {
     user: string;
@@ -12,11 +12,11 @@ interface IUserUnbanArgs extends Arguments {
 export function unbanCommand(yargs: Argv): Argv {
     return yargs.command<IUserUnbanArgs>(
         'unban <user>',
-        t('userUnbanCmd.describe'),
+        render('userUnbanCmd.describe'),
         (yargs) =>
             yargs.positional('user', {
                 type: 'string',
-                describe: t('userUnbanCmd.userOpt'),
+                describe: render('userUnbanCmd.userOpt'),
                 demandOption: true,
             }),
         async (argv) => {
@@ -26,7 +26,10 @@ export function unbanCommand(yargs: Argv): Argv {
             } catch (error) {
                 if (error instanceof HttpError) {
                     console.error(
-                        t('errors.apiError', { code: error.statusCode, message: error.message })
+                        render('errors.apiError', {
+                            code: error.statusCode,
+                            message: error.message,
+                        })
                     );
                 } else {
                     throw error;

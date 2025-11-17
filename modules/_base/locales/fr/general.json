@@ -23,6 +23,15 @@
         "displayNameInfo": "Le nom affichable est visible par tous, et doit être idéalement différent de l'identifiant de connexion du compte.",
         "displayName": "Nom affichable du nouveau compte: "
     },
+    "changePassword": {
+        "enterPreviousPassword": "Entrez le mot de passe ACTUEL: ",
+        "enterNewPassword": "Entrez le NOUVEAU mot de passe: ",
+        "confirmNewPassword": "Confirmez le nouveau mot de passe: ",
+        "passwordMismatch": "$(createNewAccount.passwordMismatch)",
+        "emptyPassword": "$(createNewAccount.emptyPassword)",
+        "success": "Mot de passe changé avec succès",
+        "failure": "Le mot de passe n'a pas pu être changé"
+    },
     "userBanned": {
         "forever": "Bannissement permanent",
         "date": "Bannissement actif jusqu'au {{ date }}",
@@ -31,8 +40,12 @@
     },
     "mail": {
         "mailReceived": "Message reçu de la part de : {{ sender }}.",
-        "unreadMessage": "{{ count }} message non lu",
-        "unreadMessage_plural": "{{ count }} messages non lus",
+        "unreadMessage_one": "{{ count }} message non lu",
+        "unreadMessage_other": "{{ count }} messages non lus",
         "youHaveMail": "Vous avez du courrier : $t(unreadMessage)."
+    },
+    "passwdCmd": {
+        "prompt": "Nouveau mot de passe",
+        "confirm": "Confirmer nouveau mot de passe"
     }
 }

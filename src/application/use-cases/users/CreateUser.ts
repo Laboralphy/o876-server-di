@@ -61,6 +61,12 @@ export class CreateUser {
         }
     }
 
+    checkEmail(email: string) {
+        if (!email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)) {
+            throw new Error(USE_CASE_ERRORS.VALUE_INVALID + ' Email address');
+        }
+    }
+
     async execute(createUserDto: CreateUserDto): Promise<User> {
         const nNow = Date.now();
         const password = this.encryptor.encryptPassword(createUserDto.password);

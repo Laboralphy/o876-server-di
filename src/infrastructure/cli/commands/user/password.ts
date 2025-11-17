@@ -1,10 +1,9 @@
 import { Argv, Arguments } from 'yargs';
-import { HttpError, wfGet, wfPatch, wfPut } from '../../tools/web-fetcher';
+import { HttpError, wfGet, wfPut } from '../../tools/web-fetcher';
 import { User } from '../../../../domain/entities/User';
 import { PutUserPasswordDto } from '../../../web/dto/PutUserPasswordDto';
 import { askPassword } from '../../../../libs/ask-password';
-import i18n from 'i18next';
-const { t } = i18n;
+import { render } from '../../../../libs/i18n-loader';
 
 interface IUserPasswordArgs extends Arguments {
     user: string;
@@ -14,22 +13,22 @@ interface IUserPasswordArgs extends Arguments {
 export function passwordCommand(yargs: Argv): Argv {
     return yargs.command<IUserPasswordArgs>(
         'password <user>',
-        t('userPasswordCmd.describe'),
+        render('userPasswordCmd.describe'),
         (yargs) =>
             yargs.positional('user', {
                 type: 'string',
-                describe: t('userPasswordCmd.userOpt'),
+                describe: render('userPasswordCmd.userOpt'),
                 demandOption: true,
             }),
         async (argv) => {
             try {
                 const user: User = await wfGet('users/name/' + argv.user);
                 const password = await askPassword(
-                    t('genericCmd.setPassword', { user: argv.user }) + ': '
+                    render('genericCmd.setPassword', { user: argv.user })
                 );
-                const repeatPassword = await askPassword(t('genericCmd.repeatPassword') + ': ');
+                const repeatPassword = await askPassword(render('genericCmd.repeatPassword'));
                 if (password !== repeatPassword) {
-                    console.error(t('errors.passwordMismatch'));
+                    console.error(render('errors.passwordMismatch'));
                     return;
                 }
                 const oPayload: PutUserPasswordDto = {
@@ -39,7 +38,10 @@ export function passwordCommand(yargs: Argv): Argv {
             } catch (error) {
                 if (error instanceof HttpError) {
                     console.error(
-                        t('errors.apiError', { code: error.statusCode, message: error.message })
+                        render('errors.apiError', {
+                            code: error.statusCode,
+                            message: error.message,
+                        })
                     );
                 } else {
                     throw error;

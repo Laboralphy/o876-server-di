@@ -95,6 +95,13 @@ export abstract class AbstractClientController {
         return prom;
     }
 
+    async changePassword(idClient: string) {
+        const csd = this.getClientSession(idClient);
+        csd.state = CLIENT_STATES.CHANGE_PASSWORD_PROMPT;
+        debugClient('client %s wants to change password.', idClient);
+        await this.sendClientMessage.execute(idClient, 'userPasswordCmd');
+    }
+
     /**
      * Notify client state error on log
      * @param idClient client identifier
@@ -110,23 +117,8 @@ export abstract class AbstractClientController {
         );
     }
 
-    async setLoginUsername(idClient: string, username: string) {
-        const csd = this.communicationLayer.getClientSession(idClient);
-        if (csd.state == CLIENT_STATES.LOGIN_PROMPT_USERNAME) {
-            csd.login = username;
-            debugClient('client %s login : %s', idClient, username);
-            csd.state = CLIENT_STATES.LOGIN_PROMPT_PASSWORD;
-        } else {
-            this.notifyStateError(idClient, CLIENT_STATES.LOGIN_PROMPT_USERNAME);
-        }
-    }
-
     async setLoginPassword(idClient: string, password: string) {
         const csd = this.communicationLayer.getClientSession(idClient);
-        if (csd.state != CLIENT_STATES.LOGIN_PROMPT_PASSWORD) {
-            this.notifyStateError(idClient, CLIENT_STATES.LOGIN_PROMPT_PASSWORD);
-            return;
-        }
         try {
             debugClient('client %s password : ********', idClient);
             csd.user = await this.authenticateUser.execute(csd.login, password);
@@ -148,20 +140,27 @@ export abstract class AbstractClientController {
                 );
                 // destroy client socket, then exit function
                 csd.state = CLIENT_STATES.NONE;
-                this.destroyClient.execute(idClient);
-                return;
+                return false;
             }
             csd.state = CLIENT_STATES.AUTHENTICATED;
             debugClient('client %s has been authenticated as user %s', idClient, csd.user.name);
+            return true;
         } catch (e) {
             const error = e as Error;
             await this.pauseClient(idClient, 1500);
             debugClient('client %s authentication error: %s', idClient, error.message);
-            this.communicationLayer.dropClient(idClient);
+            csd.state = CLIENT_STATES.NONE;
+            return false;
         }
     }
 
     async createNewAccount(idClient: string, accountCreation: CreateUserDto) {
+        debugClient(
+            'client : %s - creating new account : %s (%s)',
+            idClient,
+            accountCreation.name,
+            accountCreation.displayName
+        );
         const csd = this.communicationLayer.getClientSession(idClient);
         csd.user = await this.createUser.execute(accountCreation);
         return csd.user;

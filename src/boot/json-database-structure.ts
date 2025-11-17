@@ -1,11 +1,20 @@
 import { INDEX_TYPES, IndexCreationOptions } from 'o876-json-db';
 
-export const JsonDatabaseConfig: {
-    collections: { name: string; indexes: Record<string, IndexCreationOptions> }[];
-} = {
+export type CollectionStructure = {
+    name: string;
+    storage: 'disk' | 'memory';
+    indexes: Record<string, IndexCreationOptions>;
+};
+
+export type JsonDatabaseStructure = {
+    collections: CollectionStructure[];
+};
+
+export const jsonDatabaseStructure: JsonDatabaseStructure = {
     collections: [
         {
             name: 'users',
+            storage: 'disk',
             indexes: {
                 name: {
                     type: INDEX_TYPES.HASH,
@@ -24,6 +33,7 @@ export const JsonDatabaseConfig: {
         },
         {
             name: 'user-secrets',
+            storage: 'disk',
             indexes: {},
         },
     ],

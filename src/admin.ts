@@ -3,14 +3,16 @@ import { hideBin } from 'yargs/helpers';
 import { initI18nStrings } from './infrastructure/cli/tools/i18n-strings';
 import { user } from './infrastructure/cli/commands/user';
 import { getEnv } from './boot/dotenv';
+import { render } from './libs/i18n-loader';
 
 async function main() {
     const sLang = getEnv().SERVER_LANGUAGE ?? 'en';
-    const t = await initI18nStrings(sLang);
+    await initI18nStrings(sLang);
     yargs(hideBin(process.argv))
         .locale(sLang)
-        .command('user', t('userCmd.describe'), user)
+        .command('user', render('userCmd.describe'), user)
         .help()
+        .alias('h', 'help')
         .parseAsync()
         .catch((err) => {
             console.error('Error:', err.message);

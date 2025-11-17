@@ -2,7 +2,7 @@ export async function askPassword(sPrompt: string): Promise<string> {
     return new Promise((resolve) => {
         const stdout = process.stdout;
         const stdin = process.stdin;
-        stdout.write(sPrompt);
+        stdout.write(sPrompt + ': ');
         stdin.setRawMode(true);
         stdin.resume();
         stdin.setEncoding('utf8');

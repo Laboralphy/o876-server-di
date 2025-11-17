@@ -1,5 +1,8 @@
 export enum CLIENT_STATES {
     NONE, // not connected
+    LOGIN,
+    CREATE_ACCOUNT,
+    CHANGE_PASSWORD,
     LOGIN_PROMPT_USERNAME, // waiting for username or "new"
     LOGIN_PROMPT_PASSWORD, // client has entered a username, waiting for password
     CREATE_ACCOUNT_PROMPT_USERNAME, // client has entered "new" as username : this is the new user creation phase

@@ -4,7 +4,6 @@ import { IUserRepository } from '../../../domain/ports/repositories/IUserReposit
 import { IEncryptor } from '../../ports/services/IEncryptor';
 import { User } from '../../../domain/entities/User';
 import { ITime } from '../../ports/services/ITime';
-import { UseCaseError } from '../../error/UseCaseError';
 import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
 
 /**

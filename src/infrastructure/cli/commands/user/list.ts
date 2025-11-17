@@ -4,7 +4,7 @@ import { renderDate } from '../../../../libs/date-renderer';
 import { HttpError, wfGet } from '../../tools/web-fetcher';
 import { User } from '../../../../domain/entities/User';
 import i18n from 'i18next';
-const { t } = i18n;
+import { render } from '../../../../libs/i18n-loader';
 
 interface IUserListArgs extends Arguments {
     filter: string;
@@ -15,26 +15,26 @@ interface IUserListArgs extends Arguments {
 export function listCommand(yargs: Argv): Argv {
     return yargs.command<IUserListArgs>(
         'list',
-        t('userListCmd.describe'),
+        render('userListCmd.describe'),
         (yargs) =>
             yargs
                 .option('filter', {
                     type: 'string',
-                    describe: t('userListCmd.filterOpt'),
+                    describe: render('userListCmd.filterOpt'),
                     default: '',
                     alias: 'f',
                     demandOption: false,
                 })
                 .option('page', {
                     type: 'number',
-                    describe: t('userListCmd.pageOpt'),
+                    describe: render('userListCmd.pageOpt'),
                     alias: 'p',
                     default: 0,
                     demandOption: false,
                 })
                 .option('pagesize', {
                     type: 'number',
-                    describe: t('userListCmd.describe'),
+                    describe: render('userListCmd.describe'),
                     alias: 's',
                     default: 25,
                     demandOption: false,
@@ -57,7 +57,7 @@ export function listCommand(yargs: Argv): Argv {
                 const nPageMax = bPaginationMode
                     ? Math.ceil(filteredUserList.length / argv.pagesize)
                     : 1;
-                const sBanned = t('userListCmd.listLabelBanned');
+                const sBanned = render('userListCmd.listLabelBanned');
                 const sNotBanned = ' ';
                 const output = filteredUserList
                     .slice(nStart, nStart + nCount)
@@ -70,16 +70,16 @@ export function listCommand(yargs: Argv): Argv {
                     ]);
                 if (output.length > 0) {
                     output.unshift([
-                        t('userListCmd.listLabelId'),
-                        t('userListCmd.listLabelName'),
-                        t('userListCmd.listLabelDateCreated'),
-                        t('userListCmd.listLabelLastLogin'),
-                        t('userListCmd.listLabelBanned'),
+                        render('userListCmd.listLabelId'),
+                        render('userListCmd.listLabelName'),
+                        render('userListCmd.listLabelDateCreated'),
+                        render('userListCmd.listLabelLastLogin'),
+                        render('userListCmd.listLabelBanned'),
                     ]);
                     console.log(tr.render(output).join('\n'));
                     if (bPaginationMode) {
                         console.log(
-                            t('userListCmd.listPage', {
+                            render('userListCmd.listPage', {
                                 page: argv.page,
                                 max: nPageMax,
                                 pagesize: argv.pagesize,
@@ -88,16 +88,19 @@ export function listCommand(yargs: Argv): Argv {
                         );
                     } else {
                         console.log(
-                            t('userListCmd.listUserCount', { count: filteredUserList.length })
+                            render('userListCmd.listUserCount', { count: filteredUserList.length })
                         );
                     }
                 } else {
-                    console.log(t('userListCmd.listNoUser'));
+                    console.log(render('userListCmd.listNoUser'));
                 }
             } catch (error) {
                 if (error instanceof HttpError) {
                     console.error(
-                        t('errors.apiError', { code: error.statusCode, message: error.message })
+                        render('errors.apiError', {
+                            code: error.statusCode,
+                            message: error.message,
+                        })
                     );
                 } else {
                     throw error;

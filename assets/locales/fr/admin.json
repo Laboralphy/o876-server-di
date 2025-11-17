@@ -1,64 +1,69 @@
 {
-  "userCmd": {
-    "describe": "Gestion des utilisateurs"
-  },
-  "userBanCmd": {
-    "describe": "Bannir un utilisateur",
-    "userOpt": "Nom de l'utilisateur à bannir",
-    "daysOpt": "Durée du bannissement en jours",
-    "hoursOpt": "Durée du bannissement en heures",
-    "minutesOpt": "Durée du bannissement en minutes",
-    "reasonOpt": "Raison pour laquelle cet utilisateur est banni"
-  },
-  "userCreateCmd": {
-    "describe": "Créer un utilisateur",
-    "userOpt": "Nom du nouvel utilisateur",
-    "emailOpt": "Adresse e-mail de l'utilisateur"
-  },
-  "userDeleteCmd": {
-    "describe": "Supprimer un utilisateur",
-    "userOpt": "Nom de l'utilisateur à supprimer"
-  },
-  "userInfoCmd": {
-    "describe": "Afficher les informations d'un utilisateur",
-    "userOpt": "Nom de l'utilisateur à afficher"
-  },
-  "userListCmd": {
-    "describe": "Afficher la liste de tous les utilisateurs enregistrés",
-    "filterOpt": "Filtrer les utilisateurs dont le nom contient une chaîne de caractères spécifique",
-    "pageOpt": "'Numéro de page (première page = 1 ; toutes les pages = 0)'",
-    "pagesizeOpt": "Nombre d'éléments par page",
-    "listLabelId": "identifiant",
-    "listLabelName": "nom",
-    "listLabelDateCreated": "date de création",
-    "listLabelLastLogin": "dernière connexion",
-    "listLabelBanned": "banni",
-    "listPage": "Page {{ page }} sur {{ max }} (Utilisateurs par page : {{ pagesize }}). Total : {{ count }} utilisateur",
-    "listPage_plural": "Page {{ page }} sur {{ max }} (Utilisateurs par page : {{ pagesize }}). Total : {{ count }} utilisateurs",
-    "listUserCount": "{{ count }} utilisateur",
-    "listUserCount_plural": "{{ count }} utilisateurs",
-    "listNoUser": "Aucun utilisateur ne correspond au filtre"
-  },
-  "userModifyCmd": {
-    "describe": "Modifier les propriétés d'un utilisateur",
-    "userOpt": "Nom de l'utilisateur à modifier",
-    "nameOpt": "Nouveau nom d'utilisateur",
-    "emailOpt": "Nouvelle adresse e-mail de l'utilisateur"
-  },
-  "userPasswordCmd": {
-    "describe": "Définir un nouveau mot de passe pour un utilisateur",
-    "userOpt": "Nom de l'utilisateur dont le mot de passe doit être changé"
-  },
-  "userUnbanCmd": {
-    "describe": "Débannir un utilisateur",
-    "userOpt": "Nom de l'utilisateur à débannir"
-  },
-  "genericCmd": {
-    "setPassword": "Définir le mot de passe pour l'utilisateur {{ user }}",
-    "repeatPassword": "Répéter le mot de passe"
-  },
-  "errors": {
-    "apiError": "Erreur {{ code }} : {{ message }}",
-    "passwordMismatch": "Les mots de passe doivent être identiques."
-  }
+    "userCmd": {
+        "describe": "Gestion des utilisateurs"
+    },
+    "userBanCmd": {
+        "describe": "Bannir un utilisateur",
+        "userOpt": "Nom de l'utilisateur à bannir",
+        "daysOpt": "Durée du bannissement en jours",
+        "hoursOpt": "Durée du bannissement en heures",
+        "minutesOpt": "Durée du bannissement en minutes",
+        "reasonOpt": "Raison pour laquelle cet utilisateur est banni"
+    },
+    "userCreateCmd": {
+        "describe": "Créer un utilisateur",
+        "userOpt": "Identifiant de connexion du nouvel utilisateur",
+        "emailOpt": "Adresse e-mail de l'utilisateur",
+        "displayNameOpt": "Nom affichable du nouvel utilisateur"
+    },
+    "userDeleteCmd": {
+        "describe": "Supprimer un utilisateur",
+        "userOpt": "Identifiant de connexion de l'utilisateur à supprimer"
+    },
+    "userInfoCmd": {
+        "describe": "Afficher les informations d'un utilisateur",
+        "userOpt": "Identifiant de connexion de l'utilisateur à afficher"
+    },
+    "userListCmd": {
+        "describe": "Afficher la liste de tous les utilisateurs enregistrés",
+        "filterOpt": "Filtrer les utilisateurs dont le nom contient une chaîne de caractères spécifique",
+        "pageOpt": "'Numéro de page (première page = 1 ; toutes les pages = 0)'",
+        "pagesizeOpt": "Nombre d'éléments par page",
+        "listLabelId": "clé primaire",
+        "listLabelName": "identifiant de connexion",
+        "listLabelDisplayName": "Nom affichable",
+        "listLabelDateCreated": "date de création",
+        "listLabelLastLogin": "dernière connexion",
+        "listLabelBanned": "banni",
+        "listPage_one": "Page {{ page }} sur {{ max }} (Utilisateurs par page : {{ pagesize }}). Total : {{ count }} utilisateur",
+        "listPage_other": "Page {{ page }} sur {{ max }} (Utilisateurs par page : {{ pagesize }}). Total : {{ count }} utilisateurs",
+        "listUserCount_one": "{{ count }} utilisateur",
+        "listUserCount_other": "{{ count }} utilisateurs",
+        "listNoUser": "Aucun utilisateur ne correspond au filtre"
+    },
+    "userModifyCmd": {
+        "describe": "Modifier les propriétés d'un utilisateur",
+        "userOpt": "Identifiant de connexion de l'utilisateur à modifier",
+        "nameOpt": "Nouvelle identifiant de connexion d'utilisateur (à modifier avec prudence)",
+        "emailOpt": "Nouvelle adresse e-mail de l'utilisateur",
+        "displayName": "Nouveau nom affichable de l'utilisateur",
+        "grantOpt": "Accorde un rôle à l'utilisateur",
+        "revokeOpt": "Retire un rôle à l'utilisateur"
+    },
+    "userPasswordCmd": {
+        "describe": "Définir un nouveau mot de passe pour un utilisateur",
+        "userOpt": "Identifiant de connexion de l'utilisateur dont le mot de passe doit être changé"
+    },
+    "userUnbanCmd": {
+        "describe": "Débannir un utilisateur",
+        "userOpt": "Identifiant de connexion de l'utilisateur à débannir"
+    },
+    "genericCmd": {
+        "setPassword": "Définir le mot de passe pour l'utilisateur {{ user }}",
+        "repeatPassword": "Répéter le mot de passe"
+    },
+    "errors": {
+        "apiError": "Erreur {{ code }} : {{ message }}",
+        "passwordMismatch": "Les mots de passe doivent être identiques."
+    }
 }

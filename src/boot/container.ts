@@ -1,4 +1,4 @@
-import { createContainer, asClass } from 'awilix';
+import { createContainer, asClass, asValue } from 'awilix';
 import { UserRepository } from '../infrastructure/persistance/json-database/UserRepository';
 
 import { Encryptor } from '../infrastructure/services/Encryptor';
@@ -49,6 +49,9 @@ import { IModuleManager } from '../application/ports/services/IModuleManager';
 import { ServerConfig } from '../infrastructure/services/ServerConfig';
 import { MailInboxRepository } from '../infrastructure/persistance/json-database/MailInboxRepository';
 import { MailMessageRepository } from '../infrastructure/persistance/json-database/MailMessageRepository';
+import { AddUserRoles } from '../application/use-cases/users/AddUserRoles';
+import { RemoveUserRoles } from '../application/use-cases/users/RemoveUserRoles';
+import { jsonDatabaseStructure, JsonDatabaseStructure } from './json-database-structure';
 
 /**
  * To as a new use case, port ...,
@@ -68,6 +71,8 @@ export interface Cradle {
     setUserPassword: SetUserPassword;
     banUser: BanUser;
     unbanUser: UnbanUser;
+    addUserRoles: AddUserRoles;
+    removeUserRoles: RemoveUserRoles;
     // use cases clients
     authenticateUser: AuthenticateUser;
     destroyClient: DestroyClient;
@@ -97,6 +102,9 @@ export interface Cradle {
     scriptRunner: IScriptRunner;
     moduleManager: IModuleManager;
     serverConfig: IServerConfig;
+
+    // values
+    jsonDatabaseStructure: JsonDatabaseStructure;
 }
 // Container creation
 export const container = createContainer<Cradle>();
@@ -115,6 +123,8 @@ container.register({
     banUser: asClass(BanUser).singleton(),
     unbanUser: asClass(UnbanUser).singleton(),
     authenticateUser: asClass(AuthenticateUser).singleton(),
+    addUserRoles: asClass(AddUserRoles).singleton(),
+    removeUserRoles: asClass(RemoveUserRoles).singleton(),
     // use cases : clients
     destroyClient: asClass(DestroyClient).singleton(),
     sendClientMessage: asClass(SendClientMessage).singleton(),
@@ -144,4 +154,7 @@ container.register({
     scriptRunner: asClass(ScriptRunner).singleton(),
     moduleManager: asClass(ModuleManager).singleton(),
     serverConfig: asClass(ServerConfig).singleton(),
+
+    // values
+    jsonDatabaseStructure: asValue(jsonDatabaseStructure),
 });

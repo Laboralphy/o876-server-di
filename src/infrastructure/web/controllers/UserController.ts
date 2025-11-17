@@ -51,6 +51,7 @@ export class UserController {
             name: dto.name,
             password: dto.password,
             email: dto.email,
+            displayName: dto.displayName,
         });
         ctx.status = HTTP_STATUS.CREATED;
         ctx.body = user;
@@ -63,7 +64,7 @@ export class UserController {
     }
 
     async findByName(ctx: Context): Promise<void> {
-        const user = await this.findUser.execute(ctx.params.name);
+        const user = await this.findUser.execute({ name: ctx.params.name });
         if (user) {
             ctx.status = HTTP_STATUS.OK;
             ctx.body = user;
@@ -77,6 +78,8 @@ export class UserController {
         const dto: PatchUserDto = PatchUserDtoSchema.parse(ctx.request.body);
         const user = await this.modifyUser.execute(idUser, {
             email: dto.email,
+            displayName: dto.displayName,
+            roles: dto.roles,
         });
         ctx.status = HTTP_STATUS.CREATED;
         ctx.body = user;
@@ -136,6 +139,7 @@ export class UserController {
                 email: user.email,
                 created: this.time.renderDate(user.tsCreation, 'ymd'),
                 connected: false,
+                roles: user.roles.map((r) => r.toString()),
                 ban: {
                     bannedBy: bannedByUser?.name ?? '[admin or deleted user]',
                     reason: userBan.reason,
@@ -153,6 +157,7 @@ export class UserController {
                 email: user.email,
                 created: this.time.renderDate(user.tsCreation, 'ymd'),
                 connected: false,
+                roles: user.roles.map((r) => r.toString()),
                 ban: null,
             });
         }

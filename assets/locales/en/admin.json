@@ -1,64 +1,69 @@
 {
-  "userCmd": {
-    "describe": "User management"
-  },
-  "userBanCmd": {
-    "describe": "Ban a user",
-    "userOpt": "Name of user to ban",
-    "daysOpt": "Ban duration in days",
-    "hoursOpt": "Ban duration in hours",
-    "minutesOpt": "Ban duration in minutes",
-    "reasonOpt": "Reason why this user is banned"
-  },
-  "userCreateCmd": {
-    "describe": "Create a user",
-    "userOpt": "New user name",
-    "emailOpt": "User email address"
-  },
-  "userDeleteCmd": {
-    "describe": "Delete a user",
-    "userOpt": "Name of user to be deleted"
-  },
-  "userInfoCmd": {
-    "describe": "Show a user information",
-    "userOpt": "Name of user to be displayed"
-  },
-  "userListCmd": {
-    "describe": "Show a list of all registered users",
-    "filterOpt": "Filter users whose name contains a specific sub-string",
-    "pageOpt": "'Page number (starting page = 1 ; all pages = 0)'",
-    "pagesizeOpt": "Number of items per page",
-    "listLabelId": "id",
-    "listLabelName": "name",
-    "listLabelDateCreated": "date created",
-    "listLabelLastLogin": "last login",
-    "listLabelBanned": "banned",
-    "listPage": "Page {{ page }} of {{ max }} (Users per page: {{ pagesize }}). Total: {{ count }} user",
-    "listPage_plural": "Page {{ page }} of {{ max }} (Users per page: {{ pagesize }}). Total: {{ count }} users",
-    "listUserCount": "{{ count }} user",
-    "listUserCount_plural": "{{ count }} users",
-    "listNoUser": "No user matching filter"
-  },
-  "userModifyCmd": {
-    "describe": "Modify user properties",
-    "userOpt": "Name of user to be modified",
-    "nameOpt": "New user name",
-    "emailOpt": "New user email address"
-  },
-  "userPasswordCmd": {
-    "describe": "Set a new password for a user",
-    "userOpt": "Name of user whose password is to be changed"
-  },
-  "userUnbanCmd": {
-    "describe": "Unban a user",
-    "userOpt": "Name of user to be unban"
-  },
-  "genericCmd": {
-    "setPassword": "Set password for user {{ user }}",
-    "repeatPassword": "Repeat password"
-  },
-  "errors": {
-    "apiError": "Error {{ code }}: {{ message }}",
-    "passwordMismatch": "Passwords must be the same."
-  }
+    "userCmd": {
+        "describe": "User management"
+    },
+    "userBanCmd": {
+        "describe": "Ban a user",
+        "userOpt": "Name of user to ban",
+        "daysOpt": "Ban duration in days",
+        "hoursOpt": "Ban duration in hours",
+        "minutesOpt": "Ban duration in minutes",
+        "reasonOpt": "Reason why this user is banned"
+    },
+    "userCreateCmd": {
+        "describe": "Create a user",
+        "userOpt": "New user name",
+        "emailOpt": "New user email address",
+        "displayNameOpt": "New user display name"
+    },
+    "userDeleteCmd": {
+        "describe": "Delete a user",
+        "userOpt": "Name of user to be deleted"
+    },
+    "userInfoCmd": {
+        "describe": "Show a user information",
+        "userOpt": "Name of user to be displayed"
+    },
+    "userListCmd": {
+        "describe": "Show a list of all registered users",
+        "filterOpt": "Filter users whose name contains a specific sub-string",
+        "pageOpt": "'Page number (starting page = 1 ; all pages = 0)'",
+        "pagesizeOpt": "Number of items per page",
+        "listLabelId": "id",
+        "listLabelName": "username",
+        "listLabelDisplayName": "user display name",
+        "listLabelDateCreated": "date created",
+        "listLabelLastLogin": "last login",
+        "listLabelBanned": "banned",
+        "listPage_one": "Page {{ page }} of {{ max }} (Users per page: {{ pagesize }}). Total: {{ count }} user",
+        "listPage_other": "Page {{ page }} of {{ max }} (Users per page: {{ pagesize }}). Total: {{ count }} users",
+        "listUserCount_one": "{{ count }} user",
+        "listUserCount_other": "{{ count }} users",
+        "listNoUser": "No user matching filter"
+    },
+    "userModifyCmd": {
+        "describe": "Modify user properties",
+        "userOpt": "Name of user to be modified",
+        "nameOpt": "User new name, this is user login name, be careful changing this !",
+        "emailOpt": "User new email address",
+        "displayNameOpt": "User new display name",
+        "grantOpt": "Grants role for user",
+        "revokeOpt": "Revokes role for user"
+    },
+    "userPasswordCmd": {
+        "describe": "Set a new password for a user",
+        "userOpt": "Name of user whose password is to be changed"
+    },
+    "userUnbanCmd": {
+        "describe": "Unban a user",
+        "userOpt": "Name of user to be unban"
+    },
+    "genericCmd": {
+        "setPassword": "Set password for user {{ user }}",
+        "repeatPassword": "Repeat password"
+    },
+    "errors": {
+        "apiError": "Error {{ code }}: {{ message }}",
+        "passwordMismatch": "Passwords must be the same."
+    }
 }

@@ -1,7 +1,5 @@
 import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
-import { ModifyUserDto } from '../../dto/ModifyUserDto';
 import { Cradle } from '../../../boot/container';
-import { IEncryptor } from '../../ports/services/IEncryptor';
 import { IUserSecretRepository } from '../../../domain/ports/repositories/IUserSecretRepository';
 import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
 

@@ -4,17 +4,30 @@ import {
     IDatabaseAdapter,
 } from '../../domain/ports/adapters/IDatabaseAdapter';
 import path from 'node:path';
-import { Collection, DiskStorage, IndexCreationOptions, IStorage } from 'o876-json-db';
+import {
+    Collection,
+    DiskStorage,
+    MemoryStorage,
+    IndexCreationOptions,
+    IStorage,
+} from 'o876-json-db';
 import { JsonObject, ScalarValue } from '../../domain/types/JsonStruct';
 import { debug } from '../../libs/o876-debug';
 import { expandPath } from '../../libs/expand-path';
-import { JsonDatabaseConfig } from '../../boot/json-database.config';
+import { Cradle } from '../../boot/container';
+import { JsonDatabaseStructure } from '../../boot/json-database-structure';
 
 const debugDb = debug('srv:database');
 
 export class JsonDatabase implements IDatabaseAdapter {
     private collections: Map<string, Collection<JsonObject>> = new Map();
     private diskStorage = new DiskStorage();
+    private memoryStorage = new MemoryStorage();
+    private structure: JsonDatabaseStructure;
+
+    constructor({ jsonDatabaseStructure }: Cradle) {
+        this.structure = jsonDatabaseStructure;
+    }
 
     async initCollection(
         name: string,
@@ -40,12 +53,17 @@ export class JsonDatabase implements IDatabaseAdapter {
     }
 
     async init(options: DatabaseInitOptions): Promise<void> {
-        debugDb('json-database management system : json json-database');
+        debugDb('json-database - building structure / index');
         // Users
-        for (const { name, indexes } of JsonDatabaseConfig.collections) {
-            await this.initCollection(name, this.diskStorage, options, indexes);
+        for (const { name, storage, indexes } of this.structure.collections) {
+            await this.initCollection(
+                name,
+                storage == 'memory' ? this.memoryStorage : this.diskStorage,
+                options,
+                indexes
+            );
         }
-        debugDb('json-database initialization complete');
+        debugDb('json-database structure initialized');
     }
 
     async find<T extends JsonObject>(

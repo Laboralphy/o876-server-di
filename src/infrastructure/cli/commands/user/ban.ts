@@ -3,8 +3,7 @@ import { wfGet, wfPut, HttpError } from '../../tools/web-fetcher';
 import { User } from '../../../../domain/entities/User';
 import { PutUserBanDto } from '../../../web/dto/PutUserBanDto';
 import i18n from 'i18next';
-
-const { t } = i18n;
+import { render } from '../../../../libs/i18n-loader';
 
 interface IUserBanArgs extends Arguments {
     user: string;
@@ -18,38 +17,37 @@ interface IUserBanArgs extends Arguments {
 export function banCommand(yargs: Argv): Argv {
     return yargs.command<IUserBanArgs>(
         'ban <user>',
-        t('userBanCmd.describe'),
+        render('userBanCmd.describe'),
         (yargs) =>
             yargs
                 .positional('user', {
                     type: 'string',
-                    describe: t('userBanCmd.userOpt'),
+                    describe: render('userBanCmd.userOpt'),
                     demandOption: true,
                 })
                 .option('days', {
                     type: 'number',
-                    describe: t('userBanCmd.daysOpt'),
+                    describe: render('userBanCmd.daysOpt'),
                     alias: 'd',
                     demandOption: false,
                     default: 0,
                 })
                 .option('hours', {
                     type: 'number',
-                    describe: t('userBanCmd.hoursOpt'),
-                    alias: 'h',
+                    describe: render('userBanCmd.hoursOpt'),
                     demandOption: false,
                     default: 0,
                 })
                 .option('minutes', {
                     type: 'number',
-                    describe: t('userBanCmd.minutesOpt'),
+                    describe: render('userBanCmd.minutesOpt'),
                     alias: 'm',
                     demandOption: false,
                     default: 0,
                 })
                 .option('reason', {
                     type: 'string',
-                    describe: t('userBanCmd.reasonOpt'),
+                    describe: render('userBanCmd.reasonOpt'),
                     alias: 'r',
                     demandOption: false,
                     default: '',
@@ -73,7 +71,10 @@ export function banCommand(yargs: Argv): Argv {
             } catch (error) {
                 if (error instanceof HttpError) {
                     console.error(
-                        t('errors.apiError', { code: error.statusCode, message: error.message })
+                        render('errors.apiError', {
+                            code: error.statusCode,
+                            message: error.message,
+                        })
                     );
                 } else {
                     throw error;

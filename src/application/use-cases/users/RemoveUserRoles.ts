@@ -3,7 +3,7 @@ import { Cradle } from '../../../boot/container';
 import { ModifyUserRolesDto } from '../../dto/ModifyUserRolesDto';
 import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
 
-export class RemoveUserRole {
+export class RemoveUserRoles {
     private userRepository: IUserRepository;
 
     constructor(cradle: Cradle) {

@@ -1,14 +1,16 @@
 import { IUserRepository } from '../../../domain/ports/repositories/IUserRepository';
 import { ModifyUserDto } from '../../dto/ModifyUserDto';
 import { Cradle } from '../../../boot/container';
-import { UseCaseError } from '../../error/UseCaseError';
 import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
+import { CreateUser } from './CreateUser';
 
 export class ModifyUser {
-    private userRepository: IUserRepository;
+    private readonly userRepository: IUserRepository;
+    private readonly createUser: CreateUser;
 
     constructor(cradle: Cradle) {
         this.userRepository = cradle.userRepository;
+        this.createUser = cradle.createUser;
     }
 
     async execute(idUser: string, dto: ModifyUserDto) {
@@ -16,14 +18,18 @@ export class ModifyUser {
         if (user) {
             let modified = false;
             if (dto.email) {
-                if (dto.email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)) {
-                    user.email = dto.email;
-                    modified = true;
-                } else {
-                    throw new Error(
-                        USE_CASE_ERRORS.VALUE_INVALID + ` Email address : ${dto.email}`
-                    );
-                }
+                this.createUser.checkEmail(dto.email);
+                user.email = dto.email;
+                modified = true;
+            }
+            if (dto.displayName) {
+                await this.createUser.checkDisplayName(dto.displayName);
+                user.displayName = dto.displayName;
+                modified = true;
+            }
+            if (dto.roles) {
+                user.roles = dto.roles;
+                modified = true;
             }
             if (modified) {
                 await this.userRepository.save(user);

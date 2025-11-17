@@ -1,50 +1,60 @@
 import { Argv, Arguments } from 'yargs';
 import { HttpError, wfPost } from '../../tools/web-fetcher';
 import { askPassword } from '../../../../libs/ask-password';
-import i18n from 'i18next';
-const { t } = i18n;
+import { render } from '../../../../libs/i18n-loader';
 
 interface IUserCreateArgs extends Arguments {
     name: string;
     email: string;
+    displayName: string;
 }
 
 export function createCommand(yargs: Argv): Argv {
     return yargs.command<IUserCreateArgs>(
         'create <name>',
-        t('userCreateCmd.describe'),
+        render('userCreateCmd.describe'),
         (yargs) =>
             yargs
                 .positional('name', {
                     type: 'string',
-                    describe: t('userCreateCmd.nameOpt'),
+                    describe: render('userCreateCmd.nameOpt'),
                     demandOption: true,
                 })
                 .option('email', {
                     type: 'string',
-                    describe: t('userCreateCmd.emailOpt'),
+                    describe: render('userCreateCmd.emailOpt'),
                     alias: 'm',
+                    demandOption: true,
+                })
+                .option('display-name', {
+                    type: 'string',
+                    describe: render('userCreateCmd.displayNameOpt'),
+                    alias: 'd',
                     demandOption: true,
                 }),
         async (argv) => {
             try {
                 const password = await askPassword(
-                    t('genericCmd.setPassword', { user: argv.name })
+                    render('genericCmd.setPassword', { user: argv.name })
                 );
-                const repeatPassword = await askPassword(t('genericCmd.repeatPassword'));
+                const repeatPassword = await askPassword(render('genericCmd.repeatPassword'));
                 if (password !== repeatPassword) {
-                    console.error(t('errors.passwordMismatch'));
+                    console.error(render('errors.passwordMismatch'));
                     return;
                 }
                 await wfPost('users', {
                     name: argv.name,
                     password,
                     email: argv.email,
+                    displayName: argv.displayName,
                 });
             } catch (error) {
                 if (error instanceof HttpError) {
                     console.error(
-                        t('errors.apiError', { code: error.statusCode, message: error.message })
+                        render('errors.apiError', {
+                            code: error.statusCode,
+                            message: error.message,
+                        })
                     );
                 } else {
                     throw error;

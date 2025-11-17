@@ -23,6 +23,15 @@
         "displayNameInfo": "Display name is visible too all, and should be different from your account username (for security reason).",
         "displayName": "New account display name: "
     },
+    "changePassword": {
+        "enterPreviousPassword": "Enter CURRENT password: ",
+        "enterNewPassword": "Enter NEW password: ",
+        "confirmNewPassword": "Confirms new password: ",
+        "passwordMismatch": "$(createNewAccount.passwordMismatch)",
+        "emptyPassword": "$(createNewAccount.emptyPassword)",
+        "success": "Password has been successfully changed",
+        "failure": "Password could not be changed"
+    },
     "userBanned": {
         "forever": "Permanent ban",
         "date": "Ban active until : {{ date }}",
@@ -31,7 +40,11 @@
     },
     "mail": {
         "mailReceived": "Received mail from : {{ sender }}.",
-        "youHaveMail": "You have mail : {{ count }} unread message.",
-        "youHaveMail_plural": "You have mail : {{ count }} unread messages."
+        "youHaveMail_one": "You have mail : {{ count }} unread message.",
+        "youHaveMail_other": "You have mail : {{ count }} unread messages."
+    },
+    "passwdCmd": {
+        "prompt": "New password",
+        "confirm": "Confirm new password"
     }
 }
