@@ -16,6 +16,7 @@ import { CreateUser } from '../../application/use-cases/users/CreateUser';
 import { IServerConfig } from '../../application/ports/services/IServerConfig';
 import { CreateUserDto } from '../../application/dto/CreateUserDto';
 import { FindUser } from '../../application/use-cases/users/FindUser';
+import { JsonObject } from '../../domain/types/JsonStruct';
 
 const debugClient = debug('srv:client');
 
@@ -72,6 +73,15 @@ export abstract class AbstractClientController {
 
     getClientSession(idClient: string): ClientSession {
         return this.communicationLayer.getClientSession(idClient);
+    }
+
+    sendMessage(idClient: string, key: string, parameters?: JsonObject) {
+        return this.sendClientMessage.execute(idClient, key, parameters);
+    }
+
+    send(idClient: string, message: string) {
+        const csd = this.getClientSession(idClient);
+        return csd.clientSocket.send(message);
     }
 
     /**
@@ -201,7 +211,9 @@ export abstract class AbstractClientController {
     }
 
     async dropClient(idClient: string) {
-        this.communicationLayer.dropClient(idClient);
+        await this.sendMessage(idClient, 'welcome.goodbye');
+        await this.pauseClient(idClient, 250);
+        return this.communicationLayer.dropClient(idClient);
     }
 
     /**

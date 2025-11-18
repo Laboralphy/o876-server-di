@@ -16,4 +16,5 @@ export type ClientSession = {
     user: User | null; // Authenticated User, remains null if failed
     state: CLIENT_STATES;
     login: string; // This is what client has typed to identify itself
+    processRegistry: Map<string, any>;
 };

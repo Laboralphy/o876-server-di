@@ -11,12 +11,12 @@ enum PASSWORD_CHANGE_PHASES {
     PASSWORD_EMPTY,
 }
 
-type PasswordChangerProcessorResult = SuccessFailureOutcome & {
+export type PasswordChangeProcessorResult = SuccessFailureOutcome & {
     currentPassword: string;
     newPassword: string;
 };
 
-export class PasswordChangeProcessor extends AbstractMessageProcessor<PasswordChangerProcessorResult> {
+export class PasswordChangeProcessor extends AbstractMessageProcessor<PasswordChangeProcessorResult> {
     private _phase: PASSWORD_CHANGE_PHASES = PASSWORD_CHANGE_PHASES.ENTER_CURRENT_PASSWORD;
     private _password: string = '';
     private _currentPassword: string = '';
@@ -25,7 +25,7 @@ export class PasswordChangeProcessor extends AbstractMessageProcessor<PasswordCh
         super(clientSession);
     }
 
-    get status(): PasswordChangerProcessorResult {
+    get status(): PasswordChangeProcessorResult {
         const success = this._phase == PASSWORD_CHANGE_PHASES.PASSWORD_CHANGED;
         const failure =
             this._phase == PASSWORD_CHANGE_PHASES.PASSWORD_EMPTY ||
@@ -38,7 +38,7 @@ export class PasswordChangeProcessor extends AbstractMessageProcessor<PasswordCh
         };
     }
 
-    async processMessage(message: string): Promise<PasswordChangerProcessorResult> {
+    async processMessage(message: string): Promise<PasswordChangeProcessorResult> {
         switch (this._phase) {
             case PASSWORD_CHANGE_PHASES.ENTER_CURRENT_PASSWORD: {
                 await this.currentPasswordPhase(message);

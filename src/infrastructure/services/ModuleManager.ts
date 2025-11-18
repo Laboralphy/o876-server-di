@@ -9,7 +9,6 @@
  * This class provides these methods :
  * - load a new module
  */
-import { ScriptRunner } from './ScriptRunner';
 import { JsonObject, JsonValue } from '../../domain/types/JsonStruct';
 import { Cradle } from '../../boot/container';
 import fs from 'node:fs/promises';
@@ -18,12 +17,13 @@ import { debug } from '../../libs/o876-debug';
 import { IStringRepository } from '../../application/ports/services/IStringRepository';
 import { ITemplateRepository } from '../../application/ports/services/ITemplateRepository';
 import { IScriptRunner } from '../../application/ports/services/IScriptRunner';
+import { IModuleManager } from '../../application/ports/services/IModuleManager';
 
 const debugmm = debug('srv:module');
 
 type AssetStatItemFormat = { count: number; size: number };
 
-export class ModuleManager {
+export class ModuleManager implements IModuleManager {
     private readonly assets = new Map<string, JsonObject>();
     private readonly scriptRunner: IScriptRunner;
     private readonly stringRepository: IStringRepository;

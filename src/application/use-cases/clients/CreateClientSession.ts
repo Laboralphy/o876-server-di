@@ -43,11 +43,12 @@ export class CreateClientSession {
         };
         const clientSession: ClientSession = {
             id: idClient,
-            state: CLIENT_STATES.LOGIN_PROMPT_USERNAME,
+            state: CLIENT_STATES.LOGIN,
             clientSocket,
             clientContext: apiContext,
             user: null,
             login: '',
+            processRegistry: new Map(),
         };
         this.communicationLayer.linkClientSession(clientSession);
         return clientSession;

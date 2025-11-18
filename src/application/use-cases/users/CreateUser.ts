@@ -2,14 +2,12 @@ import { IUserRepository } from '../../../domain/ports/repositories/IUserReposit
 import { CreateUserDto } from '../../dto/CreateUserDto';
 import { IEncryptor } from '../../ports/services/IEncryptor';
 import { IIdGenerator } from '../../ports/services/IIdGenerator';
-import { UserSchema, User } from '../../../domain/entities/User';
+import { UserSchema, User, REGEX_DISPLAYNAME } from '../../../domain/entities/User';
 import { Cradle } from '../../../boot/container';
 import { UserSecretSchema } from '../../../domain/entities/UserSecret';
 import { IUserSecretRepository } from '../../../domain/ports/repositories/IUserSecretRepository';
 import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
 import { IServerConfig } from '../../ports/services/IServerConfig';
-
-const REGEX_DISPLAYNAME = /^[a-zA-Z](?:[a-zA-Z-]*[a-zA-Z])?$/;
 
 /**
  * Creates a new User

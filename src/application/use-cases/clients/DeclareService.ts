@@ -1,0 +1,8 @@
+import { IClientContextService } from '../../ports/classes/IClientContextService';
+import { ClientContext } from '../../../domain/classes/ClientContext';
+
+class DeclareService {
+    execute(service: IClientContextService) {
+        ClientContext.addService(service);
+    }
+}

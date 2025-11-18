@@ -7,7 +7,8 @@
         "login": "Login: ",
         "password": "Mot de passe: ",
         "badLogin": "Nom d'utilisateur ou mot de passe incorrect.",
-        "authenticated": "Bienvenue {{ name }}."
+        "authenticated": "Bienvenue {{ name }}.",
+        "goodbye": "Au revoir !"
     },
     "createNewAccount": {
         "username": "Identifiant de connexion du nouveau compte: ",
@@ -21,7 +22,9 @@
         "nameTaken": "Identifiant de connexion déjà utilisé.",
         "displayNameTaken": "Nom affichable déjà utilisé.",
         "displayNameInfo": "Le nom affichable est visible par tous, et doit être idéalement différent de l'identifiant de connexion du compte.",
-        "displayName": "Nom affichable du nouveau compte: "
+        "displayName": "Nom affichable du nouveau compte: ",
+        "usernameInvalid": "Username is invalid",
+        "displayNameInvalid": "Display name is invalid"
     },
     "changePassword": {
         "enterPreviousPassword": "Entrez le mot de passe ACTUEL: ",
@@ -42,7 +45,7 @@
         "mailReceived": "Message reçu de la part de : {{ sender }}.",
         "unreadMessage_one": "{{ count }} message non lu",
         "unreadMessage_other": "{{ count }} messages non lus",
-        "youHaveMail": "Vous avez du courrier : $t(unreadMessage)."
+        "youHaveMail": "Vous avez du courrier : $t(mail.unreadMessage)."
     },
     "passwdCmd": {
         "prompt": "Nouveau mot de passe",

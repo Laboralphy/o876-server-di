@@ -1,4 +1,4 @@
-import { VM, NodeVM, VMScript } from 'vm2';
+import { NodeVM, VMScript } from 'vm2';
 import { IScriptRunner } from '../../application/ports/services/IScriptRunner';
 
 export class ScriptRunner implements IScriptRunner {

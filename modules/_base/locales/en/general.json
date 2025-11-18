@@ -7,7 +7,8 @@
         "login": "Login: ",
         "password": "Password: ",
         "badLogin": "Invalid username or password.",
-        "authenticated": "Welcome {{ name }}."
+        "authenticated": "Welcome {{ name }}.",
+        "goodbye": "Goodbye !"
     },
     "createNewAccount": {
         "username": "New account username: ",
@@ -18,10 +19,12 @@
         "email": "New account email address: ",
         "success": "New account {{ name }} has been successfully created. Please reconnect.",
         "failure": "Account creation failed.",
-        "nameTaken": "Name already in use",
-        "displayNameTaken": "Display name already in use",
+        "nameTaken": "Name already taken",
+        "displayNameTaken": "Display name already taken",
         "displayNameInfo": "Display name is visible too all, and should be different from your account username (for security reason).",
-        "displayName": "New account display name: "
+        "displayName": "New account display name: ",
+        "usernameInvalid": "Username is invalid",
+        "displayNameInvalid": "Display name is invalid"
     },
     "changePassword": {
         "enterPreviousPassword": "Enter CURRENT password: ",
@@ -41,7 +44,8 @@
     "mail": {
         "mailReceived": "Received mail from : {{ sender }}.",
         "youHaveMail_one": "You have mail : {{ count }} unread message.",
-        "youHaveMail_other": "You have mail : {{ count }} unread messages."
+        "youHaveMail_other": "You have mail : {{ count }} unread messages.",
+        "youHaveMail": "You have mail : $t(mail.unreadMessage)."
     },
     "passwdCmd": {
         "prompt": "New password",
