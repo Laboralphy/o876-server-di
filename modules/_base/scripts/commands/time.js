@@ -1,6 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="../../../../@types/client-context.d.ts" />
-
 /**
  * pads zero at the beginning of the specified number
  * this function is used for displaying numbers.
@@ -26,10 +25,16 @@ async function time(ctx) {
     const time = [pad0(d.getHours(), 2), pad0(d.getMinutes(), 2), pad0(d.getSeconds(), 2)].join(
         ':'
     );
+    /**
+     * @var {MoonPhase}
+     */
+    const mp = ctx.getService('MoonPhase');
+    const sGlyph = mp.renderPhase(d.getFullYear(), d.getMonth() + 1, d.getDate());
     await ctx.sendMessage('server-time', {
         time: time,
         date: date,
         timezone: timezone,
+        moon: sGlyph,
     });
 }
 

@@ -20,5 +20,5 @@ export interface IScriptRunner {
      * @param id
      * @param context
      */
-    run(id: string, context: Record<string, never>): void | Promise<void>;
+    run(id: string, context: Record<string, any>): void | Promise<void>;
 }

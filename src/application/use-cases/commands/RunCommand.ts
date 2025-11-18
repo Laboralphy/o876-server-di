@@ -1,10 +1,10 @@
 import { Cradle } from '../../../boot/container';
 import { quoteSplit } from '../../../libs/quote-split';
 import { ClientSession } from '../../../domain/types/ClientSession';
-import { ScriptRunner } from '../../../infrastructure/services/ScriptRunner';
+import { IScriptRunner } from '../../ports/services/IScriptRunner';
 
 export class RunCommand {
-    private readonly scriptRunner: ScriptRunner;
+    private readonly scriptRunner: IScriptRunner;
     constructor(cradle: Cradle) {
         // get some command script runner here
         this.scriptRunner = cradle.scriptRunner;

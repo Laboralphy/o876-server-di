@@ -17,6 +17,7 @@ import { IServerConfig } from '../../application/ports/services/IServerConfig';
 import { CreateUserDto } from '../../application/dto/CreateUserDto';
 import { FindUser } from '../../application/use-cases/users/FindUser';
 import { JsonObject } from '../../domain/types/JsonStruct';
+import { SetUserPassword } from '../../application/use-cases/user-secrets/SetUserPassword';
 
 const debugClient = debug('srv:client');
 
@@ -37,6 +38,7 @@ export abstract class AbstractClientController {
     private readonly createUser: CreateUser;
     private readonly serverConfig: IServerConfig;
     private readonly findUser: FindUser;
+    private readonly setUserPassword: SetUserPassword;
 
     constructor(cradle: Cradle) {
         this.authenticateUser = cradle.authenticateUser;
@@ -50,6 +52,7 @@ export abstract class AbstractClientController {
         this.createUser = cradle.createUser;
         this.findUser = cradle.findUser;
         this.serverConfig = cradle.serverConfig;
+        this.setUserPassword = cradle.setUserPassword;
     }
 
     getServerConfig(): IServerConfig {
@@ -105,11 +108,25 @@ export abstract class AbstractClientController {
         return prom;
     }
 
-    async changePassword(idClient: string) {
+    /**
+     * The client want to change its password
+     * This works only when user instance exists in database
+     * @param idClient
+     * @param currentPassword
+     * @param newPassword
+     */
+    async changePassword(
+        idClient: string,
+        newPassword: string,
+        currentPassword: string
+    ): Promise<boolean> {
+        // get user associated with this client
         const csd = this.getClientSession(idClient);
-        csd.state = CLIENT_STATES.CHANGE_PASSWORD_PROMPT;
-        debugClient('client %s wants to change password.', idClient);
-        await this.sendClientMessage.execute(idClient, 'userPasswordCmd');
+        if (csd.user) {
+            return this.setUserPassword.execute(csd.user.id, newPassword, currentPassword);
+        } else {
+            throw new Error('There is no user identity associated with this client');
+        }
     }
 
     /**

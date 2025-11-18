@@ -9,6 +9,7 @@ import { expandPath } from './libs/expand-path';
 import telnet, { Server as TelnetServer, Client as TelnetClient } from 'telnet2';
 import path from 'node:path';
 import fs from 'node:fs/promises';
+import { initContextServices } from './boot/context-services';
 
 const debugServer = debug('srv:main');
 
@@ -155,6 +156,9 @@ export class Server {
         await this.initTelnetService();
         await this.initWebsocketService();
         await this.initModules();
+
+        debugServer('initializing context services');
+        initContextServices();
 
         process.on('SIGTERM', async () => {
             debugServer('receiving SIGTERM');

@@ -10,7 +10,7 @@ import { FindUser } from '../../../application/use-cases/users/FindUser';
 import { DeleteUser } from '../../../application/use-cases/users/DeleteUser';
 import { GetUserBan } from '../../../application/use-cases/users/GetUserBan';
 import { PutUserPasswordDto, PutUserPasswordDtoSchema } from '../dto/PutUserPasswordDto';
-import { SetUserPassword } from '../../../application/use-cases/users/SetUserPassword';
+import { SetUserPassword } from '../../../application/use-cases/user-secrets/SetUserPassword';
 import { ITime } from '../../../application/ports/services/ITime';
 import { GetUser } from '../../../application/use-cases/users/GetUser';
 import { PutUserBanDto, PutUserBanDtoSchema } from '../dto/PutUserBanDto';

@@ -21,7 +21,7 @@ import { ModifyUser } from '../application/use-cases/users/ModifyUser';
 import { FindUser } from '../application/use-cases/users/FindUser';
 import { DeleteUser } from '../application/use-cases/users/DeleteUser';
 import { GetUserBan } from '../application/use-cases/users/GetUserBan';
-import { SetUserPassword } from '../application/use-cases/users/SetUserPassword';
+import { SetUserPassword } from '../application/use-cases/user-secrets/SetUserPassword';
 import { GetUser } from '../application/use-cases/users/GetUser';
 import { BanUser } from '../application/use-cases/users/BanUser';
 import { UnbanUser } from '../application/use-cases/users/UnbanUser';
@@ -61,6 +61,10 @@ import { jsonDatabaseStructure, JsonDatabaseStructure } from './json-database-st
 
 export interface Cradle {
     // use cases
+    // use case user secret
+    setUserPassword: SetUserPassword;
+
+    // use cases
     createUser: CreateUser;
     modifyUser: ModifyUser;
     getUserList: GetUserList;
@@ -68,7 +72,6 @@ export interface Cradle {
     deleteUser: DeleteUser;
     getUserBan: GetUserBan;
     getUser: GetUser;
-    setUserPassword: SetUserPassword;
     banUser: BanUser;
     unbanUser: UnbanUser;
     addUserRoles: AddUserRoles;
@@ -111,6 +114,8 @@ export const container = createContainer<Cradle>();
 
 // Registering dependencies
 container.register({
+    // use cases : user secret
+    setUserPassword: asClass(SetUserPassword).singleton(),
     // use cases : users
     createUser: asClass(CreateUser).singleton(),
     modifyUser: asClass(ModifyUser).singleton(),
@@ -119,16 +124,17 @@ container.register({
     deleteUser: asClass(DeleteUser).singleton(),
     getUserBan: asClass(GetUserBan).singleton(),
     getUser: asClass(GetUser).singleton(),
-    setUserPassword: asClass(SetUserPassword).singleton(),
     banUser: asClass(BanUser).singleton(),
     unbanUser: asClass(UnbanUser).singleton(),
     authenticateUser: asClass(AuthenticateUser).singleton(),
     addUserRoles: asClass(AddUserRoles).singleton(),
     removeUserRoles: asClass(RemoveUserRoles).singleton(),
+
     // use cases : clients
     destroyClient: asClass(DestroyClient).singleton(),
     sendClientMessage: asClass(SendClientMessage).singleton(),
     createClientSession: asClass(CreateClientSession).singleton(),
+
     // use cases : commands
     runCommand: asClass(RunCommand).singleton(),
 

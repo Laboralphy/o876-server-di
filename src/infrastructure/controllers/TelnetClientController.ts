@@ -273,8 +273,75 @@ export class TelnetClientController extends AbstractClientController {
         }
     }
 
-    async passwordChangeProcess(clientSession: ClientSession, message: string = ''): Promise<void> {
-        //
+    async changePasswordProcess(clientSession: ClientSession, message: string = '') {
+        // User wants to change its password
+        enum PHASES {
+            EXPECT_CURRENT_PASSWORD,
+            EXPECT_NEW_PASSWORD,
+            EXPECT_CONFIRM_PASSWORD,
+        }
+        type ChangePasswordStruct = {
+            currentPassword: string;
+            newPassword: string;
+        };
+        if (!clientSession.processRegistry.has('phase')) {
+            clientSession.processRegistry.set('phase', PHASES.EXPECT_CURRENT_PASSWORD);
+            const changePasswordStruct: ChangePasswordStruct = {
+                currentPassword: '',
+                newPassword: '',
+            };
+            clientSession.processRegistry.set('changePasswordStruct', changePasswordStruct);
+            return this.askPassword(clientSession.id, 'changePassword.enterPreviousPassword');
+        }
+        const changePasswordStruct: ChangePasswordStruct = clientSession.processRegistry.get(
+            'changePasswordStruct'
+        )! as ChangePasswordStruct;
+
+        switch (clientSession.processRegistry.get('phase')) {
+            case PHASES.EXPECT_CURRENT_PASSWORD: {
+                changePasswordStruct.currentPassword = message;
+                await this.exitPasswordMode(clientSession.id);
+                await this.askPassword(clientSession.id, 'changePassword.enterNewPassword');
+                clientSession.processRegistry.set('phase', PHASES.EXPECT_NEW_PASSWORD);
+                break;
+            }
+            case PHASES.EXPECT_NEW_PASSWORD: {
+                await this.exitPasswordMode(clientSession.id);
+                if (message == '') {
+                    await this.sendMessage(clientSession.id, 'createNewAccount.emptyPassword');
+                    await this.askPassword(clientSession.id, 'changePassword.enterNewPassword');
+                } else {
+                    changePasswordStruct.currentPassword = message;
+                    await this.askPassword(clientSession.id, 'changePassword.confirmNewPassword');
+                    clientSession.processRegistry.set('phase', PHASES.EXPECT_CONFIRM_PASSWORD);
+                }
+                break;
+            }
+            case PHASES.EXPECT_CONFIRM_PASSWORD: {
+                await this.exitPasswordMode(clientSession.id);
+                if (message == changePasswordStruct.newPassword) {
+                    // Client has confirmed new password
+                    // Try to change password with use case
+                    const bSuccess = await this.changePassword(
+                        clientSession.id,
+                        changePasswordStruct.newPassword,
+                        changePasswordStruct.currentPassword
+                    );
+                    await this.sendMessage(
+                        clientSession.id,
+                        bSuccess ? 'changePassword.success' : 'changePassword.failure'
+                    );
+                } else {
+                    await this.sendMessage(clientSession.id, 'changePassword.passwordMismatch');
+                }
+                clientSession.processRegistry.clear();
+                clientSession.state = CLIENT_STATES.LOGIN;
+                break;
+            }
+            default: {
+                break;
+            }
+        }
     }
 
     /**
@@ -332,6 +399,11 @@ export class TelnetClientController extends AbstractClientController {
                     case CLIENT_STATES.AUTHENTICATED: {
                         // When client is authenticated, all message are passed to th command interpreter
                         await this.execCommand(idClient, message);
+                        break;
+                    }
+
+                    case CLIENT_STATES.CHANGE_PASSWORD: {
+                        await this.changePasswordProcess(csd, message);
                         break;
                     }
 
