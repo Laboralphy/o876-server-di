@@ -8,21 +8,51 @@ import { getMoonPhase } from '../../libs/moon-phase';
 import { ICommunicationLayer } from '../../application/ports/services/ICommunicationLayer';
 import { CLIENT_STATES } from '../../domain/enums/client-states';
 import { SetUserPassword } from '../../application/use-cases/user-secrets/SetUserPassword';
+import {
+    CheckMailInbox,
+    CheckMailInboxEntry,
+} from '../../application/use-cases/mail/CheckMailInbox';
+import { SendMailMessage } from '../../application/use-cases/mail/SendMailMessage';
+import { User } from '../../domain/entities/User';
+import { FindUser } from '../../application/use-cases/users/FindUser';
 
 export class ApiContextBuilder implements IApiContextBuilder {
     private sendClientMessage: SendClientMessage;
     private destroyClient: DestroyClient;
     private setUserPassword: SetUserPassword;
     private communicationLayer: ICommunicationLayer;
+    private sendMailMessage: SendMailMessage;
+    private checkMailInbox: CheckMailInbox;
+    private findUser: FindUser;
 
     constructor(cradle: Cradle) {
         // use cases
         this.sendClientMessage = cradle.sendClientMessage;
         this.destroyClient = cradle.destroyClient;
         this.setUserPassword = cradle.setUserPassword;
+        this.sendMailMessage = cradle.sendMailMessage;
+        this.checkMailInbox = cradle.checkMailInbox;
+        this.findUser = cradle.findUser;
 
         // services
         this.communicationLayer = cradle.communicationLayer;
+    }
+
+    getClientSession(idClient: string) {
+        const clientSession = this.communicationLayer.getClientSession(idClient);
+        if (!clientSession) {
+            throw new Error(`client ${idClient} has no clientSession`);
+        }
+        return clientSession;
+    }
+
+    getClientUser(idClient: string): User {
+        const clientSession = this.getClientSession(idClient);
+        if (clientSession.user) {
+            return clientSession.user;
+        } else {
+            throw new Error(`client ${idClient} is not associated with a user`);
+        }
     }
 
     buildApiContext(idClient: string): IClientContext {
@@ -103,6 +133,32 @@ export class ApiContextBuilder implements IApiContextBuilder {
             /****** MAIL MESSAGING ****** MAIL MESSAGING ****** MAIL MESSAGING ****** MAIL MESSAGING ******/
             /****** MAIL MESSAGING ****** MAIL MESSAGING ****** MAIL MESSAGING ****** MAIL MESSAGING ******/
             /****** MAIL MESSAGING ****** MAIL MESSAGING ****** MAIL MESSAGING ****** MAIL MESSAGING ******/
+
+            mailSendMessage: async (
+                recipients: string[],
+                topic: string,
+                message: string
+            ): Promise<void> => {
+                const recipientUsers: User[] = [];
+                const recipientIds: string[] = [];
+                const notFoundRecipients: string[] = [];
+                for (let i = 0, l = recipients.length; i < l; i++) {
+                    const user = await this.findUser.execute({ displayName: recipients[i] });
+                    if (user) {
+                        recipientUsers.push(user);
+                        recipientIds.push(user.id);
+                    } else {
+                        notFoundRecipients.push(recipients[i]);
+                    }
+                }
+                const user = this.getClientUser(idClient);
+                return this.sendMailMessage.execute(user.id, recipientIds, topic, message);
+            },
+
+            mailCheckInbox: async (): Promise<CheckMailInboxEntry[]> => {
+                const user = this.getClientUser(idClient);
+                return this.checkMailInbox.execute(user.id);
+            },
         };
         return apiContext;
     }

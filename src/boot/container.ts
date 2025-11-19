@@ -54,6 +54,8 @@ import { RemoveUserRoles } from '../application/use-cases/users/RemoveUserRoles'
 import { jsonDatabaseStructure, JsonDatabaseStructure } from './json-database-structure';
 import { IApiContextBuilder } from '../application/ports/services/IApiContextBuilder';
 import { ApiContextBuilder } from '../infrastructure/services/ApiContextBuilder';
+import { CheckMailInbox } from '../application/use-cases/mail/CheckMailInbox';
+import { SendMailMessage } from '../application/use-cases/mail/SendMailMessage';
 
 /**
  * To as a new use case, port ...,
@@ -85,6 +87,9 @@ export interface Cradle {
     createClientSession: CreateClientSession;
     // use cases command
     runCommand: RunCommand;
+    // use cases mail
+    checkMailInbox: CheckMailInbox;
+    sendMailMessage: SendMailMessage;
 
     // repositories
     userRepository: IUserRepository;
@@ -141,6 +146,10 @@ container.register({
 
     // use cases : commands
     runCommand: asClass(RunCommand).singleton(),
+
+    // use cases : mail
+    checkMailInbox: asClass(CheckMailInbox).singleton(),
+    sendMailMessage: asClass(SendMailMessage).singleton(),
 
     // repositories
     userRepository: asClass(UserRepository).singleton(),
