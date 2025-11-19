@@ -50,5 +50,18 @@
     "passwdCmd": {
         "prompt": "Nouveau mot de passe",
         "confirm": "Confirmer nouveau mot de passe"
+    },
+    "moon": {
+        "labels": {
+            "new": "Nouvelle lune",
+            "waxingCrescent": "Premier croissant",
+            "waxingQuarter": "Premier quartier",
+            "waxingGibbous": "Lune gibbeuse croissante",
+            "full": "Pleine lune",
+            "waningGibbous": "Lune gibbeuse décroissante",
+            "lastQuarter": "Dernier quartier",
+            "waningCrescent": "Dernier croissant"
+        },
+        "label": "$t(moon.labels.{{ label }})"
     }
 }

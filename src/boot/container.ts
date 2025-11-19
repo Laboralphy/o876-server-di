@@ -52,6 +52,8 @@ import { MailMessageRepository } from '../infrastructure/persistance/json-databa
 import { AddUserRoles } from '../application/use-cases/users/AddUserRoles';
 import { RemoveUserRoles } from '../application/use-cases/users/RemoveUserRoles';
 import { jsonDatabaseStructure, JsonDatabaseStructure } from './json-database-structure';
+import { IApiContextBuilder } from '../application/ports/services/IApiContextBuilder';
+import { ApiContextBuilder } from '../infrastructure/services/ApiContextBuilder';
 
 /**
  * To as a new use case, port ...,
@@ -105,6 +107,7 @@ export interface Cradle {
     scriptRunner: IScriptRunner;
     moduleManager: IModuleManager;
     serverConfig: IServerConfig;
+    apiContextBuilder: IApiContextBuilder;
 
     // values
     jsonDatabaseStructure: JsonDatabaseStructure;
@@ -160,6 +163,7 @@ container.register({
     scriptRunner: asClass(ScriptRunner).singleton(),
     moduleManager: asClass(ModuleManager).singleton(),
     serverConfig: asClass(ServerConfig).singleton(),
+    apiContextBuilder: asClass(ApiContextBuilder).singleton(),
 
     // values
     jsonDatabaseStructure: asValue(jsonDatabaseStructure),

@@ -1,4 +1,3 @@
-import { IClientContextService } from './IClientContextService';
 import { JsonObject } from '../../../domain/types/JsonStruct';
 
 export interface IClientContext {
@@ -23,7 +22,9 @@ export interface IClientContext {
      */
     closeConnection(): void;
 
-    getService(name: string): IClientContextService;
-
-    getServerTime(): { date: Date; timezone: string };
+    getServerTime(): {
+        date: Date;
+        timezone: string;
+        moon: { age: string; glyph: string; label: string };
+    };
 }

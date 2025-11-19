@@ -24,6 +24,7 @@
         "koa-bodyparser": "^4.4.1",
         "o876-json-db": "github:Laboralphy/o876-json-db#v1.8.1",
         "reflect-metadata": "^0.2.2",
+        "suncalc": "^1.9.0",
         "telnet2": "^0.0.1",
         "vm2": "^3.10.0",
         "yaml": "^2.8.1",

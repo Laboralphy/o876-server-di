@@ -1,4 +1,6 @@
-const MOON_AGE_PHASE = [
+import { getMoonIllumination } from 'suncalc';
+
+const MOON_UNICODE_GLYPHS = [
     '\uD83C\uDF11',
     '\uD83C\uDF12',
     '\uD83C\uDF13',
@@ -7,62 +9,34 @@ const MOON_AGE_PHASE = [
     '\uD83C\uDF16',
     '\uD83C\uDF17',
     '\uD83C\uDF18',
-    '\uD83C\uDF11',
 ];
 
-export function getMoonGlyph(age: number): string {
-    const code = getMoonPhaseCode(age);
-    return MOON_AGE_PHASE[code % MOON_AGE_PHASE.length];
-}
+const MOON_PHASE_DATA = [
+    { from: 0, to: 0.0625, index: 0, name: 'new' },
+    { from: 0.0625, to: 0.1875, index: 1, name: 'waxingCrescent' },
+    { from: 0.1875, to: 0.3125, index: 2, name: 'waxingQuarter' },
+    { from: 0.3125, to: 0.4375, index: 3, name: 'waxingGibbous' },
+    { from: 0.4375, to: 0.5625, index: 4, name: 'full' },
+    { from: 0.5625, to: 0.6875, index: 5, name: 'waningGibbous' },
+    { from: 0.6875, to: 0.8125, index: 6, name: 'lastQuarter' },
+    { from: 0.8125, to: 0.9375, index: 7, name: 'waningCrescent' },
+    { from: 0.9375, to: Infinity, index: 0, name: 'new' },
+];
 
-export function getMoonPhaseCode(age: number): number {
-    if (age < 1) {
-        return 0;
-    } else if (age < 3.7) {
-        return 1;
-    } else if (age < 7.4) {
-        return 2;
-    } else if (age < 11.1) {
-        return 3;
-    } else if (age < 14.8) {
-        return 4;
-    } else if (age < 18.5) {
-        return 5;
-    } else if (age < 22.2) {
-        return 6;
-    } else if (age < 25.9) {
-        return 7;
-    } else {
-        return 0;
+export function getMoonPhase(date: Date) {
+    const mi = getMoonIllumination(date);
+    for (let i = 0, l = MOON_PHASE_DATA.length; i < l; ++i) {
+        if (mi.phase >= MOON_PHASE_DATA[i].from && mi.phase < MOON_PHASE_DATA[i].to) {
+            return {
+                age: (29.530587981 * mi.phase).toFixed(1),
+                glyph: MOON_UNICODE_GLYPHS[MOON_PHASE_DATA[i].index],
+                label: MOON_PHASE_DATA[i].name,
+            };
+        }
     }
-}
-
-export function computeMoonAge(year: number, month: number, day: number): number {
-    // Calcul du nombre de jours juliens (JJ)
-    const a = Math.floor((14 - month) / 12);
-    const y = year + 4800 - a;
-    const m = month + 12 * a - 3;
-
-    const JJ =
-        day +
-        Math.floor((153 * m + 2) / 5) +
-        365 * y +
-        Math.floor(y / 4) -
-        Math.floor(y / 100) +
-        Math.floor(y / 400) -
-        32045;
-
-    // Jour julien pour la nouvelle lune de référence (6 janvier 2000)
-    const JJReference = 2451550.1;
-
-    // Nombre de jours écoulés depuis la nouvelle lune de référence
-    const joursEcoules = JJ - JJReference;
-
-    // Âge de la lune en jours
-    return ((joursEcoules % 29.530588853) + 29.530588853) % 29.530588853;
-}
-
-export function renderMoonPhase(year: number, month: number, day: number): string {
-    const age = computeMoonAge(year, month, day);
-    return getMoonGlyph(age);
+    return {
+        age: '0.0',
+        glyph: MOON_UNICODE_GLYPHS[0],
+        label: '-',
+    };
 }

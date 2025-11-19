@@ -52,13 +52,16 @@
         "confirm": "Confirm new password"
     },
     "moon": {
-        "new": "Nouvelle lune",
-        "waxingCrescent": "Premier croissant",
-        "waxingQuarter": "Premier quartier",
-        "waxingGibbous": "Lune gibbeuse croissante",
-        "full": "Pleine lune",
-        "waningGibbous": "Lune gibbeuse décroissante",
-        "lastQuarter": "Dernier quartier",
-        "waningCrescent": "Dernier croissant"
+        "labels": {
+            "new": "New moon",
+            "waxingCrescent": "Waxing crescent",
+            "waxingQuarter": "First quarter",
+            "waxingGibbous": "Waxing gibbous",
+            "full": "Full moon",
+            "waningGibbous": "Waning gibbous",
+            "lastQuarter": "Last quarter",
+            "waningCrescent": "Waning crescent"
+        },
+        "label": "$t(moon.labels.{{ label }})"
     }
 }
