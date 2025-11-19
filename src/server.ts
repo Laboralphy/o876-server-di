@@ -9,6 +9,7 @@ import { expandPath } from './libs/expand-path';
 import telnet, { Server as TelnetServer, Client as TelnetClient } from 'telnet2';
 import path from 'node:path';
 import fs from 'node:fs/promises';
+import { serverConfig } from './libs/server-config';
 
 const debugServer = debug('srv:main');
 

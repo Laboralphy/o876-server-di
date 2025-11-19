@@ -43,9 +43,7 @@ export class CreateUser {
             );
         }
         // May not be like "new"
-        if (
-            displayName.toLowerCase() === this.serverConfig.getConfigVariableString('loginNewUser')
-        ) {
+        if (displayName.toLowerCase() === this.serverConfig.getVariables().loginNewUser) {
             throw new Error(
                 USE_CASE_ERRORS.VALUE_RESERVED + ' Display name : this value is reserved'
             );

@@ -32,11 +32,11 @@ export class ScriptRunner implements IScriptRunner {
                 ...context,
             };
             const vm = new NodeVM({
-                console: 'redirect', // Capture les logs
+                console: 'inherit', // Capture les logs
                 sandbox: ctx, // Contexte vide par défaut
                 require: {
                     external: false, // Désactive les modules externes
-                    builtin: [], // Désactive les modules built-in
+                    builtin: [console], // Désactive les modules built-in
                     root: './',
                 },
                 timeout: 1000, // Timeout en ms

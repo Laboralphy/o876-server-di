@@ -1,5 +1,5 @@
+import { ServerConfigOptions } from '../../../domain/types/ServerConfig';
+
 export interface IServerConfig {
-    getConfigVariableString(name: string): string;
-    getConfigVariableNumber(name: string): number;
-    getConfigVariableBoolean(name: string): boolean;
+    getVariables(): ServerConfigOptions;
 }

@@ -58,14 +58,8 @@ export class SendMailMessage {
         const tsCreation = this.time.now();
         const message: MailMessage = {
             id: this.idGenerator.generateUID(),
-            content: content.substring(
-                0,
-                this.serverConfig.getConfigVariableNumber('mailMaxMessageLength')
-            ),
-            topic: topic.substring(
-                0,
-                this.serverConfig.getConfigVariableNumber('mailMaxTopicLength')
-            ),
+            content: content.substring(0, this.serverConfig.getVariables().mailMaxMessageLength),
+            topic: topic.substring(0, this.serverConfig.getVariables().mailMaxTopicLength),
             recipientIds,
             senderId,
             tsCreation,

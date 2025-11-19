@@ -72,7 +72,7 @@ export class CheckMailInbox {
     async execute(userId: string): Promise<CheckMailInboxEntry[]> {
         const tsNow = this.time.now();
         const tsExpirationDuration =
-            this.serverConfig.getConfigVariableNumber('mailMaxExpirationDays') * 24 * 3600 * 1000;
+            this.serverConfig.getVariables().mailMaxExpirationDays * 24 * 3600 * 1000;
         const tsExpired = tsNow - tsExpirationDuration;
         // get raw inbox entries
         const aInbox = await this.checkInbox(userId);
@@ -80,9 +80,7 @@ export class CheckMailInbox {
         const aMessages = await Promise.all(
             aInbox.map((mib) => this.mailMessageRepository.get(mib.messageId))
         );
-        const nMaxMessageLength = this.serverConfig.getConfigVariableNumber(
-            'mailMaxMessagePreviewLength'
-        );
+        const nMaxMessageLength = this.serverConfig.getVariables().mailMaxMessagePreviewLength;
         const aResult: CheckMailInboxEntry[] = [];
         const aDelete: Promise<void>[] = [];
         for (let i = 0; i < aInbox.length; i += 1) {

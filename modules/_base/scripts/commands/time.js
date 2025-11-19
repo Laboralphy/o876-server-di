@@ -12,7 +12,8 @@ function pad0(n, size) {
 }
 
 /**
- * This command will display server time, with timezone indication
+ * This command will display server time, with timezone indication, as well as some various astronomical
+ * data like moon phase and moon age
  * @param ctx {IClientContext}
  */
 async function time(ctx) {

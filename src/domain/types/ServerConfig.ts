@@ -8,6 +8,11 @@ export const ServerConfigOptionsSchema = z
         mailMaxMessageLength: z.number().int(),
         mailMaxTopicLength: z.number().int(),
         mailMaxMessagePreviewLength: z.number().int(),
+        name: z.string(),
+        version: z.string(),
+        author: z.string(),
+        license: z.string(),
+        description: z.string(),
     })
     .strict();
 

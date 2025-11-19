@@ -63,7 +63,7 @@ export class TelnetClientController extends AbstractClientController {
                 // client is expected to enter login or "new"
                 if (
                     message.toLowerCase() ==
-                    this.getServerConfig().getConfigVariableString('loginNewUser').toLowerCase()
+                    this.getServerConfig().getVariables().loginNewUser.toLowerCase()
                 ) {
                     debugTelnet('client %s : is asking for account creation', clientSession.id);
                     clientSession.processRegistry.clear();
@@ -354,10 +354,10 @@ export class TelnetClientController extends AbstractClientController {
         const idClient = clientSession.id;
         const clientContext = clientSession.clientContext;
         const serverConfig = this.getServerConfig();
-        const newAccountCode = serverConfig.getConfigVariableString('loginNewUser');
+        const newAccountCode = serverConfig.getVariables().loginNewUser;
         await clientContext.sendMessage('server-welcome', {
-            serverDescription: serverConfig.getConfigVariableString('description'),
-            serverVersion: serverConfig.getConfigVariableString('version'),
+            serverDescription: serverConfig.getVariables().description,
+            serverVersion: serverConfig.getVariables().version,
             newAccountCode,
         });
         await this.echo(idClient, true);
