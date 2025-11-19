@@ -7,7 +7,7 @@ import { IUserRepository } from '../../../domain/ports/repositories/IUserReposit
 import { IServerConfig } from '../../ports/services/IServerConfig';
 import { IIdGenerator } from '../../ports/services/IIdGenerator';
 
-type CheckMailInboxEntry = {
+export type CheckMailInboxEntry = {
     tag: number;
     message: string;
     date: string;
@@ -98,9 +98,9 @@ export class CheckMailInbox {
                 const entry: CheckMailInboxEntry = {
                     tag: mib.tag,
                     message:
-                        msg.content.length > nMaxMessageLength
-                            ? msg.content.substring(0, nMaxMessageLength - 3) + '...'
-                            : msg.content,
+                        msg.topic.length > nMaxMessageLength
+                            ? msg.topic.substring(0, nMaxMessageLength - 3) + '...'
+                            : msg.topic,
                     date: this.time.renderDate(mib.tsReceived, 'ymd hm'),
                     read: mib.read,
                     kept: mib.kept,

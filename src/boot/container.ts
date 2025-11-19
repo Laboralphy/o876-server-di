@@ -107,6 +107,7 @@ export interface Cradle {
     scriptRunner: IScriptRunner;
     moduleManager: IModuleManager;
     serverConfig: IServerConfig;
+    // Api Context
     apiContextBuilder: IApiContextBuilder;
 
     // values

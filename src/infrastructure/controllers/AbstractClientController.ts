@@ -239,4 +239,6 @@ export abstract class AbstractClientController {
      * We listen the events fired by this socket, and we execute the corresponding use cases.
      */
     abstract connect(socket: never): Promise<void>;
+
+    abstract changePasswordProcess(clientSession: ClientSession, message?: string): Promise<void>;
 }

@@ -7,8 +7,11 @@ mailMaxExpirationDays: 30
 # Number of messages a user can pin to prevent auto deletion
 mailMaxKeptMessages: 20
 
-# Maximum character in a messages
+# Maximum character count in a messages
 mailMaxMessageLength: 1024
+
+# Maximum character count in a message topics
+mailMaxTopicLength: 128
 
 # Maximum mail message preview length
 mailMaxMessagePreviewLength: 32

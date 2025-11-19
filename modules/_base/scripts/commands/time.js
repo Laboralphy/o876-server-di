@@ -38,4 +38,4 @@ async function time(ctx) {
 /**
  * @var context {IClientContext}
  */
-time(context);
+module.exports = time(context);

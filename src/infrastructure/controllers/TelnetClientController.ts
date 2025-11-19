@@ -31,10 +31,8 @@ export class TelnetClientController extends AbstractClientController {
     }
 
     async exitPasswordMode(idClient: string) {
-        if (!this.#echoValue) {
-            await this.echo(idClient, true);
-            await this.send(idClient, '\n');
-        }
+        await this.echo(idClient, true);
+        await this.send(idClient, '\n');
     }
 
     async askString(idClient: string, key: string, parameters?: JsonObject) {
@@ -291,7 +289,7 @@ export class TelnetClientController extends AbstractClientController {
                 newPassword: '',
             };
             clientSession.processRegistry.set('changePasswordStruct', changePasswordStruct);
-            return this.askPassword(clientSession.id, 'changePassword.enterPreviousPassword');
+            await this.askPassword(clientSession.id, 'changePassword.enterPreviousPassword');
         }
         const changePasswordStruct: ChangePasswordStruct = clientSession.processRegistry.get(
             'changePasswordStruct'
@@ -311,7 +309,7 @@ export class TelnetClientController extends AbstractClientController {
                     await this.sendMessage(clientSession.id, 'createNewAccount.emptyPassword');
                     await this.askPassword(clientSession.id, 'changePassword.enterNewPassword');
                 } else {
-                    changePasswordStruct.currentPassword = message;
+                    changePasswordStruct.newPassword = message;
                     await this.askPassword(clientSession.id, 'changePassword.confirmNewPassword');
                     clientSession.processRegistry.set('phase', PHASES.EXPECT_CONFIRM_PASSWORD);
                 }
@@ -335,7 +333,7 @@ export class TelnetClientController extends AbstractClientController {
                     await this.sendMessage(clientSession.id, 'changePassword.passwordMismatch');
                 }
                 clientSession.processRegistry.clear();
-                clientSession.state = CLIENT_STATES.LOGIN;
+                clientSession.state = CLIENT_STATES.AUTHENTICATED;
                 break;
             }
             default: {

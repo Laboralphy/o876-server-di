@@ -8,7 +8,6 @@ import { MailMessage } from '../../../domain/entities/MailMessage';
 import { IIdGenerator } from '../../ports/services/IIdGenerator';
 import { User } from '../../../domain/entities/User';
 import { MailInbox } from '../../../domain/entities/MailInbox';
-import { UseCaseError } from '../../error/UseCaseError';
 import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
 
 /**
@@ -40,7 +39,7 @@ export class SendMailMessage {
         return aInbox.map((mib: MailInbox) => mib.tag);
     }
 
-    async execute(senderId: string, recipientNames: string[], content: string) {
+    async execute(senderId: string, recipientNames: string[], topic: string, content: string) {
         const aMaybeUsers = await this.getUserFromNames(recipientNames);
         const recipientIds: string[] = [];
         const notFoundUserSet = new Set<string>();
@@ -62,6 +61,10 @@ export class SendMailMessage {
             content: content.substring(
                 0,
                 this.serverConfig.getConfigVariableNumber('mailMaxMessageLength')
+            ),
+            topic: topic.substring(
+                0,
+                this.serverConfig.getConfigVariableNumber('mailMaxTopicLength')
             ),
             recipientIds,
             senderId,

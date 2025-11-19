@@ -9,6 +9,7 @@ const CONFIG: ServerConfigOptions = {
     mailMaxExpirationDays: 30,
     mailMaxKeptMessages: 20,
     mailMaxMessageLength: 1024,
+    mailMaxTopicLength: 128,
     mailMaxMessagePreviewLength: 32,
 };
 

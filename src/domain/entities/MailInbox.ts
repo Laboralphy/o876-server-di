@@ -2,7 +2,7 @@ import z from 'zod';
 import { EntityId } from '../schemas/EntityId';
 
 export const MailInboxSchema = z.object({
-    messageId: z.string(),
+    messageId: EntityId,
     tag: z.number(),
     userId: EntityId,
     tsReceived: z.number(),

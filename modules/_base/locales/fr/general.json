@@ -30,8 +30,8 @@
         "enterPreviousPassword": "Entrez le mot de passe ACTUEL: ",
         "enterNewPassword": "Entrez le NOUVEAU mot de passe: ",
         "confirmNewPassword": "Confirmez le nouveau mot de passe: ",
-        "passwordMismatch": "$(createNewAccount.passwordMismatch)",
-        "emptyPassword": "$(createNewAccount.emptyPassword)",
+        "passwordMismatch": "$t(createNewAccount.passwordMismatch)",
+        "emptyPassword": "$t(createNewAccount.emptyPassword)",
         "success": "Mot de passe changé avec succès",
         "failure": "Le mot de passe n'a pas pu être changé"
     },
@@ -48,8 +48,7 @@
         "youHaveMail": "Vous avez du courrier : $t(mail.unreadMessage)."
     },
     "passwdCmd": {
-        "prompt": "Nouveau mot de passe",
-        "confirm": "Confirmer nouveau mot de passe"
+        "mustBeLobby": "Vous devez être en mode Lobby pour pouvoir changer le mot de passe."
     },
     "moon": {
         "labels": {

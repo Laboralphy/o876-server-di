@@ -6,6 +6,7 @@ export const ServerConfigOptionsSchema = z
         mailMaxExpirationDays: z.number().int(),
         mailMaxKeptMessages: z.number().int(),
         mailMaxMessageLength: z.number().int(),
+        mailMaxTopicLength: z.number().int(),
         mailMaxMessagePreviewLength: z.number().int(),
     })
     .strict();
