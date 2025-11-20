@@ -355,7 +355,7 @@ export class TelnetClientController extends AbstractClientController {
         const clientContext = clientSession.clientContext;
         const serverConfig = this.getServerConfig();
         const newAccountCode = serverConfig.getVariables().loginNewUser;
-        await clientContext.sendMessage('server-welcome', {
+        await clientContext.print('server-welcome', {
             serverDescription: serverConfig.getVariables().description,
             serverVersion: serverConfig.getVariables().version,
             newAccountCode,

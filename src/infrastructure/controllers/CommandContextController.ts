@@ -1,22 +1,20 @@
-import { IApiContextBuilder } from '../../application/ports/services/IApiContextBuilder';
-import { IClientContext } from '../../application/ports/classes/IClientContext';
-import { JsonObject } from '../../domain/types/JsonStruct';
+import { User } from '../../domain/entities/User';
 import { SendClientMessage } from '../../application/use-cases/clients/SendClientMessage';
-import { Cradle } from '../../boot/container';
 import { DestroyClient } from '../../application/use-cases/clients/DestroyClient';
-import { getMoonPhase } from '../../libs/moon-phase';
-import { ICommunicationLayer } from '../../application/ports/services/ICommunicationLayer';
-import { CLIENT_STATES } from '../../domain/enums/client-states';
 import { SetUserPassword } from '../../application/use-cases/user-secrets/SetUserPassword';
+import { ICommunicationLayer } from '../../application/ports/services/ICommunicationLayer';
+import { SendMailMessage } from '../../application/use-cases/mail/SendMailMessage';
 import {
     CheckMailInbox,
     CheckMailInboxEntry,
 } from '../../application/use-cases/mail/CheckMailInbox';
-import { SendMailMessage } from '../../application/use-cases/mail/SendMailMessage';
-import { User } from '../../domain/entities/User';
 import { FindUser } from '../../application/use-cases/users/FindUser';
+import { Cradle } from '../../boot/container';
+import { JsonObject } from '../../domain/types/JsonStruct';
+import { getMoonPhase } from '../../libs/moon-phase';
+import { CLIENT_STATES } from '../../domain/enums/client-states';
 
-export class ApiContextBuilder implements IApiContextBuilder {
+export class CommandContextController {
     private sendClientMessage: SendClientMessage;
     private destroyClient: DestroyClient;
     private setUserPassword: SetUserPassword;
@@ -46,16 +44,11 @@ export class ApiContextBuilder implements IApiContextBuilder {
         return clientSession;
     }
 
-    getClientUser(idClient: string): User {
-        const clientSession = this.getClientSession(idClient);
-        if (clientSession.user) {
-            return clientSession.user;
-        } else {
-            throw new Error(`client ${idClient} is not associated with a user`);
-        }
+    findUserByName(displayName: string): Promise<User | undefined> {
+        return this.findUser.execute({ displayName });
     }
 
-    buildApiContext(idClient: string): IClientContext {
+    buildCommandContext(idClient: string) {
         const clientSession = this.getClientSession(idClient);
         if (!clientSession) {
             throw new Error(`client ${idClient} is not associated with a clientSession`);
@@ -67,24 +60,25 @@ export class ApiContextBuilder implements IApiContextBuilder {
                 throw new Error(`client ${idClient} is not associated with a user`);
             }
         };
-        const apiContext: IClientContext = {
+        const print = (key: string, parameters?: JsonObject): Promise<void> => {
+            return this.sendClientMessage.execute(idClient, key, parameters);
+        };
+        const cmdContext = {
             /****** GETTING USERS ****** GETTING USERS ****** GETTING USERS ****** GETTING USERS ******/
             /****** GETTING USERS ****** GETTING USERS ****** GETTING USERS ****** GETTING USERS ******/
             /****** GETTING USERS ****** GETTING USERS ****** GETTING USERS ****** GETTING USERS ******/
 
-            me: (): User => me(),
+            me,
 
             findUser: (displayName: string): Promise<User | undefined> => {
-                return this.findUser.execute({ displayName });
+                return this.findUserByName(displayName);
             },
 
             /****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ******/
             /****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ******/
             /****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ******/
 
-            print: (key: string, parameters?: JsonObject): Promise<void> => {
-                return this.sendClientMessage.execute(idClient, key, parameters);
-            },
+            print,
 
             closeConnection: () => {
                 return this.destroyClient.execute(idClient);
@@ -105,11 +99,7 @@ export class ApiContextBuilder implements IApiContextBuilder {
                 newPassword?: string,
                 currentPassword?: string
             ): Promise<void> => {
-                if (!clientSession.user) {
-                    throw new Error(
-                        `At this stage, client session user instance should have been initialized for client ${idClient}`
-                    );
-                }
+                const user = me();
                 // Check if client is in AUTHENTICATED state
                 if (clientSession.state !== CLIENT_STATES.AUTHENTICATED) {
                     await this.sendClientMessage.execute(idClient, 'passwdCmd.mustBeLobby');
@@ -126,18 +116,12 @@ export class ApiContextBuilder implements IApiContextBuilder {
                     });
                     // Sends message
                     // Sends echo off
-                    await this.sendClientMessage.execute(
-                        clientSession.id,
-                        'changePassword.enterPreviousPassword',
-                        { _nolf: true }
-                    );
+                    await print('changePassword.enterPreviousPassword', {
+                        _nolf: true,
+                    });
                     await clientSession.clientSocket.send(Buffer.from([0xff, 0xfb, 0x01]));
                 } else if (newPassword !== undefined && currentPassword !== undefined) {
-                    await this.setUserPassword.execute(
-                        clientSession.user.id,
-                        newPassword,
-                        currentPassword
-                    );
+                    await this.setUserPassword.execute(user.id, newPassword, currentPassword);
                 } else {
                     throw new Error('Both new password and current password must be specified');
                 }
@@ -164,15 +148,15 @@ export class ApiContextBuilder implements IApiContextBuilder {
                         notFoundRecipients.push(recipients[i]);
                     }
                 }
-                const user = this.getClientUser(idClient);
+                const user = me();
                 return this.sendMailMessage.execute(user.id, recipientIds, topic, message);
             },
 
             mailCheckInbox: async (): Promise<CheckMailInboxEntry[]> => {
-                const user = this.getClientUser(idClient);
+                const user = me();
                 return this.checkMailInbox.execute(user.id);
             },
         };
-        return apiContext;
+        return cmdContext;
     }
 }

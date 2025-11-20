@@ -26,7 +26,7 @@ async function time(ctx) {
     const time = [pad0(d.getHours(), 2), pad0(d.getMinutes(), 2), pad0(d.getSeconds(), 2)].join(
         ':'
     );
-    await ctx.sendMessage('server-time', {
+    await ctx.print('server-time', {
         time: time,
         date: date,
         timezone: timezone,

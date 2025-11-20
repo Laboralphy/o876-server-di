@@ -1,5 +1,7 @@
 import { JsonObject } from '../../../domain/types/JsonStruct';
 import { CheckMailInboxEntry } from '../../use-cases/mail/CheckMailInbox';
+import { ClientSession } from '../../../domain/types/ClientSession';
+import { User } from '../../../domain/entities/User';
 
 export interface IClientContext {
     /****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ******/
@@ -7,9 +9,16 @@ export interface IClientContext {
     /****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ******/
 
     /**
-     * returns the client id
+     * Returns instance of the user at the origin of this command.
      */
-    getClientId(): string;
+    me(): User;
+
+    /**
+     * Return a User instance by providing display name
+     * Returns undefined if not found
+     * @param sDisplayName
+     */
+    findUser(sDisplayName: string): Promise<User | undefined>;
 
     /**
      * Asynchronous method !
@@ -20,7 +29,7 @@ export interface IClientContext {
      * @param key message content, or a i18n string reference, or hbs template
      * @param parameters a plain object used to replace variables in i18n string or hbs template
      */
-    sendMessage(key: string, parameters?: JsonObject): Promise<void>;
+    print(key: string, parameters?: JsonObject): Promise<void>;
 
     /**
      * Close client connection to server.

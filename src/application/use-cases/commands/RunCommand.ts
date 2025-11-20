@@ -25,7 +25,7 @@ export class RunCommand {
             });
         } catch (error) {
             console.error(error);
-            await clientSession.clientContext.sendMessage('command-runtime-error', {
+            await clientSession.clientContext.print('command-runtime-error', {
                 error: (error as Error).message,
                 command: opcode,
             });
