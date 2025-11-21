@@ -9,7 +9,7 @@ import { IIdGenerator } from '../../ports/services/IIdGenerator';
 
 export type CheckMailInboxEntry = {
     tag: number;
-    message: string;
+    topic: string;
     date: string;
     sender: string;
     kept: boolean;
@@ -93,16 +93,17 @@ export class CheckMailInbox {
             }
             if (msg) {
                 const senderUser = await this.userRepository.get(msg.senderId);
+                const sTopic = msg.topic.length > 0 ? msg.topic : msg.content;
                 const entry: CheckMailInboxEntry = {
                     tag: mib.tag,
-                    message:
-                        msg.topic.length > nMaxMessageLength
-                            ? msg.topic.substring(0, nMaxMessageLength - 3) + '...'
-                            : msg.topic,
+                    topic:
+                        sTopic.length > nMaxMessageLength
+                            ? sTopic.substring(0, nMaxMessageLength - 3) + '...'
+                            : sTopic,
                     date: this.time.renderDate(mib.tsReceived, 'ymd hm'),
                     read: mib.read,
                     kept: mib.kept,
-                    sender: senderUser?.name ?? '???',
+                    sender: senderUser?.displayName ?? '???',
                 };
                 aResult.push(entry);
             }

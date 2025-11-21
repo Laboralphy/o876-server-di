@@ -1,0 +1,21 @@
+{{!--
+User mail inbox table
+@param inbox[].tag : message tag
+@param inbox[].flags : list of message flags
+@param inbox[].flags.important : The message is marked as important (system)
+@param inbox[].flags.read : The message has been read
+@param inbox[].flags.kept : The message will not be deleted automatically
+@param inbox[].from : message sender
+@param inbox[].topic : message topic
+@param inbox[].date : message date
+--}}
+{{#if inbox}}
+    {{#table}}
+        {{t mail.inboxHeaderTag }}, {{t mail.inboxHeaderFlags }}, {{t mail.inboxHeaderFrom }}, {{t mail.inboxHeaderTopic }}, {{t mail.inboxHeaderDate }}
+        {{#each inbox}}
+            {{ tag }}, {{#if flags.important}}⚠️{{/if}}{{#if flags.read }}{{else}}📩{{/if}}{{#if flags.kept }}📌{{/if}}, {{ from }}, {{ topic }}, {{ date }}
+        {{/each}}
+    {{/table}}
+{{else}}
+    {{t mail.inboxEmpty }}
+{{/if}}

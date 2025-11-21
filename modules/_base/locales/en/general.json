@@ -45,7 +45,16 @@
         "mailReceived": "Received mail from : {{ sender }}.",
         "youHaveMail_one": "You have mail : {{ count }} unread message.",
         "youHaveMail_other": "You have mail : {{ count }} unread messages.",
-        "youHaveMail": "You have mail : $t(mail.unreadMessage)."
+        "youHaveMail": "You have mail : $t(mail.unreadMessage).",
+        "inboxHeaderTag": "#",
+        "inboxHeaderFlags": "Flags",
+        "inboxHeaderFrom": "Sender",
+        "inboxHeaderTopic": "Topic",
+        "inboxHeaderDate": "Date",
+        "inboxEmpty": "Inbox is empty",
+        "notFoundUsers_one": "Recipient not found",
+        "notFoundUsers_other": "Recipients not found",
+        "sent": "Message sent to"
     },
     "passwdCmd": {
         "mustBeLobby": "You must be in Lobby mode in order to change your password."

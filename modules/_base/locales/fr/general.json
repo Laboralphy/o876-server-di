@@ -45,7 +45,16 @@
         "mailReceived": "Message reçu de la part de : {{ sender }}.",
         "unreadMessage_one": "{{ count }} message non lu",
         "unreadMessage_other": "{{ count }} messages non lus",
-        "youHaveMail": "Vous avez du courrier : $t(mail.unreadMessage)."
+        "youHaveMail": "Vous avez du courrier : $t(mail.unreadMessage).",
+        "inboxHeaderTag": "#",
+        "inboxHeaderFlags": "Attrib.",
+        "inboxHeaderFrom": "Expéditeur",
+        "inboxHeaderTopic": "Sujet",
+        "inboxHeaderDate": "Date",
+        "inboxEmpty": "Boîte de réception vide",
+        "notFoundUsers_one": "Destinataire non trouvé",
+        "notFoundUsers_other": "{{ count }} destinataires non trouvés",
+        "sent": "Message envoyé à"
     },
     "passwdCmd": {
         "mustBeLobby": "Vous devez être en mode Lobby pour pouvoir changer le mot de passe."

@@ -40,7 +40,7 @@ function parseMailParams(params) {
  * @param ctx {IClientContext}
  * @param parameters {string[]}
  */
-function sendMail(ctx, parameters) {
+async function sendMail(ctx, parameters) {
     // 1) analyse parameters
     // 2) extract recipient
     // 3) test recipient existence
@@ -50,8 +50,19 @@ function sendMail(ctx, parameters) {
     // sendmail recipient1, recipient2, recipient3 "topic topic" this is the message content.
     const { recipients, topic, body } = parseMailParams(parameters);
     // convert recipient list to array of user ids
-
-    return true;
+    const rcptUsers = await Promise.all(recipients.map((r) => ctx.findUser(r)));
+    const recipientNames = new Set(recipients);
+    rcptUsers.forEach((user) => {
+        recipientNames.delete(user.displayName);
+    });
+    if (rcptUsers.length > 0) {
+        // at laest one recipient user could be found
+        await ctx.mailSendMessage(rcptUsers, topic, body);
+    }
+    if (recipientNames.size > 0) {
+        // some users were not found
+        await ctx.print('');
+    }
 }
 
 module.exports = sendMail(context, parameters);

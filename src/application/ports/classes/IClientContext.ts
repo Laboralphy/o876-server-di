@@ -72,5 +72,5 @@ export interface IClientContext {
      */
     mailCheckInbox(): Promise<CheckMailInboxEntry[]>;
 
-    mailSendMessage(recipientNames: string[], topic: string, content: string): Promise<void>;
+    mailSendMessage(recipientNames: User[], topic: string, content: string): Promise<void>;
 }
