@@ -1,0 +1,20 @@
+{{!--
+Moderator ⚖️
+Admin ⚙️
+GM 🎲
+
+
+@typedef user {{ name: string, online: boolean, admin: boolean, moderator: boolean, gameMaster: boolean }}
+--}}
+{{#table}}
+    {{t "who.colUser"}},{{t "who.colRoles"}},{{t "who.colOnline"}}
+    {{#each users}}
+        {{#line}}
+            {{#if online}}{{color "#2f4"}}{{else}}{{color "#666"}}{{/if}}{{ name }}{{color ""}},
+            {{#if admin}}⚙️{{/if}}
+            {{#if gameMaster}}🎲{{/if}}
+            {{#if moderator}}⚖️{{/if}},
+            {{#if online }}{{color "#2f4"}}Online{{/if}}{{color ""}}
+        {{/line}}
+    {{/each}}
+{{/table}}

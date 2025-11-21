@@ -56,8 +56,13 @@
         "notFoundUsers_other": "Recipients not found",
         "sent": "Message sent to"
     },
-    "passwdCmd": {
+    "passwd": {
         "mustBeLobby": "You must be in Lobby mode in order to change your password."
+    },
+    "who": {
+        "colUser": "Users",
+        "colRoles": "Roles",
+        "colOnline": "Online"
     },
     "moon": {
         "labels": {

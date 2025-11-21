@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../../../../@types/client-context.d.ts" />
 // /**
 //  * pads zero at the beginning of the specified number
 //  * this function is used for displaying numbers.

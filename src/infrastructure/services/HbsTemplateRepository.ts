@@ -14,12 +14,14 @@ import Handlebars from 'handlebars';
 import { parseCSVLine } from '../../libs/parse-csv';
 import { TableRenderer } from '../../libs/table-renderer';
 import { ICellString } from '../../libs/table-renderer/ICellString';
+import stringWidth from 'string-width';
 
-class StylizedString implements ICellString {
+export class StylizedString implements ICellString {
     private readonly _length;
 
     constructor(private readonly _text: string) {
         this._length = this.getLengthWithoutANSI(this._text);
+        console.log(_text, '-->', this._length);
     }
 
     getLengthWithoutANSI(str: string): number {
@@ -50,15 +52,16 @@ export class HbsTemplateRepository implements ITemplateRepository {
     }
 
     init(): void {
-        handlebars.registerHelper('t', (key: string, options: HelperOptions) => {
-            return this.stringRepository.render(key, { ...options.data.root, ...options.hash });
+        const stringRepository = this.stringRepository;
+        handlebars.registerHelper('t', function (key: string, options: HelperOptions) {
+            return stringRepository.render(key, { ...options.data.root, ...options.hash });
         });
-        handlebars.registerHelper('color', (fg: string, bg: string | HelperOptions) => {
+        handlebars.registerHelper('color', function (fg: string, bg: string | HelperOptions) {
             const sFG = fg == '' ? ANSI_RESET_FG : fgcolor(fg);
             const sBG = typeof bg === 'string' ? (bg == '' ? ANSI_RESET_BG : bgcolor(bg)) : '';
-            return sFG + sBG;
+            return new Handlebars.SafeString(sFG + sBG);
         });
-        Handlebars.registerHelper('table', (options: HelperOptions): string => {
+        Handlebars.registerHelper('table', function (this: unknown, options: HelperOptions) {
             const sText = options.fn(this);
             const aTable = sText
                 .trim()
@@ -70,7 +73,17 @@ export class HbsTemplateRepository implements ITemplateRepository {
                     })
                 );
             const tr = new TableRenderer();
-            return tr.render(aTable).join('\n');
+            return new Handlebars.SafeString(tr.render(aTable).join('\n'));
+        });
+        Handlebars.registerHelper('line', function (this: unknown, options: HelperOptions) {
+            // Get inside block content
+            const content = options.fn(this);
+            // Trims all \n and space
+            const lines = content.split('\n');
+            const trimmedLines = lines.map((line) => line.trim());
+            // Filters out empty lines
+            const result = trimmedLines.filter((line) => line).join(' ');
+            return new Handlebars.SafeString(result + '\n');
         });
     }
 

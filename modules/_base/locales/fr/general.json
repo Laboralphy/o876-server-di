@@ -56,8 +56,13 @@
         "notFoundUsers_other": "{{ count }} destinataires non trouvés",
         "sent": "Message envoyé à"
     },
-    "passwdCmd": {
+    "passwd": {
         "mustBeLobby": "Vous devez être en mode Lobby pour pouvoir changer le mot de passe."
+    },
+    "who": {
+        "colUser": "Utilisateur",
+        "colRoles": "Rôles",
+        "colOnline": "En ligne"
     },
     "moon": {
         "labels": {

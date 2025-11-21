@@ -7,19 +7,6 @@ export interface IClientContext {
     /****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ******/
     /****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ******/
     /****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ******/
-
-    /**
-     * Returns instance of the user at the origin of this command.
-     */
-    me(): User;
-
-    /**
-     * Return a User instance by providing display name
-     * Returns undefined if not found
-     * @param sDisplayName
-     */
-    findUser(sDisplayName: string): Promise<User | undefined>;
-
     /**
      * Asynchronous method !
      * Sends a message to client.
@@ -73,4 +60,29 @@ export interface IClientContext {
     mailCheckInbox(): Promise<CheckMailInboxEntry[]>;
 
     mailSendMessage(recipientNames: User[], topic: string, content: string): Promise<void>;
+
+    /****** USER MANAGEMENT ****** USER MANAGEMENT ****** USER MANAGEMENT ****** USER MANAGEMENT ******/
+    /****** USER MANAGEMENT ****** USER MANAGEMENT ****** USER MANAGEMENT ****** USER MANAGEMENT ******/
+    /****** USER MANAGEMENT ****** USER MANAGEMENT ****** USER MANAGEMENT ****** USER MANAGEMENT ******/
+
+    getUserList(): Promise<User[]>;
+
+    /**
+     * Returns instance of the user at the origin of this command.
+     */
+    me(): User;
+
+    /**
+     * Returns true if the specified user is currently connected
+     * ( = has one or more clients )
+     * @param user user instance
+     */
+    isUserConnected(user: User): boolean;
+
+    /**
+     * Return a User instance by providing display name
+     * Returns undefined if not found
+     * @param sDisplayName user display name
+     */
+    findUser(sDisplayName: string): Promise<User | undefined>;
 }

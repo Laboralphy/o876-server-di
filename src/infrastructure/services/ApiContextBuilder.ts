@@ -15,24 +15,31 @@ import {
 import { SendMailMessage } from '../../application/use-cases/mail/SendMailMessage';
 import { User } from '../../domain/entities/User';
 import { FindUser } from '../../application/use-cases/users/FindUser';
+import { GetUserList } from '../../application/use-cases/users/GetUserList';
 
 export class ApiContextBuilder implements IApiContextBuilder {
     private sendClientMessage: SendClientMessage;
     private destroyClient: DestroyClient;
     private setUserPassword: SetUserPassword;
     private communicationLayer: ICommunicationLayer;
+    // mail
     private sendMailMessage: SendMailMessage;
     private checkMailInbox: CheckMailInbox;
+    // users
     private findUser: FindUser;
+    private getUserList: GetUserList;
 
     constructor(cradle: Cradle) {
         // use cases
         this.sendClientMessage = cradle.sendClientMessage;
         this.destroyClient = cradle.destroyClient;
         this.setUserPassword = cradle.setUserPassword;
+        // mail
         this.sendMailMessage = cradle.sendMailMessage;
         this.checkMailInbox = cradle.checkMailInbox;
+        // users
         this.findUser = cradle.findUser;
+        this.getUserList = cradle.getUserList;
 
         // services
         this.communicationLayer = cradle.communicationLayer;
@@ -50,12 +57,9 @@ export class ApiContextBuilder implements IApiContextBuilder {
         return this.findUser.execute({ displayName });
     }
 
-    buildApiContext(idClient: string) {
-        const clientSession = this.getClientSession(idClient);
-        if (!clientSession) {
-            throw new Error(`client ${idClient} is not associated with a clientSession`);
-        }
+    buildApiContext(idClient: string): IClientContext {
         const me = (): User => {
+            const clientSession = this.getClientSession(idClient);
             if (clientSession.user) {
                 return clientSession.user;
             } else {
@@ -66,16 +70,6 @@ export class ApiContextBuilder implements IApiContextBuilder {
             return this.sendClientMessage.execute(idClient, key, parameters);
         };
         const cmdContext: IClientContext = {
-            /****** GETTING USERS ****** GETTING USERS ****** GETTING USERS ****** GETTING USERS ******/
-            /****** GETTING USERS ****** GETTING USERS ****** GETTING USERS ****** GETTING USERS ******/
-            /****** GETTING USERS ****** GETTING USERS ****** GETTING USERS ****** GETTING USERS ******/
-
-            me,
-
-            findUser: (displayName: string): Promise<User | undefined> => {
-                return this.findUserByName(displayName);
-            },
-
             /****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ******/
             /****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ******/
             /****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ******/
@@ -101,10 +95,11 @@ export class ApiContextBuilder implements IApiContextBuilder {
                 newPassword?: string,
                 currentPassword?: string
             ): Promise<void> => {
+                const clientSession = this.getClientSession(idClient);
                 const user = me();
                 // Check if client is in AUTHENTICATED state
                 if (clientSession.state !== CLIENT_STATES.AUTHENTICATED) {
-                    await this.sendClientMessage.execute(idClient, 'passwdCmd.mustBeLobby');
+                    await this.sendClientMessage.execute(idClient, 'passwd.mustBeLobby');
                     return;
                 }
                 if (newPassword === undefined && currentPassword === undefined) {
@@ -150,6 +145,24 @@ export class ApiContextBuilder implements IApiContextBuilder {
             mailCheckInbox: async (): Promise<CheckMailInboxEntry[]> => {
                 const user = me();
                 return this.checkMailInbox.execute(user.id);
+            },
+
+            /****** USER MANAGEMENT ****** USER MANAGEMENT ****** USER MANAGEMENT ******/
+            /****** USER MANAGEMENT ****** USER MANAGEMENT ****** USER MANAGEMENT ******/
+            /****** USER MANAGEMENT ****** USER MANAGEMENT ****** USER MANAGEMENT ******/
+
+            getUserList: async (): Promise<User[]> => {
+                return this.getUserList.execute();
+            },
+
+            me,
+
+            isUserConnected: (user: User): boolean => {
+                return this.communicationLayer.getUserClients(user).length > 0;
+            },
+
+            findUser: (displayName: string): Promise<User | undefined> => {
+                return this.findUserByName(displayName);
             },
         };
         return cmdContext;
