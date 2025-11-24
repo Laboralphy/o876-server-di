@@ -1,7 +1,7 @@
 /**
  * @var context {IClientContext}
  */
-module.exports = async () => {
+async function main(ctx) {
     /**
      * @type {CheckMailInboxEntry[]}
      */
@@ -17,4 +17,7 @@ module.exports = async () => {
             kept: m.kept,
         },
     }));
-};
+    ctx.print('mail-inbox', mibResult);
+}
+
+module.exports = main(context);

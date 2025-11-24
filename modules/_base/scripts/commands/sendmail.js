@@ -51,17 +51,35 @@ async function sendMail(ctx, parameters) {
     const { recipients, topic, body } = parseMailParams(parameters);
     // convert recipient list to array of user ids
     const rcptUsers = await Promise.all(recipients.map((r) => ctx.findUser(r)));
-    const recipientNames = new Set(recipients);
-    rcptUsers.forEach((user) => {
-        recipientNames.delete(user.displayName);
-    });
-    if (rcptUsers.length > 0) {
-        // at laest one recipient user could be found
-        await ctx.mailSendMessage(rcptUsers, topic, body);
+    /**
+     * @type {string[]}
+     */
+    const notFoundUsers = [];
+    /**
+     * @type {User[]}
+     */
+    const foundUsers = [];
+    for (let i = 0, l = recipients.length; i < l; i++) {
+        if (rcptUsers[i] === undefined) {
+            notFoundUsers.push(recipients[i]);
+        } else {
+            foundUsers.push(rcptUsers[i]);
+        }
     }
-    if (recipientNames.size > 0) {
+    if (foundUsers.length > 0) {
+        // at least one recipient user could be found
+        await ctx.mailSendMessage(foundUsers, topic, body);
+        await ctx.print('mail-sent', {
+            count: notFoundUsers.length,
+            rcpt: foundUsers.map((u) => u.displayName),
+            rcptNotFound: notFoundUsers,
+        });
+    } else {
         // some users were not found
-        await ctx.print('');
+        await ctx.print('mail.notFoundUsers', {
+            count: notFoundUsers.length,
+            rcptNotFound: notFoundUsers,
+        });
     }
 }
 

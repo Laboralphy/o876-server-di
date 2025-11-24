@@ -136,7 +136,7 @@ export class ApiContextBuilder implements IApiContextBuilder {
                 const user = me();
                 return this.sendMailMessage.execute(
                     user.id,
-                    recipients.map((r) => r.id),
+                    recipients.map((user) => user.id),
                     topic,
                     message
                 );

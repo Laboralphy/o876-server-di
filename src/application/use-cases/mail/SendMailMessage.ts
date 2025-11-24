@@ -30,8 +30,8 @@ export class SendMailMessage {
         this.idGenerator = cradle.idGenerator;
     }
 
-    getUserFromNames(aNames: string[]): Promise<(User | undefined)[]> {
-        return Promise.all(aNames.map((name: string) => this.userRepository.findByName(name)));
+    getUserFromIds(ids: string[]): Promise<(User | undefined)[]> {
+        return Promise.all(ids.map((id: string) => this.userRepository.get(id)));
     }
 
     async getMailInboxTags(userId: string): Promise<number[]> {
@@ -39,28 +39,29 @@ export class SendMailMessage {
         return aInbox.map((mib: MailInbox) => mib.tag);
     }
 
-    async execute(senderId: string, recipientNames: string[], topic: string, content: string) {
-        const aMaybeUsers = await this.getUserFromNames(recipientNames);
-        const recipientIds: string[] = [];
+    async execute(senderId: string, recipientIds: string[], topic: string, content: string) {
+        const aMaybeUsers = await this.getUserFromIds(recipientIds);
         const notFoundUserSet = new Set<string>();
-        for (let i = 0; i < recipientNames.length; i += 1) {
+        const foundUsers: User[] = [];
+        for (let i = 0; i < recipientIds.length; i += 1) {
             const user = aMaybeUsers[i];
             if (user) {
-                recipientIds.push(user.id);
+                foundUsers.push(user);
             } else {
                 notFoundUserSet.add(recipientIds[i]);
             }
         }
         if (notFoundUserSet.size > 0) {
             const sNotFoundUsers = Array.from(notFoundUserSet).join(', ');
-            throw new Error(USE_CASE_ERRORS.ENTITY_NOT_FOUND + ` User : ${sNotFoundUsers}`);
+            throw new Error(USE_CASE_ERRORS.ENTITY_NOT_FOUND + ` User ids : ${sNotFoundUsers}`);
         }
+        const foundUserIds = foundUsers.map((user: User) => user.id);
         const tsCreation = this.time.now();
         const message: MailMessage = {
             id: this.idGenerator.generateUID(),
             content: content.substring(0, this.serverConfig.getVariables().mailMaxMessageLength),
             topic: topic.substring(0, this.serverConfig.getVariables().mailMaxTopicLength),
-            recipientIds,
+            recipientIds: foundUserIds,
             senderId,
             tsCreation,
         };

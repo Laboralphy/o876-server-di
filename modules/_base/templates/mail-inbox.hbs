@@ -11,11 +11,23 @@ User mail inbox table
 --}}
 {{#if inbox}}
     {{#table}}
-        {{t mail.inboxHeaderTag }}, {{t mail.inboxHeaderFlags }}, {{t mail.inboxHeaderFrom }}, {{t mail.inboxHeaderTopic }}, {{t mail.inboxHeaderDate }}
-        {{#each inbox}}
-            {{ tag }}, {{#if flags.important}}⚠️{{/if}}{{#if flags.read }}{{else}}📩{{/if}}{{#if flags.kept }}📌{{/if}}, {{ from }}, {{ topic }}, {{ date }}
-        {{/each}}
+        {{#line}}
+            {{t "mail.inboxHeaderTag" }},
+            {{t "mail.inboxHeaderFlags" }},
+            {{t "mail.inboxHeaderFrom" }},
+            {{t "mail.inboxHeaderTopic" }},
+            {{t "mail.inboxHeaderDate" }}
+        {{/line}}
+        {{#each inbox}}{{#line}}
+            {{ tag }},
+            {{#if flags.important}}{{color "yellow"}}{{#underline}}/!\\{{/underline}}{{/if}}
+            {{#if flags.read }}{{else}}{{color "blue"}}U{{color ""}}{{/if}}
+            {{#if flags.kept }}{{color "red"}}{{#bold}}P{{/bold}}{{color ""}}{{/if}},
+            {{ from }},
+            {{ topic }},
+            {{ date }}
+        {{/line}}{{/each}}
     {{/table}}
 {{else}}
-    {{t mail.inboxEmpty }}
+    {{t "mail.inboxEmpty" }}
 {{/if}}

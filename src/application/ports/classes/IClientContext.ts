@@ -1,6 +1,5 @@
 import { JsonObject } from '../../../domain/types/JsonStruct';
 import { CheckMailInboxEntry } from '../../use-cases/mail/CheckMailInbox';
-import { ClientSession } from '../../../domain/types/ClientSession';
 import { User } from '../../../domain/entities/User';
 
 export interface IClientContext {

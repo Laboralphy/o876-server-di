@@ -18,11 +18,11 @@ export const jsonDatabaseStructure: JsonDatabaseStructure = {
             indexes: {
                 name: {
                     type: INDEX_TYPES.HASH,
-                    caseInsensitive: true,
+                    caseInsensitive: false,
                 },
                 displayName: {
                     type: INDEX_TYPES.HASH,
-                    caseInsensitive: false,
+                    caseInsensitive: true,
                     nullable: true,
                 },
                 ban: {

@@ -10,10 +10,10 @@ GM 🎲
     {{t "who.colUser"}},{{t "who.colRoles"}},{{t "who.colOnline"}}
     {{#each users}}
         {{#line}}
-            {{#if online}}{{color "#2f4"}}{{else}}{{color "#666"}}{{/if}}{{ name }}{{color ""}},
-            {{#if admin}}⚙️{{/if}}
-            {{#if gameMaster}}🎲{{/if}}
-            {{#if moderator}}⚖️{{/if}},
+            {{#if online}}{{color "#2f4"}}{{else}}{{color "#888"}}{{/if}}{{ name }}{{color ""}},
+            {{#if admin}}{{#bold}}{{color "#ff0"}}A{{color ""}}{{/bold}}{{/if}}
+            {{#if gameMaster}}{{#bold}}{{color "#d0f"}}G{{color ""}}{{/bold}}{{/if}}
+            {{#if moderator}}{{#bold}}{{color "#f80"}}M{{color ""}}{{/bold}}{{/if}},
             {{#if online }}{{color "#2f4"}}Online{{/if}}{{color ""}}
         {{/line}}
     {{/each}}
