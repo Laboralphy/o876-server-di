@@ -2,6 +2,10 @@ import { IUserRepository } from '../../../domain/ports/repositories/IUserReposit
 import { Cradle } from '../../../boot/container';
 import { User } from '../../../domain/entities/User';
 
+/**
+ * Returns User identified by spécified identifier
+ * Returns undefined if identifier could not be associated with an entity
+ */
 export class GetUser {
     private readonly userRepository: IUserRepository;
 

@@ -2,7 +2,7 @@ import { IUserRepository } from '../../../domain/ports/repositories/IUserReposit
 import { CreateUserDto } from '../../dto/CreateUserDto';
 import { IEncryptor } from '../../ports/services/IEncryptor';
 import { IIdGenerator } from '../../ports/services/IIdGenerator';
-import { UserSchema, User, REGEX_DISPLAYNAME } from '../../../domain/entities/User';
+import { UserSchema, User } from '../../../domain/entities/User';
 import { Cradle } from '../../../boot/container';
 import { UserSecretSchema } from '../../../domain/entities/UserSecret';
 import { IUserSecretRepository } from '../../../domain/ports/repositories/IUserSecretRepository';
@@ -28,21 +28,7 @@ export class CreateUser {
     }
 
     async checkDisplayName(displayName: string) {
-        // checks displayName
-        // 1 - must match REGEX_DISPLAYNAME
-        // 2 - must e unique among users
-        if (displayName.length > 24) {
-            throw new Error(
-                USE_CASE_ERRORS.VALUE_TOO_LONG + ' Display name is too long, 24 characters max'
-            );
-        }
-        if (!displayName.match(REGEX_DISPLAYNAME)) {
-            throw new Error(
-                USE_CASE_ERRORS.VALUE_INVALID +
-                    ' Display name may only contain dashes and alphabetic characters)'
-            );
-        }
-        // May not be like "new"
+        // checks displayName : must be unique to all users, must not be like : "new"
         if (displayName.toLowerCase() === this.serverConfig.getVariables().loginNewUser) {
             throw new Error(
                 USE_CASE_ERRORS.VALUE_RESERVED + ' Display name : this value is reserved'
@@ -54,12 +40,6 @@ export class CreateUser {
             throw new Error(
                 USE_CASE_ERRORS.VALUE_ALREADY_EXISTS + ` Display name : ${displayName} `
             );
-        }
-    }
-
-    checkEmail(email: string) {
-        if (!email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)) {
-            throw new Error(USE_CASE_ERRORS.VALUE_INVALID + ' Email address');
         }
     }
 
@@ -86,6 +66,14 @@ export class CreateUser {
         }
         if (await this.userRepository.get(user.id)) {
             throw new Error(USE_CASE_ERRORS.VALUE_ALREADY_EXISTS + ` ${user.id}`);
+        }
+        if (user.name === this.serverConfig.getVariables().loginNewUser) {
+            throw new Error(USE_CASE_ERRORS.VALUE_RESERVED + ' name : this value is reserved');
+        }
+        if (await this.userRepository.findByDisplayName(user.displayName)) {
+            throw new Error(
+                USE_CASE_ERRORS.VALUE_ALREADY_EXISTS + ` Display name : ${user.displayName} `
+            );
         }
         await this.checkDisplayName(user.displayName);
         await this.userRepository.save(user);

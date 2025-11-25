@@ -2,15 +2,14 @@ import z from 'zod';
 import { ROLES } from '../enums/roles';
 import { EntityId } from '../schemas/EntityId';
 import { BanSchema } from './Ban';
-
-export const REGEX_DISPLAYNAME = /^[a-zA-Z](?:[a-zA-Z-]{1,22}[a-zA-Z])?$/;
-export const REGEX_USERNAME = /^[-_a-z0-9]{3,24}$/;
+import { DisplayName } from '../schemas/DisplayName';
+import { UserName } from '../schemas/UserName';
 
 export const UserSchema = z
     .object({
         id: EntityId,
-        name: z.string().regex(REGEX_USERNAME),
-        displayName: z.string().regex(REGEX_DISPLAYNAME),
+        name: UserName,
+        displayName: DisplayName,
         email: z.email(),
         tsCreation: z.number(),
         tsLastUsed: z.number(),

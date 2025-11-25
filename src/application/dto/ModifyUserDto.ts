@@ -1,11 +1,11 @@
 import z from 'zod';
-import { String1k } from '../../domain/schemas/String1k';
 import { ROLES } from '../../domain/enums/roles';
+import { DisplayName } from '../../domain/schemas/DisplayName';
 
 export const ModifyUserDtoSchema = z
     .object({
         email: z.email().max(1024).optional(),
-        displayName: String1k.optional(),
+        displayName: DisplayName.optional(),
         roles: z.array(z.enum(ROLES)).optional(),
     })
     .strict();
