@@ -8,8 +8,8 @@ import { SendMailMessage } from '../src/application/use-cases/mail/SendMailMessa
 describe('UseCase Mail', () => {
     const currentDate: Date = new Date();
     let container: AwilixContainer<any>;
-    let mailMessages: Map<string, MailMessage>;
-    let mailInboxes: Map<string, MailInbox>;
+    const mailMessages: Map<string, MailMessage> = new Map<string, MailMessage>();
+    const mailInboxes: Map<string, MailInbox> = new Map<string, MailInbox>();
     beforeEach(() => {
         // mailInboxRepository
         // mailMessageRepository
@@ -17,8 +17,8 @@ describe('UseCase Mail', () => {
         // time
         // serverConfig
         // idGenerator
-        mailMessages = new Map<string, MailMessage>();
-        mailInboxes = new Map<string, MailInbox>();
+        mailMessages.clear();
+        mailInboxes.clear();
         container = createContainer();
         container.register({
             time: asValue({
@@ -125,6 +125,32 @@ describe('UseCase Mail', () => {
                 kept: false,
                 read: false,
             });
+        });
+        it('should throw an error and should not send message, if one of recipients does not exist', async () => {
+            const sendMailMessage = container.resolve<SendMailMessage>('sendMailMessage');
+            await expect(
+                sendMailMessage.execute(
+                    '1',
+                    ['3', '4'],
+                    "some of you don't really exist in the database",
+                    "Some of the users I send this message don't exist, so the operation will likely throw an error"
+                )
+            ).rejects.toThrow('ENTITY_NOT_FOUND User ids : 4');
+            expect(mailInboxes.size).toBe(0);
+            expect(mailMessages.size).toBe(0);
+        });
+        it('should not send message multiple times when parameters specify a user id several times', async () => {
+            const sendMailMessage = container.resolve<SendMailMessage>('sendMailMessage');
+            expect(mailInboxes.size).toBe(0);
+            expect(mailMessages.size).toBe(0);
+            await sendMailMessage.execute(
+                '1',
+                ['3', '3', '3', '3'],
+                'Sending this message to user 3 x 4',
+                'You should not receive this message 4 times.'
+            );
+            expect(mailInboxes.size).toBe(1);
+            expect(mailMessages.size).toBe(1);
         });
     });
 });

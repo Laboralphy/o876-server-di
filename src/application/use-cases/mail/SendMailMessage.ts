@@ -42,11 +42,11 @@ export class SendMailMessage {
     async execute(senderId: string, recipientIds: string[], topic: string, content: string) {
         const aMaybeUsers = await this.getUserFromIds(recipientIds);
         const notFoundUserSet = new Set<string>();
-        const foundUsers: User[] = [];
+        const foundUsers = new Set<User>();
         for (let i = 0; i < recipientIds.length; i += 1) {
             const user = aMaybeUsers[i];
             if (user) {
-                foundUsers.push(user);
+                foundUsers.add(user);
             } else {
                 notFoundUserSet.add(recipientIds[i]);
             }
@@ -55,7 +55,7 @@ export class SendMailMessage {
             const sNotFoundUsers = Array.from(notFoundUserSet).join(', ');
             throw new Error(USE_CASE_ERRORS.ENTITY_NOT_FOUND + ` User ids : ${sNotFoundUsers}`);
         }
-        const foundUserIds = foundUsers.map((user: User) => user.id);
+        const foundUserIds = Array.from(foundUsers).map((user: User) => user.id);
         const tsCreation = this.time.now();
         const message: MailMessage = {
             id: this.idGenerator.generateUID(),
