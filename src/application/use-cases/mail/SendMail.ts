@@ -13,7 +13,7 @@ import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
 /**
  * Sends a message to a user
  */
-export class SendMailMessage {
+export class SendMail {
     private readonly mailInboxRepository: IMailInboxRepository;
     private readonly mailMessageRepository: IMailMessageRepository;
     private readonly userRepository: IUserRepository;

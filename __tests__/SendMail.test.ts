@@ -30,7 +30,10 @@ describe('SendUserMail', () => {
             serverConfig: asValue({
                 getVariables: () => {
                     return {
+                        mailMaxMessageLength: 1024,
                         mailMaxExpirationDays: 30,
+                        mailMaxKeptMessages: 20,
+                        mailMaxTopicLength: 40,
                     };
                 },
             }),

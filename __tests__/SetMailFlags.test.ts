@@ -3,9 +3,10 @@ import { MailMessage } from '../src/domain/entities/MailMessage';
 import { MailInbox } from '../src/domain/entities/MailInbox';
 import { UIDGenerator } from '../src/infrastructure/services/UIDGenerator';
 import { User } from '../src/domain/entities/User';
+import { SetMailFlags } from '../src/application/use-cases/mail/SetMailFlags';
 import { CheckMailInbox } from '../src/application/use-cases/mail/CheckMailInbox';
 
-describe('CheckMailInbox', () => {
+describe('SetMailFlags', () => {
     const currentDate: Date = new Date();
     let container: AwilixContainer<any>;
     const mailMessages: Map<string, MailMessage> = new Map<string, MailMessage>();
@@ -80,7 +81,12 @@ describe('CheckMailInbox', () => {
                     mailMessages.set(message.id, message);
                 },
                 get: async (id: string): Promise<MailMessage | undefined> => {
-                    return mailMessages.get(id);
+                    const r = mailMessages.get(id);
+                    if (r) {
+                        return { ...r };
+                    } else {
+                        return r;
+                    }
                 },
             }),
             mailInboxRepository: asValue({
@@ -88,54 +94,53 @@ describe('CheckMailInbox', () => {
                     mailInboxes.set(mib.userId + '-' + mib.messageId, mib);
                 },
                 findByUserId: async (userId: string) => {
-                    return Array.from(mailInboxes.values()).filter(
-                        (mib: MailInbox) => mib.userId === userId
-                    );
+                    return Array.from(mailInboxes.values())
+                        .filter((mib: MailInbox) => mib.userId === userId)
+                        .map((r) => ({ ...r }));
                 },
                 get: async (id: string): Promise<MailInbox | undefined> => {
-                    return mailInboxes.get(id);
+                    const r = mailInboxes.get(id);
+                    if (r) {
+                        return { ...r };
+                    } else {
+                        return r;
+                    }
                 },
                 delete: async (id: string): Promise<void> => {
                     mailInboxes.delete(id);
                 },
             }),
+            setMailFlags: asClass(SetMailFlags).singleton(),
             checkMailInbox: asClass(CheckMailInbox).singleton(),
         });
     });
-    it('should return an empty array when no mail has been sent', async () => {
-        const checkMailInbox = container.resolve<CheckMailInbox>('checkMailInbox');
-        const mib = await checkMailInbox.execute('1');
-        expect(mib).toEqual([]);
-    });
-    it('should return 1 mail inbox entry', async () => {
-        mailMessages.set('a1000', {
-            id: 'a1000',
-            recipientIds: ['2'],
-            content: 'xyz',
-            topic: 'topic1',
+    it('deleted message should not appear in mailbox list', async () => {
+        // create message
+        const m1: MailMessage = {
+            id: '1',
+            tsCreation: currentDate.getTime(),
+            topic: 'Topic1',
+            content: 'xxxxx',
             senderId: '1',
-            tsCreation: Date.now(),
-        });
-        mailInboxes.set('2-a1000', {
+            recipientIds: ['2'],
+        };
+        const mib1: MailInbox = {
             userId: '2',
-            messageId: 'a1000',
-            tsReceived: Date.now(),
+            messageId: '1',
+            tsReceived: currentDate.getTime(),
             tag: 1,
             read: false,
             kept: false,
             deleted: false,
-        });
+        };
+        mailMessages.set('1', m1);
+        mailInboxes.set('2-1', mib1);
         const checkMailInbox = container.resolve<CheckMailInbox>('checkMailInbox');
-        const mib = await checkMailInbox.execute('2');
-        expect(mib).toEqual([
-            {
-                tag: 1,
-                topic: 'topic1',
-                date: 'xx-xx-xx',
-                read: false,
-                kept: false,
-                sender: 'Ralphy',
-            },
-        ]);
+        const setMailFlags = container.resolve<SetMailFlags>('setMailFlags');
+        const mibList1 = await checkMailInbox.execute('2');
+        expect(mibList1.length).toBe(1);
+        await setMailFlags.execute('2-1', { deleted: true });
+        const mibList2 = await checkMailInbox.execute('2');
+        expect(mibList2.length).toBe(0);
     });
 });

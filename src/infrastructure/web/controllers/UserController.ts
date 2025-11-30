@@ -110,7 +110,7 @@ export class UserController {
     async setPassword(ctx: Context): Promise<void> {
         const idUser = ctx.params.id;
         const dto: PutUserPasswordDto = PutUserPasswordDtoSchema.parse(ctx.request.body);
-        await this.setUserPassword.execute(idUser, dto.password);
+        await this.setUserPassword.execute(idUser, dto.password, '');
         ctx.status = HTTP_STATUS.NO_CONTENT;
     }
 

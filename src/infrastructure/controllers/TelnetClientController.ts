@@ -5,8 +5,9 @@ import { CLIENT_STATES } from '../../domain/enums/client-states';
 import { CreateUserDto } from '../../application/dto/CreateUserDto';
 import { ClientSession } from '../../domain/types/ClientSession';
 import { JsonObject } from '../../domain/types/JsonStruct';
-import { REGEX_DISPLAYNAME, REGEX_USERNAME } from '../../domain/entities/User';
 import { debug } from '../../libs/o876-debug';
+import { UserName } from '../../domain/schemas/UserName';
+import { DisplayName } from '../../domain/schemas/DisplayName';
 
 const debugTelnet = debug('srv:telnet');
 
@@ -145,7 +146,7 @@ export class TelnetClientController extends AbstractClientController {
                 // check username at once for availability
                 // if username already taken, send message, exit
                 // if username valid : next phase
-                if (!message.match(REGEX_USERNAME)) {
+                if (!UserName.safeParse(message)) {
                     // the username is invalid
                     await this.sendMessage(clientSession.id, 'createNewAccount.usernameInvalid');
                     // another chance
@@ -208,7 +209,7 @@ export class TelnetClientController extends AbstractClientController {
                 // Check if display name is valid
                 // check if display anme is already taken
                 // go to next phase
-                if (message.match(REGEX_DISPLAYNAME)) {
+                if (DisplayName.safeParse(message)) {
                     // seems ok
                     // let's see if not already taken
                     if (await this.findUserByDisplayName(message)) {

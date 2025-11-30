@@ -80,7 +80,7 @@ export class CheckMailInbox {
         const aMessages = await Promise.all(
             aInbox.map((mib) => this.mailMessageRepository.get(mib.messageId))
         );
-        const nMaxMessageLength = this.serverConfig.getVariables().mailMaxMessagePreviewLength;
+        const nMaxMessageLength = 40;
         const aResult: CheckMailInboxEntry[] = [];
         const aDelete: Promise<void>[] = [];
         for (let i = 0; i < aInbox.length; i += 1) {

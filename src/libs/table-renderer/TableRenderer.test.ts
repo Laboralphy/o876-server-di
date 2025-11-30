@@ -2,7 +2,7 @@ import { TableRenderer } from './index';
 import { ICellString } from './ICellString';
 
 describe('new table renderer', function () {
-    it('should throw ne error when instanciating', function () {
+    it('should throw ne error when instantiating', function () {
         expect(() => new TableRenderer()).not.toThrow();
     });
 });
@@ -51,7 +51,7 @@ describe('stylized string', function () {
     it('should', function () {
         const C = class implements ICellString {
             private _printableText: string;
-            private _outputText: string;
+            private readonly _outputText: string;
 
             constructor(private _text: string) {
                 this._printableText = _text.replace(/\*\*/g, '');
@@ -64,6 +64,10 @@ describe('stylized string', function () {
 
             get length() {
                 return this._printableText.length;
+            }
+
+            get rawLength() {
+                return this.length;
             }
 
             toString() {
@@ -109,6 +113,10 @@ describe('stylized string', function () {
 
             get length() {
                 return this._length;
+            }
+
+            get rawLength() {
+                return this.length;
             }
 
             toString() {

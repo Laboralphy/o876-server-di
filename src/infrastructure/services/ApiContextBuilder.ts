@@ -12,7 +12,7 @@ import {
     CheckMailInbox,
     CheckMailInboxEntry,
 } from '../../application/use-cases/mail/CheckMailInbox';
-import { SendMailMessage } from '../../application/use-cases/mail/SendMailMessage';
+import { SendMail } from '../../application/use-cases/mail/SendMail';
 import { User } from '../../domain/entities/User';
 import { FindUser } from '../../application/use-cases/users/FindUser';
 import { GetUserList } from '../../application/use-cases/users/GetUserList';
@@ -23,7 +23,7 @@ export class ApiContextBuilder implements IApiContextBuilder {
     private setUserPassword: SetUserPassword;
     private communicationLayer: ICommunicationLayer;
     // mail
-    private sendMailMessage: SendMailMessage;
+    private sendMail: SendMail;
     private checkMailInbox: CheckMailInbox;
     // users
     private findUser: FindUser;
@@ -35,7 +35,7 @@ export class ApiContextBuilder implements IApiContextBuilder {
         this.destroyClient = cradle.destroyClient;
         this.setUserPassword = cradle.setUserPassword;
         // mail
-        this.sendMailMessage = cradle.sendMailMessage;
+        this.sendMail = cradle.sendMail;
         this.checkMailInbox = cradle.checkMailInbox;
         // users
         this.findUser = cradle.findUser;
@@ -134,7 +134,7 @@ export class ApiContextBuilder implements IApiContextBuilder {
                 message: string
             ): Promise<void> => {
                 const user = me();
-                return this.sendMailMessage.execute(
+                return this.sendMail.execute(
                     user.id,
                     recipients.map((user) => user.id),
                     topic,

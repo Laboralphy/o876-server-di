@@ -7,7 +7,6 @@ export const ServerConfigOptionsSchema = z
         mailMaxKeptMessages: z.number().int(),
         mailMaxMessageLength: z.number().int(),
         mailMaxTopicLength: z.number().int(),
-        mailMaxMessagePreviewLength: z.number().int(),
         name: z.string(),
         version: z.string(),
         author: z.string(),

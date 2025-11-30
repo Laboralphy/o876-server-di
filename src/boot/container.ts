@@ -54,7 +54,8 @@ import { jsonDatabaseStructure, JsonDatabaseStructure } from './json-database-st
 import { IApiContextBuilder } from '../application/ports/services/IApiContextBuilder';
 import { ApiContextBuilder } from '../infrastructure/services/ApiContextBuilder';
 import { CheckMailInbox } from '../application/use-cases/mail/CheckMailInbox';
-import { SendMailMessage } from '../application/use-cases/mail/SendMailMessage';
+import { SendMail } from '../application/use-cases/mail/SendMail';
+import { SetMailFlags } from '../application/use-cases/mail/SetMailFlags';
 
 /**
  * To as a new use case, port ...,
@@ -87,7 +88,8 @@ export interface Cradle {
     runCommand: RunCommand;
     // use cases mail
     checkMailInbox: CheckMailInbox;
-    sendMailMessage: SendMailMessage;
+    sendMail: SendMail;
+    setMailFlags: SetMailFlags;
 
     // repositories
     userRepository: IUserRepository;
@@ -146,7 +148,8 @@ container.register({
 
     // use cases : mail
     checkMailInbox: asClass(CheckMailInbox).singleton(),
-    sendMailMessage: asClass(SendMailMessage).singleton(),
+    sendMail: asClass(SendMail).singleton(),
+    setMailFlags: asClass(SetMailFlags).singleton(),
 
     // repositories
     userRepository: asClass(UserRepository).singleton(),

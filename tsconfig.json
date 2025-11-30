@@ -1,9 +1,6 @@
 {
     "compilerOptions": {
-        "typeRoots": [
-            "./node_modules/@types",
-            "./@types" // Chemin vers TES types personnalisés
-        ],
+        "typeRoots": ["./node_modules/@types", "./@types"],
         "target": "ES2016",
         "module": "commonjs",
         "resolveJsonModule": true,

@@ -83,11 +83,11 @@ describe('ModifyUser', () => {
                 await modifyUser.execute('1', { displayName: 'Albator-LXXXIV-' });
             }).rejects.toThrow();
         });
-        it('should now throw an error when displayname is valid', async () => {
+        it('should not throw an error when displayname is valid', async () => {
             const modifyUser = container.resolve<ModifyUser>('modifyUser');
             await expect(async () => {
                 await modifyUser.execute('1', { displayName: 'Albator-LXXXIV' });
-            }).rejects.not.toThrow();
+            }).resolves.not.toThrow();
         });
     });
     it('should remove a new role to user 1', async () => {
@@ -99,5 +99,15 @@ describe('ModifyUser', () => {
         expect(u0?.roles).toEqual([]);
         expect(u1.roles).toEqual([ROLES.MODERATOR]);
         expect(u2?.roles).toEqual([ROLES.MODERATOR]);
+    });
+    it('should throw an error when identifier is invalid', async () => {
+        const modifyUser = container.resolve<ModifyUser>('modifyUser');
+        await expect(
+            modifyUser.execute('10', {
+                displayName: 'xxx',
+                email: 'xxx@hotmail.con',
+                roles: [ROLES.MODERATOR],
+            })
+        ).rejects.toThrow();
     });
 });
