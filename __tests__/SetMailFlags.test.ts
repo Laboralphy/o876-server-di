@@ -24,7 +24,7 @@ describe('SetMailFlags', () => {
         container.register({
             time: asValue({
                 now: () => currentDate.getTime(),
-                renderDate: () => 'xx-xx-xx',
+                renderDate: (d: Date) => new Date(d).toISOString(),
                 renderDuration: () => '',
                 convertToMilliseconds: () => 0,
             }),
@@ -142,5 +142,53 @@ describe('SetMailFlags', () => {
         await setMailFlags.execute('2-1', { deleted: true });
         const mibList2 = await checkMailInbox.execute('2');
         expect(mibList2.length).toBe(0);
+    });
+    it('pinned message should be displayed first', async () => {
+        // create message
+        currentDate.setTime(new Date('2024-12-01T18:00:00.000Z').getTime());
+        const m1: MailMessage = {
+            id: '1',
+            tsCreation: currentDate.getTime() - 1000000,
+            topic: 'Topic1',
+            content: 'xxxxx',
+            senderId: '1',
+            recipientIds: ['2'],
+        };
+        const m2: MailMessage = {
+            id: '2',
+            tsCreation: currentDate.getTime() - 500000,
+            topic: 'Topic2',
+            content: 'xxxxx',
+            senderId: '1',
+            recipientIds: ['2'],
+        };
+        const mib1: MailInbox = {
+            userId: '2',
+            messageId: '1',
+            tsReceived: m1.tsCreation,
+            tag: 1,
+            read: false,
+            kept: false,
+            deleted: false,
+        };
+        const mib2: MailInbox = {
+            userId: '2',
+            messageId: '2',
+            tsReceived: m2.tsCreation,
+            tag: 2,
+            read: false,
+            kept: false,
+            deleted: false,
+        };
+        mailMessages.set('1', m1);
+        mailMessages.set('2', m2);
+        mailInboxes.set('2-1', mib1);
+        mailInboxes.set('2-2', mib2);
+        const checkMailInbox = container.resolve<CheckMailInbox>('checkMailInbox');
+        const mibList0 = await checkMailInbox.execute('2');
+        console.log(mibList0);
+        // message 0 must be more recent thant message 1
+        expect(mibList0[0].date > mibList0[1].date).toBeTruthy();
+        // But if message 1 is pinned, it become on top of the list
     });
 });
