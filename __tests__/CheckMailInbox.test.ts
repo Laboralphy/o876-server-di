@@ -122,7 +122,7 @@ describe('CheckMailInbox', () => {
             tsReceived: Date.now(),
             tag: 1,
             read: false,
-            kept: false,
+            pinned: false,
             deleted: false,
         });
         const checkMailInbox = container.resolve<CheckMailInbox>('checkMailInbox');
@@ -133,7 +133,7 @@ describe('CheckMailInbox', () => {
                 topic: 'topic1',
                 date: 'xx-xx-xx',
                 read: false,
-                kept: false,
+                pinned: false,
                 sender: 'Ralphy',
             },
         ]);

@@ -130,7 +130,7 @@ describe('SetMailFlags', () => {
             tsReceived: currentDate.getTime(),
             tag: 1,
             read: false,
-            kept: false,
+            pinned: false,
             deleted: false,
         };
         mailMessages.set('1', m1);
@@ -150,7 +150,7 @@ describe('SetMailFlags', () => {
             id: '1',
             tsCreation: currentDate.getTime() - 1000000,
             topic: 'Topic1',
-            content: 'xxxxx',
+            content: 'message content 1',
             senderId: '1',
             recipientIds: ['2'],
         };
@@ -158,7 +158,7 @@ describe('SetMailFlags', () => {
             id: '2',
             tsCreation: currentDate.getTime() - 500000,
             topic: 'Topic2',
-            content: 'xxxxx',
+            content: 'message content 2',
             senderId: '1',
             recipientIds: ['2'],
         };
@@ -168,7 +168,7 @@ describe('SetMailFlags', () => {
             tsReceived: m1.tsCreation,
             tag: 1,
             read: false,
-            kept: false,
+            pinned: false,
             deleted: false,
         };
         const mib2: MailInbox = {
@@ -177,7 +177,7 @@ describe('SetMailFlags', () => {
             tsReceived: m2.tsCreation,
             tag: 2,
             read: false,
-            kept: false,
+            pinned: false,
             deleted: false,
         };
         mailMessages.set('1', m1);
@@ -186,9 +186,25 @@ describe('SetMailFlags', () => {
         mailInboxes.set('2-2', mib2);
         const checkMailInbox = container.resolve<CheckMailInbox>('checkMailInbox');
         const mibList0 = await checkMailInbox.execute('2');
-        console.log(mibList0);
+        expect(mibList0[0].topic).toBe('Topic2');
+        expect(mibList0[1].topic).toBe('Topic1');
         // message 0 must be more recent thant message 1
         expect(mibList0[0].date > mibList0[1].date).toBeTruthy();
         // But if message 1 is pinned, it become on top of the list
+        const setMailFlags = container.resolve<SetMailFlags>('setMailFlags');
+        await setMailFlags.execute(mibList0[1].id, { pinned: true });
+        // check if message 1 is on top
+        const mibList1 = await checkMailInbox.execute('2');
+        expect(mibList1[0].topic).toBe('Topic1');
+        expect(mibList1[0].pinned).toBe(true);
+        expect(mibList1[1].topic).toBe('Topic2');
+        expect(mibList1[1].pinned).toBe(false);
+        // unpin message
+        await setMailFlags.execute(mibList0[1].id, { pinned: false });
+        const mibList2 = await checkMailInbox.execute('2');
+        expect(mibList2[0].topic).toBe('Topic2');
+        expect(mibList2[0].pinned).toBe(false);
+        expect(mibList2[1].topic).toBe('Topic1');
+        expect(mibList2[1].pinned).toBe(false);
     });
 });

@@ -76,7 +76,7 @@ export const jsonDatabaseStructure: JsonDatabaseStructure = {
                 deleted: {
                     type: INDEX_TYPES.BOOLEAN,
                 },
-                kept: {
+                pinned: {
                     type: INDEX_TYPES.BOOLEAN,
                 },
                 read: {

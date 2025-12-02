@@ -4,7 +4,7 @@ User mail inbox table
 @param inbox[].flags : list of message flags
 @param inbox[].flags.important : The message is marked as important (system)
 @param inbox[].flags.read : The message has been read
-@param inbox[].flags.kept : The message will not be deleted automatically
+@param inbox[].flags.pinned : The message will not be deleted automatically
 @param inbox[].from : message sender
 @param inbox[].topic : message topic
 @param inbox[].date : message date
@@ -22,7 +22,7 @@ User mail inbox table
             {{ tag }},
             {{#if flags.important}}{{color "yellow"}}{{#underline}}/!\\{{/underline}}{{/if}}
             {{#if flags.read }}{{else}}{{color "blue"}}U{{color ""}}{{/if}}
-            {{#if flags.kept }}{{color "red"}}{{#bold}}P{{/bold}}{{color ""}}{{/if}},
+            {{#if flags.pinned }}{{color "red"}}{{#bold}}P{{/bold}}{{color ""}}{{/if}},
             {{ from }},
             {{ topic }},
             {{ date }}

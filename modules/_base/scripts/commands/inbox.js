@@ -14,7 +14,7 @@ async function main(ctx) {
         flags: {
             read: m.read,
             important: false,
-            kept: m.kept,
+            pinned: m.pinned,
         },
     }));
     ctx.print('mail-inbox', mibResult);

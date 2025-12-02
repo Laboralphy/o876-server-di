@@ -32,7 +32,7 @@ describe('SendUserMail', () => {
                     return {
                         mailMaxMessageLength: 1024,
                         mailMaxExpirationDays: 30,
-                        mailMaxKeptMessages: 20,
+                        mailMaxPinnedMessages: 20,
                         mailMaxTopicLength: 40,
                     };
                 },
@@ -117,14 +117,14 @@ describe('SendUserMail', () => {
             userId: '2',
             tag: 1,
             deleted: false,
-            kept: false,
+            pinned: false,
             read: false,
         });
         expect(mailInbox1).toMatchObject({
             userId: '3',
             tag: 1,
             deleted: false,
-            kept: false,
+            pinned: false,
             read: false,
         });
     });

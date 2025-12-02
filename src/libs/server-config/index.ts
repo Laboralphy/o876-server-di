@@ -8,7 +8,7 @@ let bConfigLoaded: boolean = false;
 const CONFIG: ServerConfigOptions = {
     loginNewUser: 'new',
     mailMaxExpirationDays: 30,
-    mailMaxKeptMessages: 20,
+    mailMaxPinnedMessages: 20,
     mailMaxMessageLength: 1024,
     mailMaxTopicLength: 40,
     name,

@@ -76,7 +76,7 @@ export class SendMail {
                 tag,
                 tsReceived: tsCreation,
                 deleted: false,
-                kept: false,
+                pinned: false,
                 read: false,
             };
             return this.mailInboxRepository.save(mib);

@@ -8,11 +8,12 @@ import { IServerConfig } from '../../ports/services/IServerConfig';
 import { IIdGenerator } from '../../ports/services/IIdGenerator';
 
 export type CheckMailInboxEntry = {
+    id: string;
     tag: number;
     topic: string;
     date: string;
     sender: string;
-    kept: boolean;
+    pinned: boolean;
     read: boolean;
 };
 
@@ -61,10 +62,10 @@ export class CheckMailInbox {
         return aInbox
             .filter((a) => !a.deleted)
             .sort((a, b) => {
-                if (a.kept == b.kept) {
+                if (a.pinned == b.pinned) {
                     return b.tsReceived - a.tsReceived;
                 } else {
-                    return a.kept ? -1 : 1;
+                    return a.pinned ? -1 : 1;
                 }
             });
     }
@@ -95,6 +96,7 @@ export class CheckMailInbox {
                 const senderUser = await this.userRepository.get(msg.senderId);
                 const sTopic = msg.topic.length > 0 ? msg.topic : msg.content;
                 const entry: CheckMailInboxEntry = {
+                    id: mib.userId + '-' + mib.messageId,
                     tag: mib.tag,
                     topic:
                         sTopic.length > nMaxMessageLength
@@ -102,7 +104,7 @@ export class CheckMailInbox {
                             : sTopic,
                     date: this.time.renderDate(mib.tsReceived, 'ymd hm'),
                     read: mib.read,
-                    kept: mib.kept,
+                    pinned: mib.pinned,
                     sender: senderUser?.displayName ?? '???',
                 };
                 aResult.push(entry);

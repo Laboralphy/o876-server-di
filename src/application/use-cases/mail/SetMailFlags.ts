@@ -20,8 +20,8 @@ export class SetMailFlags {
             if (flags.deleted !== undefined) {
                 mib.deleted = flags.deleted;
             }
-            if (flags.kept !== undefined) {
-                mib.kept = flags.kept;
+            if (flags.pinned !== undefined) {
+                mib.pinned = flags.pinned;
             }
             if (flags.read !== undefined) {
                 mib.read = flags.read;

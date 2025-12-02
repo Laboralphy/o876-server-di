@@ -4,7 +4,7 @@ export const SetMailFlagsDtoSchema = z
     .object({
         read: z.boolean().optional(),
         deleted: z.boolean().optional(),
-        kept: z.boolean().optional(),
+        pinned: z.boolean().optional(),
     })
     .strict();
 

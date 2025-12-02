@@ -7,7 +7,7 @@ export const MailInboxSchema = z.object({
     userId: EntityId,
     tsReceived: z.number(),
     deleted: z.boolean(),
-    kept: z.boolean(),
+    pinned: z.boolean(),
     read: z.boolean(),
 });
 
