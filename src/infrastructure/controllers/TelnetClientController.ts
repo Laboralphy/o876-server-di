@@ -8,6 +8,7 @@ import { JsonObject } from '../../domain/types/JsonStruct';
 import { debug } from '../../libs/o876-debug';
 import { UserName } from '../../domain/schemas/UserName';
 import { DisplayName } from '../../domain/schemas/DisplayName';
+import { EmailString } from '../../domain/schemas/EmailString';
 
 const debugTelnet = debug('srv:telnet');
 
@@ -146,10 +147,11 @@ export class TelnetClientController extends AbstractClientController {
                 // check username at once for availability
                 // if username already taken, send message, exit
                 // if username valid : next phase
-                if (!UserName.safeParse(message)) {
+                if (!UserName.safeParse(message).success) {
                     // the username is invalid
                     await this.sendMessage(clientSession.id, 'createNewAccount.usernameInvalid');
                     // another chance
+                    await this.sendMessage(clientSession.id, 'createNewAccount.usernameHint');
                     return this.askString(clientSession.id, 'createNewAccount.username');
                 } else if (await this.findUserByName(message)) {
                     // username already taken
@@ -197,11 +199,16 @@ export class TelnetClientController extends AbstractClientController {
             }
 
             case PHASES.EXPECT_EMAIL_ADDRESS: {
-                createUserDto.email = message;
-                // goto next phase
-                clientSession.processRegistry.set('phase', PHASES.EXPECT_DISPLAY_NAME);
-                // now asking for display name
-                await this.askString(clientSession.id, 'createNewAccount.displayName');
+                if (EmailString.safeParse(message).success) {
+                    createUserDto.email = message;
+                    // goto next phase
+                    clientSession.processRegistry.set('phase', PHASES.EXPECT_DISPLAY_NAME);
+                    // now asking for display name
+                    await this.askString(clientSession.id, 'createNewAccount.displayName');
+                } else {
+                    await this.sendMessage(clientSession.id, 'createNewAccount.emailInvalid');
+                    await this.askString(clientSession.id, 'createNewAccount.email');
+                }
                 break;
             }
 
@@ -209,7 +216,7 @@ export class TelnetClientController extends AbstractClientController {
                 // Check if display name is valid
                 // check if display anme is already taken
                 // go to next phase
-                if (DisplayName.safeParse(message)) {
+                if (DisplayName.safeParse(message).success) {
                     // seems ok
                     // let's see if not already taken
                     if (await this.findUserByDisplayName(message)) {
@@ -261,7 +268,8 @@ export class TelnetClientController extends AbstractClientController {
                     // invalid display name
                     // take another chance
                     await this.sendMessage(clientSession.id, 'createNewAccount.displayNameInvalid');
-                    await this.sendMessage(clientSession.id, 'createNewAccount.displayName');
+                    await this.sendMessage(clientSession.id, 'createNewAccount.displayNameHint');
+                    await this.askString(clientSession.id, 'createNewAccount.displayName');
                 }
                 break;
             }

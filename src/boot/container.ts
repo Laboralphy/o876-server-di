@@ -56,6 +56,7 @@ import { ApiContextBuilder } from '../infrastructure/services/ApiContextBuilder'
 import { CheckMailInbox } from '../application/use-cases/mail/CheckMailInbox';
 import { SendMail } from '../application/use-cases/mail/SendMail';
 import { SetMailFlags } from '../application/use-cases/mail/SetMailFlags';
+import { MailContextService } from '../infrastructure/services/context-services/MailContextService';
 
 /**
  * To as a new use case, port ...,
@@ -114,6 +115,9 @@ export interface Cradle {
     serverConfig: IServerConfig;
     // Api Context
     apiContextBuilder: IApiContextBuilder;
+
+    // Api context services
+    mailContextService: MailContextService;
 
     // values
     jsonDatabaseStructure: JsonDatabaseStructure;
@@ -174,6 +178,9 @@ container.register({
     moduleManager: asClass(ModuleManager).singleton(),
     serverConfig: asClass(ServerConfig).singleton(),
     apiContextBuilder: asClass(ApiContextBuilder).singleton(),
+
+    // Api context services
+    mailContextService: asClass(MailContextService).scoped(),
 
     // values
     jsonDatabaseStructure: asValue(jsonDatabaseStructure),

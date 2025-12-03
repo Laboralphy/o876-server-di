@@ -8,23 +8,24 @@ import { getMoonPhase } from '../../libs/moon-phase';
 import { ICommunicationLayer } from '../../application/ports/services/ICommunicationLayer';
 import { CLIENT_STATES } from '../../domain/enums/client-states';
 import { SetUserPassword } from '../../application/use-cases/user-secrets/SetUserPassword';
-import {
-    CheckMailInbox,
-    CheckMailInboxEntry,
-} from '../../application/use-cases/mail/CheckMailInbox';
-import { SendMail } from '../../application/use-cases/mail/SendMail';
 import { User } from '../../domain/entities/User';
 import { FindUser } from '../../application/use-cases/users/FindUser';
 import { GetUserList } from '../../application/use-cases/users/GetUserList';
+import { container } from '../../boot/container';
+import { debug } from '../../libs/o876-debug';
+import { asValue } from 'awilix';
+
+const debugCtx = debug('srv:apictx');
+
+export interface ScopedCradle extends Cradle {
+    idClient: string;
+}
 
 export class ApiContextBuilder implements IApiContextBuilder {
     private sendClientMessage: SendClientMessage;
     private destroyClient: DestroyClient;
     private setUserPassword: SetUserPassword;
     private communicationLayer: ICommunicationLayer;
-    // mail
-    private sendMail: SendMail;
-    private checkMailInbox: CheckMailInbox;
     // users
     private findUser: FindUser;
     private getUserList: GetUserList;
@@ -34,9 +35,6 @@ export class ApiContextBuilder implements IApiContextBuilder {
         this.sendClientMessage = cradle.sendClientMessage;
         this.destroyClient = cradle.destroyClient;
         this.setUserPassword = cradle.setUserPassword;
-        // mail
-        this.sendMail = cradle.sendMail;
-        this.checkMailInbox = cradle.checkMailInbox;
         // users
         this.findUser = cradle.findUser;
         this.getUserList = cradle.getUserList;
@@ -69,6 +67,13 @@ export class ApiContextBuilder implements IApiContextBuilder {
         const print = (key: string, parameters?: JsonObject): Promise<void> => {
             return this.sendClientMessage.execute(idClient, key, parameters);
         };
+        const scope = container.createScope<ScopedCradle>();
+        scope.register('idClient', asValue(idClient));
+
+        let closingClient: boolean = false;
+
+        debugCtx('building client context for %s', idClient);
+
         const cmdContext: IClientContext = {
             /****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ******/
             /****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ******/
@@ -76,8 +81,13 @@ export class ApiContextBuilder implements IApiContextBuilder {
 
             print,
 
-            closeConnection: () => {
-                return this.destroyClient.execute(idClient);
+            closeConnection: async () => {
+                if (!closingClient) {
+                    closingClient = true;
+                    await scope.dispose();
+                    debugCtx('disposing client %s context', idClient);
+                    this.destroyClient.execute(idClient);
+                }
             },
 
             getServerTime: () => {
@@ -124,28 +134,11 @@ export class ApiContextBuilder implements IApiContextBuilder {
                 }
             },
 
-            /****** MAIL MESSAGING ****** MAIL MESSAGING ****** MAIL MESSAGING ****** MAIL MESSAGING ******/
-            /****** MAIL MESSAGING ****** MAIL MESSAGING ****** MAIL MESSAGING ****** MAIL MESSAGING ******/
-            /****** MAIL MESSAGING ****** MAIL MESSAGING ****** MAIL MESSAGING ****** MAIL MESSAGING ******/
+            /****** API CONTEXT SERVICES ****** API CONTEXT SERVICES ****** API CONTEXT SERVICES ******/
+            /****** API CONTEXT SERVICES ****** API CONTEXT SERVICES ****** API CONTEXT SERVICES ******/
+            /****** API CONTEXT SERVICES ****** API CONTEXT SERVICES ****** API CONTEXT SERVICES ******/
 
-            mailSendMessage: async (
-                recipients: User[],
-                topic: string,
-                message: string
-            ): Promise<void> => {
-                const user = me();
-                return this.sendMail.execute(
-                    user.id,
-                    recipients.map((user) => user.id),
-                    topic,
-                    message
-                );
-            },
-
-            mailCheckInbox: async (): Promise<CheckMailInboxEntry[]> => {
-                const user = me();
-                return this.checkMailInbox.execute(user.id);
-            },
+            mail: scope.resolve('mailContextService'),
 
             /****** USER MANAGEMENT ****** USER MANAGEMENT ****** USER MANAGEMENT ******/
             /****** USER MANAGEMENT ****** USER MANAGEMENT ****** USER MANAGEMENT ******/

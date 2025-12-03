@@ -23,8 +23,11 @@
         "displayNameTaken": "Display name already taken",
         "displayNameInfo": "Display name is visible too all, and should be different from your account username (for security reason).",
         "displayName": "New account display name: ",
-        "usernameInvalid": "Username is invalid",
-        "displayNameInvalid": "Display name is invalid"
+        "usernameInvalid": "Username is invalid.",
+        "usernameHint": "Username should be 3-24 alphanumeric characters lower case (- and _ are allowed).",
+        "displayNameInvalid": "Display name is invalid.",
+        "displayNameHint": "Display name must be 3-24 alphabetic lower ou upper case characters (- allowed).",
+        "emailInvalid": "Email address invalid."
     },
     "changePassword": {
         "enterPreviousPassword": "Enter CURRENT password: ",

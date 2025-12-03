@@ -5,7 +5,7 @@ async function main(ctx) {
     /**
      * @type {CheckMailInboxEntry[]}
      */
-    const mib = await context.mailCheckInbox();
+    const mib = await context.mail.checkInbox();
     const mibResult = mib.map((m) => ({
         tag: m.tag,
         from: m.sender,
@@ -17,7 +17,7 @@ async function main(ctx) {
             pinned: m.pinned,
         },
     }));
-    ctx.print('mail-inbox', mibResult);
+    ctx.print('mail-inbox', { inbox: mibResult });
 }
 
 module.exports = main(context);

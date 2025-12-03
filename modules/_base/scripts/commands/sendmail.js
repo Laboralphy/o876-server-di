@@ -68,7 +68,7 @@ async function sendMail(ctx, parameters) {
     }
     if (foundUsers.length > 0) {
         // at least one recipient user could be found
-        await ctx.mailSendMessage(foundUsers, topic, body);
+        await ctx.mail.sendMessage(foundUsers, topic, body);
         await ctx.print('mail-sent', {
             count: notFoundUsers.length,
             rcpt: foundUsers.map((u) => u.displayName),

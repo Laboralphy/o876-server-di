@@ -1,8 +1,8 @@
 import { JsonObject } from '../../../domain/types/JsonStruct';
-import { CheckMailInboxEntry } from '../../use-cases/mail/CheckMailInbox';
 import { User } from '../../../domain/entities/User';
+import { IClientContextServices } from './IClientContextServices';
 
-export interface IClientContext {
+export interface IClientContext extends IClientContextServices {
     /****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ******/
     /****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ******/
     /****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ******/
@@ -20,7 +20,7 @@ export interface IClientContext {
     /**
      * Close client connection to server.
      */
-    closeConnection(): void;
+    closeConnection(): Promise<void>;
 
     /**
      * Gets information about server time.
@@ -56,9 +56,9 @@ export interface IClientContext {
     /**
      * Returns information about user mail inbox
      */
-    mailCheckInbox(): Promise<CheckMailInboxEntry[]>;
-
-    mailSendMessage(recipientNames: User[], topic: string, content: string): Promise<void>;
+    // mailCheckInbox(): Promise<CheckMailInboxEntry[]>;
+    //
+    // mailSendMessage(recipientNames: User[], topic: string, content: string): Promise<void>;
 
     /****** USER MANAGEMENT ****** USER MANAGEMENT ****** USER MANAGEMENT ****** USER MANAGEMENT ******/
     /****** USER MANAGEMENT ****** USER MANAGEMENT ****** USER MANAGEMENT ****** USER MANAGEMENT ******/

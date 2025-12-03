@@ -90,7 +90,7 @@ export class CheckMailInbox {
             // delete message if expired
             if (mib.tsReceived < tsExpired) {
                 aDelete.push(this.mailInboxRepository.delete(mib));
-                continue;
+                continue; // go to next iteration
             }
             if (msg) {
                 const senderUser = await this.userRepository.get(msg.senderId);

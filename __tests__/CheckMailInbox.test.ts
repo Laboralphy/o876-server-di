@@ -129,6 +129,7 @@ describe('CheckMailInbox', () => {
         const mib = await checkMailInbox.execute('2');
         expect(mib).toEqual([
             {
+                id: '2-a1000',
                 tag: 1,
                 topic: 'topic1',
                 date: 'xx-xx-xx',

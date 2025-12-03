@@ -23,8 +23,11 @@
         "displayNameTaken": "Nom affichable déjà utilisé.",
         "displayNameInfo": "Le nom affichable est visible par tous, et doit être idéalement différent de l'identifiant de connexion du compte.",
         "displayName": "Nom affichable du nouveau compte: ",
-        "usernameInvalid": "Username is invalid",
-        "displayNameInvalid": "Display name is invalid"
+        "usernameInvalid": "Identifiant de connexion invalide.",
+        "usernameHint": "L'identifiant doit être composé de 3 à 24 caractères alphanumériques minuscules (- et _ autorisés).",
+        "displayNameInvalid": "Nom affichable invalide.",
+        "displayNameHint": "Le nom affichable comprend entre 3 et 24 caractères alphabétiques majuscule ou minuscule (- autorisé).",
+        "emailInvalid": "Adresse mail invalide."
     },
     "changePassword": {
         "enterPreviousPassword": "Entrez le mot de passe ACTUEL: ",

@@ -43,21 +43,22 @@ export class CommunicationLayer implements ICommunicationLayer {
      * Removes clientSession if exists
      * @param idClient client identifier
      */
-    dropClient(idClient: string): void {
+    async dropClient(idClient: string): Promise<void> {
         const cs = this.clientSessions.get(idClient);
         if (cs) {
+            this.clientSessions.delete(idClient);
+            await cs.clientContext.closeConnection();
             cs.clientSocket.close(); // will cause a "onDisconnect" event
         }
-        this.clientSessions.delete(idClient);
     }
 
     async sendMessage(idClient: string, message: string): Promise<void> {
         return this.getClientSession(idClient).clientSocket.send(message);
     }
 
-    dropAllClients() {
-        this.clientSessions.forEach((clientSession, idClient) => {
-            this.dropClient(idClient);
-        });
+    async dropAllClients() {
+        return Promise.all(
+            Array.from(this.clientSessions.entries()).map(([idClient]) => this.dropClient(idClient))
+        );
     }
 }
