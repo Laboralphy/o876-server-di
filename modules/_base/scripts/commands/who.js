@@ -24,12 +24,12 @@ function filterList(aList, sSearch) {
  * @param params {string[]}
  */
 async function main(ctx, params) {
-    const users = await ctx.getUserList();
+    const users = await ctx.user.getUsers();
     const userFoundList = filterList(
         users
             .map((user) => ({
                 name: user.displayName,
-                online: ctx.isUserConnected(user),
+                online: ctx.user.isConnected(user),
                 admin: user.roles.includes('ADMIN'),
                 moderator: user.roles.includes('MODERATOR'),
                 gameMaster: user.roles.includes('GAME_MASTER'),
