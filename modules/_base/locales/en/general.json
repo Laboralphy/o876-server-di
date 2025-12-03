@@ -57,7 +57,9 @@
         "inboxEmpty": "Inbox is empty",
         "notFoundUsers_one": "Recipient not found",
         "notFoundUsers_other": "Recipients not found",
-        "sent": "Message sent to"
+        "sent": "Message sent to",
+        "readMessageWrongParam": "Expected parameter must be a message tag.",
+        "endOfMessage": "End of message"
     },
     "passwd": {
         "mustBeLobby": "You must be in Lobby mode in order to change your password."

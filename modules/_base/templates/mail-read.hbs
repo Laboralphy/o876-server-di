@@ -1,0 +1,11 @@
+{{!--
+@param topic message topic
+@param body message body
+@param sender name of user who sent this message
+@param date
+--}}
+{{t "mail.inboxHeaderTopic"}}: {{ topic }}
+{{t "mail.inboxHeaderFrom"}}: {{ sender }} - {{t "mail.inboxHeaderDate"}}: {{ date }}
+
+{{ body }}
+--- {{t "mail.endOfMessage"}} ---

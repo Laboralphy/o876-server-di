@@ -48,7 +48,10 @@ export class ScriptRunner implements IScriptRunner {
                 // Exécute le script dans le contexte
                 await vm.run(script);
             } catch (err) {
-                console.error(`Erreur lors de l'exécution du script ${id}:`, err);
+                console.error(
+                    `Erreur lors de l'exécution du script ${id}:`,
+                    (err as Error).message
+                );
                 throw err;
             }
         }

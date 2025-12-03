@@ -87,28 +87,31 @@ export class CheckMailInbox {
         for (let i = 0; i < aInbox.length; i += 1) {
             const mib = aInbox[i];
             const msg = aMessages[i];
-            // delete message if expired
-            if (mib.tsReceived < tsExpired) {
+            // delete entry if original message is deleted
+            if (!msg) {
                 aDelete.push(this.mailInboxRepository.delete(mib));
                 continue; // go to next iteration
             }
-            if (msg) {
-                const senderUser = await this.userRepository.get(msg.senderId);
-                const sTopic = msg.topic.length > 0 ? msg.topic : msg.content;
-                const entry: CheckMailInboxEntry = {
-                    id: mib.userId + '-' + mib.messageId,
-                    tag: mib.tag,
-                    topic:
-                        sTopic.length > nMaxMessageLength
-                            ? sTopic.substring(0, nMaxMessageLength - 3) + '...'
-                            : sTopic,
-                    date: this.time.renderDate(mib.tsReceived, 'ymd hm'),
-                    read: mib.read,
-                    pinned: mib.pinned,
-                    sender: senderUser?.displayName ?? '???',
-                };
-                aResult.push(entry);
+            const senderUser = await this.userRepository.get(msg.senderId);
+            // delete message if expired
+            if (mib.tsReceived < tsExpired || !senderUser) {
+                aDelete.push(this.mailInboxRepository.delete(mib));
+                continue; // go to next iteration
             }
+            const sTopic = msg.topic.length > 0 ? msg.topic : msg.content;
+            const entry: CheckMailInboxEntry = {
+                id: mib.userId + '-' + mib.messageId,
+                tag: mib.tag,
+                topic:
+                    sTopic.length > nMaxMessageLength
+                        ? sTopic.substring(0, nMaxMessageLength - 3) + '...'
+                        : sTopic,
+                date: this.time.renderDate(mib.tsReceived, 'ymd hm'),
+                read: mib.read,
+                pinned: mib.pinned,
+                sender: senderUser.displayName,
+            };
+            aResult.push(entry);
         }
         await Promise.all(aDelete);
         return aResult;

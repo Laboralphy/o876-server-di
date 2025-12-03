@@ -1,14 +1,14 @@
 import { Cradle } from '../../../boot/container';
-import { MailInboxRepository } from '../../../infrastructure/persistance/json-database/MailInboxRepository';
 import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
 import { MailInbox } from '../../../domain/entities/MailInbox';
 import { SetMailFlagsDto } from '../../dto/SetMailFlagsDto';
+import { IMailInboxRepository } from '../../../domain/ports/repositories/IMailInboxRepository';
 
 /**
  * Deletes a mail inbox entry
  */
 export class SetMailFlags {
-    private readonly mailInboxRepository: MailInboxRepository;
+    private readonly mailInboxRepository: IMailInboxRepository;
 
     constructor(cradle: Cradle) {
         this.mailInboxRepository = cradle.mailInboxRepository;

@@ -57,6 +57,8 @@ import { CheckMailInbox } from '../application/use-cases/mail/CheckMailInbox';
 import { SendMail } from '../application/use-cases/mail/SendMail';
 import { SetMailFlags } from '../application/use-cases/mail/SetMailFlags';
 import { MailContextService } from '../infrastructure/services/context-services/MailContextService';
+import { FindMailByTag } from '../application/use-cases/mail/FindMailByTag';
+import { UserContextService } from '../infrastructure/services/context-services/UserContextService';
 
 /**
  * To as a new use case, port ...,
@@ -91,6 +93,7 @@ export interface Cradle {
     checkMailInbox: CheckMailInbox;
     sendMail: SendMail;
     setMailFlags: SetMailFlags;
+    findMailByTag: FindMailByTag;
 
     // repositories
     userRepository: IUserRepository;
@@ -116,11 +119,12 @@ export interface Cradle {
     // Api Context
     apiContextBuilder: IApiContextBuilder;
 
-    // Api context services
-    mailContextService: MailContextService;
-
     // values
     jsonDatabaseStructure: JsonDatabaseStructure;
+
+    // Api context services
+    mailContextService: MailContextService;
+    userContextService: UserContextService;
 }
 // Container creation
 export const container = createContainer<Cradle>();
@@ -154,6 +158,7 @@ container.register({
     checkMailInbox: asClass(CheckMailInbox).singleton(),
     sendMail: asClass(SendMail).singleton(),
     setMailFlags: asClass(SetMailFlags).singleton(),
+    findMailByTag: asClass(FindMailByTag).singleton(),
 
     // repositories
     userRepository: asClass(UserRepository).singleton(),
@@ -179,9 +184,10 @@ container.register({
     serverConfig: asClass(ServerConfig).singleton(),
     apiContextBuilder: asClass(ApiContextBuilder).singleton(),
 
-    // Api context services
-    mailContextService: asClass(MailContextService).scoped(),
-
     // values
     jsonDatabaseStructure: asValue(jsonDatabaseStructure),
+
+    // Api context services
+    mailContextService: asClass(MailContextService).scoped(),
+    userContextService: asClass(UserContextService).scoped(),
 });

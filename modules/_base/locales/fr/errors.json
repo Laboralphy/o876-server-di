@@ -1,5 +1,5 @@
 {
-  "error": {
-    "commandRuntime": "Erreur lors de l'exécution de la commande"
-  }
+    "error": {
+        "commandRuntime": "Erreur lors de l'exécution de la commande"
+    }
 }
