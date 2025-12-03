@@ -3,8 +3,6 @@ import { MailMessage } from '../src/domain/entities/MailMessage';
 import { MailInbox } from '../src/domain/entities/MailInbox';
 import { UIDGenerator } from '../src/infrastructure/services/UIDGenerator';
 import { User } from '../src/domain/entities/User';
-import { SetMailFlags } from '../src/application/use-cases/mail/SetMailFlags';
-import { CheckMailInbox } from '../src/application/use-cases/mail/CheckMailInbox';
 import { FindMailByTag } from '../src/application/use-cases/mail/FindMailByTag';
 
 describe('FindMailByTag', () => {

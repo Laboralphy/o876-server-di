@@ -2,7 +2,6 @@ import { User } from '../../../domain/entities/User';
 import { ClientSession } from '../../../domain/types/ClientSession';
 import { ICommunicationLayer } from '../../../application/ports/services/ICommunicationLayer';
 import { ScopedCradle } from '../ApiContextBuilder';
-import { JsonObject } from '../../../domain/types/JsonStruct';
 import { SendClientMessage } from '../../../application/use-cases/clients/SendClientMessage';
 
 export abstract class AbstractContextService {

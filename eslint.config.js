@@ -10,7 +10,7 @@ export default tseslint.config(
             prettier,
         },
         rules: {
-            'prettier/prettier': ['error', { endOfLine: 'auto' }],
+            'prettier/prettier': ['error', { endOfLine: 'lf' }],
             '@typescript-eslint/no-explicit-any': 'warn',
             '@typescript-eslint/no-unused-vars': 'error',
             '@typescript-eslint/explicit-function-return-type': 'off',
