@@ -58,8 +58,9 @@
         "notFoundUsers_one": "Destinataire non trouvé",
         "notFoundUsers_other": "{{ count }} destinataires non trouvés",
         "sent": "Message envoyé à",
-        "readMessageWrongParam": "Le paramètre attendu doit être le tag d'un message.",
-        "endOfMessage": "Fin du message"
+        "expectedTagParam": "Le paramètre attendu doit être le tag d'un message.",
+        "endOfMessage": "Fin du message",
+        "messageCannotBeAccessed": "Le contenu du message n'est pas disponnible, ou son expéditeur a été supprimé"
     },
     "passwd": {
         "mustBeLobby": "Vous devez être en mode Lobby pour pouvoir changer le mot de passe."

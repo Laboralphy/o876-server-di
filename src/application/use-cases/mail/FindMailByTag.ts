@@ -38,6 +38,8 @@ export class FindMailByTag {
                     topic: message.topic,
                     body: message.content,
                 };
+            } else {
+                return undefined;
             }
         } else {
             throw new ReferenceError(USE_CASE_ERRORS.ENTITY_NOT_FOUND + ` tag "${tag}"`);

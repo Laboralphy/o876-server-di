@@ -8,6 +8,7 @@ import { ScopedCradle } from '../ApiContextBuilder';
 import { AbstractContextService } from './AbstractContextService';
 import { FindMailByTag } from '../../../application/use-cases/mail/FindMailByTag';
 import { SetMailFlags } from '../../../application/use-cases/mail/SetMailFlags';
+import { SetMailFlagsDto } from '../../../application/dto/SetMailFlagsDto';
 
 export class MailContextService extends AbstractContextService {
     private readonly sendMail: SendMail;
@@ -43,7 +44,18 @@ export class MailContextService extends AbstractContextService {
         if (msg) {
             // change read flag
             await this.setMailFlags.execute(msg.id, { read: true });
+            return msg;
         }
-        return msg;
+    }
+
+    async setMessageFlags(tag: number, flags: SetMailFlagsDto) {
+        const msg = await this.findMailByTag.execute(this.user.id, tag);
+        if (msg) {
+            // change read flag
+            await this.setMailFlags.execute(msg.id, flags);
+            return true;
+        } else {
+            return msg;
+        }
     }
 }
