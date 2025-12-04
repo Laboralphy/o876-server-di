@@ -1,3 +1,14 @@
+/**
+ * This command sends a internal mail message to a
+ */
+
+/**
+ * Parses parameters to extract a list of recipients, a topic, and the body
+ * Users are separated by a comma ","
+ * @param params {string[]}
+ * @returns {{recipients: string[], topic: string, body: string}}
+ */
+
 function parseMailParams(params) {
     const RECIPIENT_SEPARATOR = ',';
     const recipientStringList = [];

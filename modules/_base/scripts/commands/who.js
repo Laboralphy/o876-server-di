@@ -1,13 +1,16 @@
 /**
  * This commands builds a list of registered user, with additional information
  * such as : Roles, Online status
+ *
+ * @var context {IClientContext}
+ * @var parameters {string[]}
  */
 
 /**
  * Returns a new user filtered list by string pattern
  * (provides a "search user by display name" functionality)
- * @param aList a list of users
- * @param sSearch the search pattern
+ * @param aList {User[]} a list of users
+ * @param sSearch {string} the search pattern
  * @returns {User[]}
  */
 function filterList(aList, sSearch) {
