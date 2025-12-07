@@ -1,4 +1,6 @@
 import { IRepository } from './IRepository';
 import { MailMessage } from '../../entities/MailMessage';
 
-export type IMailMessageRepository = IRepository<MailMessage>;
+export interface IMailMessageRepository extends IRepository<MailMessage> {
+    findUserMessages(userId: string): Promise<MailMessage[]>;
+}

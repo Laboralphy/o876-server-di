@@ -4,17 +4,5 @@ loginNewUser: new
 # Number of days before a mail expires and is deleted from the mailbox, unless it is pinned
 mailMaxExpirationDays: 30
 
-# Number of messages a user can pin to prevent auto deletion
-mailMaxPinnedMessages: 20
-
 # Maximum character count in a messages
 mailMaxMessageLength: 1024
-
-# Maximum character count in a message topics
-mailMaxTopicLength: 40
-
-# Maximum character count in text editor mode
-textEditorMaxCharacterCount: 2000
-
-# Maximum line count in text editor mode
-textEditorMaxLineCount: 25

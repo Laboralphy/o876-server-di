@@ -47,19 +47,15 @@ import { IServerConfig } from '../application/ports/services/IServerConfig';
 import { IScriptRunner } from '../application/ports/services/IScriptRunner';
 import { IModuleManager } from '../application/ports/services/IModuleManager';
 import { ServerConfig } from '../infrastructure/services/ServerConfig';
-import { MailInboxRepository } from '../infrastructure/persistance/json-database/MailInboxRepository';
 import { MailMessageRepository } from '../infrastructure/persistance/json-database/MailMessageRepository';
 import { RemoveUserRoles } from '../application/use-cases/users/RemoveUserRoles';
 import { jsonDatabaseStructure, JsonDatabaseStructure } from './json-database-structure';
 import { IApiContextBuilder } from '../application/ports/services/IApiContextBuilder';
 import { ApiContextBuilder } from '../infrastructure/services/ApiContextBuilder';
-import { CheckMailInbox } from '../application/use-cases/mail/CheckMailInbox';
 import { SendMail } from '../application/use-cases/mail/SendMail';
-import { SetMailFlags } from '../application/use-cases/mail/SetMailFlags';
 import { MailContextService } from '../infrastructure/services/context-services/MailContextService';
-import { FindMailByTag } from '../application/use-cases/mail/FindMailByTag';
 import { UserContextService } from '../infrastructure/services/context-services/UserContextService';
-import { TextEditorProcessController } from '../infrastructure/controllers/TextEditorProcessController';
+import { ReadMail } from '../application/use-cases/mail/ReadMail';
 
 /**
  * To as a new use case, port ...,
@@ -91,15 +87,12 @@ export interface Cradle {
     // use cases command
     runCommand: RunCommand;
     // use cases mail
-    checkMailInbox: CheckMailInbox;
     sendMail: SendMail;
-    setMailFlags: SetMailFlags;
-    findMailByTag: FindMailByTag;
+    readMail: ReadMail;
 
     // repositories
     userRepository: IUserRepository;
     userSecretRepository: IUserSecretRepository;
-    mailInboxRepository: MailInboxRepository;
     mailMessageRepository: MailMessageRepository;
 
     // controller
@@ -122,9 +115,6 @@ export interface Cradle {
 
     // values
     jsonDatabaseStructure: JsonDatabaseStructure;
-
-    // ClientProcessController
-    textEditorProcessController: TextEditorProcessController;
 
     // Api context services
     mailContextService: MailContextService;
@@ -159,15 +149,12 @@ container.register({
     runCommand: asClass(RunCommand).singleton(),
 
     // use cases : mail
-    checkMailInbox: asClass(CheckMailInbox).singleton(),
     sendMail: asClass(SendMail).singleton(),
-    setMailFlags: asClass(SetMailFlags).singleton(),
-    findMailByTag: asClass(FindMailByTag).singleton(),
+    readMail: asClass(ReadMail).singleton(),
 
     // repositories
     userRepository: asClass(UserRepository).singleton(),
     userSecretRepository: asClass(UserSecretRepository).singleton(),
-    mailInboxRepository: asClass(MailInboxRepository).singleton(),
     mailMessageRepository: asClass(MailMessageRepository).singleton(),
 
     // controllers : API

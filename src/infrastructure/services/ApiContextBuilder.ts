@@ -58,9 +58,10 @@ export class ApiContextBuilder implements IApiContextBuilder {
             getServerTime: () => {
                 const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 const date = new Date();
+                const now = date.getTime();
                 const moon = getMoonPhase(date);
                 return {
-                    date,
+                    now,
                     timezone,
                     moon,
                 };

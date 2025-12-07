@@ -50,21 +50,15 @@
     },
     "mail": {
         "mailReceived": "Message reçu de la part de : {{ sender }}.",
-        "unreadMessage_one": "{{ count }} message non lu",
-        "unreadMessage_other": "{{ count }} messages non lus",
-        "youHaveMail": "Vous avez du courrier : $t(mail.unreadMessage).",
-        "inboxHeaderTag": "#",
-        "inboxHeaderFlags": "Attrib.",
+        "unreadMessage_one": "Vous avez {{ count }} message non lu",
+        "unreadMessage_other": "Vous avez {{ count }} messages non lus",
         "inboxHeaderFrom": "Expéditeur",
-        "inboxHeaderTopic": "Sujet",
         "inboxHeaderDate": "Date",
         "inboxEmpty": "Boîte de réception vide",
-        "notFoundUsers_one": "Destinataire non trouvé",
-        "notFoundUsers_other": "{{ count }} destinataires non trouvés",
-        "sent": "Message envoyé à",
-        "expectedTagParam": "Le paramètre attendu doit être le tag d'un message.",
-        "endOfMessage": "Fin du message",
-        "messageCannotBeAccessed": "Le contenu du message n'est pas disponnible, ou son expéditeur a été supprimé"
+        "recipientNotFound": "Destinataire inexistant",
+        "mailSent": "Message envoyé à : {{ name }}",
+        "emptyMailNotSent": "Message vide : envoi annulé.",
+        "endOfMessage": "Fin du message"
     },
     "passwd": {
         "mustBeLobby": "Vous devez être en mode Lobby pour pouvoir changer le mot de passe."

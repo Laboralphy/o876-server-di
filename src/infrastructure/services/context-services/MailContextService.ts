@@ -1,61 +1,25 @@
 import { User } from '../../../domain/entities/User';
 import { SendMail } from '../../../application/use-cases/mail/SendMail';
-import {
-    CheckMailInbox,
-    CheckMailInboxEntry,
-} from '../../../application/use-cases/mail/CheckMailInbox';
 import { ClientCradle } from '../../../boot/container';
 import { AbstractContextService } from './AbstractContextService';
-import { FindMailByTag } from '../../../application/use-cases/mail/FindMailByTag';
-import { SetMailFlags } from '../../../application/use-cases/mail/SetMailFlags';
-import { SetMailFlagsDto } from '../../../application/dto/SetMailFlagsDto';
+import { ReadMail } from '../../../application/use-cases/mail/ReadMail';
 
 export class MailContextService extends AbstractContextService {
     private readonly sendMail: SendMail;
-    private readonly checkMailInbox: CheckMailInbox;
-    private readonly findMailByTag: FindMailByTag;
-    private readonly setMailFlags: SetMailFlags;
+    private readonly readMail: ReadMail;
 
     constructor(cradle: ClientCradle) {
         super(cradle);
         this.sendMail = cradle.sendMail;
-        this.checkMailInbox = cradle.checkMailInbox;
-        this.findMailByTag = cradle.findMailByTag;
-        this.setMailFlags = cradle.setMailFlags;
+        this.readMail = cradle.readMail;
     }
 
-    async sendMessage(recipients: User[], topic: string, message: string): Promise<void> {
+    async sendMessage(recipient: User, message: string): Promise<void> {
         const user = this.user;
-        return this.sendMail.execute(
-            user.id,
-            recipients.map((user) => user.id),
-            topic,
-            message
-        );
+        return this.sendMail.execute(user.id, recipient.id, message);
     }
 
-    async checkInbox(): Promise<CheckMailInboxEntry[]> {
-        const user = this.user;
-        return this.checkMailInbox.execute(user.id);
-    }
-
-    async readMessage(tag: number) {
-        const msg = await this.findMailByTag.execute(this.user.id, tag);
-        if (msg) {
-            // change read flag
-            await this.setMailFlags.execute(msg.id, { read: true });
-            return msg;
-        }
-    }
-
-    async setMessageFlags(tag: number, flags: SetMailFlagsDto) {
-        const msg = await this.findMailByTag.execute(this.user.id, tag);
-        if (msg) {
-            // change read flag
-            await this.setMailFlags.execute(msg.id, flags);
-            return true;
-        } else {
-            return msg;
-        }
+    async readMessage() {
+        return this.readMail.execute(this.user.id);
     }
 }

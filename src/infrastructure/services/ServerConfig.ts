@@ -18,11 +18,7 @@ export class ServerConfig implements IServerConfig {
             description,
             loginNewUser: 'new',
             mailMaxExpirationDays: 30,
-            mailMaxPinnedMessages: 20,
             mailMaxMessageLength: 1024,
-            mailMaxTopicLength: 40,
-            textEditorMaxCharacterCount: 2000,
-            textEditorMaxLineCount: 25,
         };
     }
 

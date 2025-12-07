@@ -8,6 +8,7 @@ import { UserSecretSchema } from '../../../domain/entities/UserSecret';
 import { IUserSecretRepository } from '../../../domain/ports/repositories/IUserSecretRepository';
 import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
 import { IServerConfig } from '../../ports/services/IServerConfig';
+import { ITime } from '../../ports/services/ITime';
 
 /**
  * Creates a new User
@@ -18,6 +19,7 @@ export class CreateUser {
     private readonly encryptor: IEncryptor;
     private readonly idGenerator: IIdGenerator;
     private readonly serverConfig: IServerConfig;
+    private readonly time: ITime;
 
     constructor(cradle: Cradle) {
         this.userRepository = cradle.userRepository;
@@ -25,6 +27,7 @@ export class CreateUser {
         this.encryptor = cradle.encryptor;
         this.idGenerator = cradle.idGenerator;
         this.serverConfig = cradle.serverConfig;
+        this.time = cradle.time;
     }
 
     async checkDisplayName(displayName: string) {
@@ -44,7 +47,7 @@ export class CreateUser {
     }
 
     async execute(createUserDto: CreateUserDto): Promise<User> {
-        const nNow = Date.now();
+        const nNow = this.time.now();
         const password = this.encryptor.encryptPassword(createUserDto.password);
         const user: User = UserSchema.parse({
             id: this.idGenerator.generateUID(),

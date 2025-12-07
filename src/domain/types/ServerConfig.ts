@@ -9,11 +9,7 @@ export const ServerConfigOptionsSchema = z
         description: z.string(),
         loginNewUser: z.string(),
         mailMaxExpirationDays: z.number().int(),
-        mailMaxPinnedMessages: z.number().int(),
         mailMaxMessageLength: z.number().int(),
-        mailMaxTopicLength: z.number().int(),
-        textEditorMaxCharacterCount: z.number().int(),
-        textEditorMaxLineCount: z.number().int(),
     })
     .strict();
 
