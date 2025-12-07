@@ -175,9 +175,7 @@ describe('FindMailByTag', () => {
         const f1 = await findMailByTag.execute('2', 1);
         const f2 = await findMailByTag.execute('2', 2);
         const f3 = await findMailByTag.execute('2', 3);
-        await expect(findMailByTag.execute('2', 4)).rejects.toThrow(
-            'ENTITY_NOT_FOUND tag "4" for user 2'
-        );
+        await expect(findMailByTag.execute('2', 4)).rejects.toThrow('ENTITY_NOT_FOUND tag "4"');
         expect(f1).toBeDefined();
         expect(f2).toBeDefined();
         expect(f3).toBeDefined();

@@ -14,6 +14,10 @@ export class CommunicationLayer implements ICommunicationLayer {
         this.clientSessions.set(clientSession.id, clientSession);
     }
 
+    unlinkClientSession(clientSession: ClientSession): void {
+        this.clientSessions.delete(clientSession.id);
+    }
+
     getClientSession(idClient: string): ClientSession {
         const cs = this.clientSessions.get(idClient);
         if (cs) {
@@ -46,6 +50,7 @@ export class CommunicationLayer implements ICommunicationLayer {
     async dropClient(idClient: string): Promise<void> {
         const cs = this.clientSessions.get(idClient);
         if (cs) {
+            this.unlinkClientSession(cs);
             this.clientSessions.delete(idClient);
             await cs.clientContext.closeConnection();
             cs.clientSocket.close(); // will cause a "onDisconnect" event

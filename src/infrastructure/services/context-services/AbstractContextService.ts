@@ -1,15 +1,15 @@
 import { User } from '../../../domain/entities/User';
 import { ClientSession } from '../../../domain/types/ClientSession';
 import { ICommunicationLayer } from '../../../application/ports/services/ICommunicationLayer';
-import { ScopedCradle } from '../ApiContextBuilder';
 import { SendClientMessage } from '../../../application/use-cases/clients/SendClientMessage';
+import { ClientCradle } from '../../../boot/container';
 
 export abstract class AbstractContextService {
     protected readonly communicationLayer: ICommunicationLayer;
     protected sendClientMessage: SendClientMessage;
     protected readonly idClient: string;
 
-    protected constructor(cradle: ScopedCradle) {
+    protected constructor(cradle: ClientCradle) {
         this.communicationLayer = cradle.communicationLayer;
         this.sendClientMessage = cradle.sendClientMessage;
 

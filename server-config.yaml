@@ -13,3 +13,8 @@ mailMaxMessageLength: 1024
 # Maximum character count in a message topics
 mailMaxTopicLength: 40
 
+# Maximum character count in text editor mode
+textEditorMaxCharacterCount: 2000
+
+# Maximum line count in text editor mode
+textEditorMaxLineCount: 25

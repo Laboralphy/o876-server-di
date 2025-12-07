@@ -44,6 +44,10 @@
         "reason": "Reason : {{ reason }}",
         "noReason": "Reason : unspecified"
     },
+    "textEditor": {
+        "starting": "Text editor mode. Please type \".\" on empty line to exit this mode.",
+        "exceedCapacity": "Maximum size reached : {{ lines }} max lines, {{ chars }} max chars."
+    },
     "mail": {
         "mailReceived": "Received mail from : {{ sender }}.",
         "youHaveMail_one": "You have mail : {{ count }} unread message.",

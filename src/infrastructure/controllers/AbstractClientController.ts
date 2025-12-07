@@ -10,7 +10,7 @@ import { IClientSocket } from '../../domain/ports/adapters/IClientSocket';
 import { User } from '../../domain/entities/User';
 import { RunCommand } from '../../application/use-cases/commands/RunCommand';
 import { ClientSession } from '../../domain/types/ClientSession';
-import { CreateClientSession } from '../../application/use-cases/clients/CreateClientSession';
+import { RegisterClient } from '../../application/use-cases/clients/RegisterClient';
 import { CLIENT_STATES } from '../../domain/enums/client-states';
 import { CreateUser } from '../../application/use-cases/users/CreateUser';
 import { IServerConfig } from '../../application/ports/services/IServerConfig';
@@ -18,6 +18,7 @@ import { CreateUserDto } from '../../application/dto/CreateUserDto';
 import { FindUser } from '../../application/use-cases/users/FindUser';
 import { JsonObject } from '../../domain/types/JsonStruct';
 import { SetUserPassword } from '../../application/use-cases/user-secrets/SetUserPassword';
+import { IClientContext } from '../../application/ports/classes/IClientContext';
 
 const debugClient = debug('srv:client');
 
@@ -34,7 +35,7 @@ export abstract class AbstractClientController {
     private readonly getUserBan: GetUserBan;
     private readonly time: ITime;
     private readonly runCommand: RunCommand;
-    private readonly createClientSession: CreateClientSession;
+    private readonly registerClient: RegisterClient;
     private readonly createUser: CreateUser;
     private readonly serverConfig: IServerConfig;
     private readonly findUser: FindUser;
@@ -48,7 +49,7 @@ export abstract class AbstractClientController {
         this.getUserBan = cradle.getUserBan;
         this.time = cradle.time;
         this.runCommand = cradle.runCommand;
-        this.createClientSession = cradle.createClientSession;
+        this.registerClient = cradle.registerClient;
         this.createUser = cradle.createUser;
         this.findUser = cradle.findUser;
         this.serverConfig = cradle.serverConfig;
@@ -67,11 +68,6 @@ export abstract class AbstractClientController {
     getAuthenticatedUser(idClient: string): User | null {
         const csd = this.communicationLayer.getClientSession(idClient);
         return csd.user;
-    }
-
-    getLogin(idClient: string): string {
-        const csd = this.communicationLayer.getClientSession(idClient);
-        return csd.login ?? '';
     }
 
     getClientSession(idClient: string): ClientSession {
@@ -197,11 +193,13 @@ export abstract class AbstractClientController {
      * Initialize client socket
      * - links the client socket to the communication layer
      * - handles several client socket events (message, close...)
-     * @param clientSocket
      */
-    initClientSession(clientSocket: IClientSocket): ClientSession {
-        const clientSession = this.createClientSession.execute(clientSocket);
-        const idClient = clientSession.id;
+    initClientSession(
+        idClient: string,
+        clientSocket: IClientSocket,
+        clientContext: IClientContext
+    ): ClientSession {
+        const clientSession = this.registerClient.execute(idClient, clientSocket, clientContext);
 
         clientSocket.onDisconnect(() => {
             debugClient('client %s disconnected', idClient);

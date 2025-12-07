@@ -44,6 +44,10 @@
         "reason": "Raison : {{ reason }}",
         "noReason": "Raison non spécifiée"
     },
+    "textEditor": {
+        "starting": "Mode édition de texte. Saisissez \".\" sur une ligne vide pour quitter le mode.",
+        "exceedCapacity": "Taille maximum atteinte : {{ lines }} lignes max, {{ chars }} caractères max."
+    },
     "mail": {
         "mailReceived": "Message reçu de la part de : {{ sender }}.",
         "unreadMessage_one": "{{ count }} message non lu",

@@ -1,13 +1,14 @@
 import z from 'zod';
 import { EntityId } from '../schemas/EntityId';
 import { String1k } from '../schemas/String1k';
+import { String2k } from '../schemas/String2k';
 
 export const MailMessageSchema = z.object({
     id: EntityId,
     senderId: EntityId,
     recipientIds: z.array(EntityId),
     topic: String1k,
-    content: z.string(),
+    content: String2k,
     tsCreation: z.number(),
 });
 

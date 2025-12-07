@@ -1,7 +1,7 @@
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import { userRoutes } from './infrastructure/web/routes/user.routes';
-import { container } from './boot/container';
+import { container, createClientContainer } from './boot/container';
 import { scopePerRequest } from 'awilix-koa';
 import { debug } from './libs/o876-debug';
 import { getEnv } from './boot/dotenv';
@@ -9,7 +9,6 @@ import { expandPath } from './libs/expand-path';
 import telnet, { Server as TelnetServer, Client as TelnetClient } from 'telnet2';
 import path from 'node:path';
 import fs from 'node:fs/promises';
-import { serverConfig } from './libs/server-config';
 
 const debugServer = debug('srv:main');
 
@@ -112,10 +111,18 @@ export class Server {
                 client.do.transmit_binary(); // easier unicode character transmission (that what the legend says)
                 client.do.window_size(); // make the client emit 'window size' events
                 client.do.gmcp(); // accept GMCP client
-                const telnetClientController = container.resolve('telnetClientController');
+                const uidg = container.resolve('idGenerator');
+                const idClient = uidg.generateUID();
+                debugServer('incoming client %s', idClient);
+                const clientScope = createClientContainer(idClient);
+                const telnetClientController = clientScope.resolve('telnetClientController');
+                client.on('close', () => {
+                    clientScope.dispose();
+                    debugServer('dispose client %s context', idClient);
+                });
                 await telnetClientController.connect(client);
             } catch (err) {
-                console.error('Error during client connection phase :', (err as Error).message);
+                console.error('Error during client connection phase :', err);
                 client.end();
             }
         });

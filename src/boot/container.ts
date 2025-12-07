@@ -1,4 +1,4 @@
-import { createContainer, asClass, asValue } from 'awilix';
+import { createContainer, asClass, asValue, AwilixContainer } from 'awilix';
 import { UserRepository } from '../infrastructure/persistance/json-database/UserRepository';
 
 import { Encryptor } from '../infrastructure/services/Encryptor';
@@ -42,7 +42,7 @@ import { ITemplateRepository } from '../application/ports/services/ITemplateRepo
 import { ScriptRunner } from '../infrastructure/services/ScriptRunner';
 import { ModuleManager } from '../infrastructure/services/ModuleManager';
 import { RunCommand } from '../application/use-cases/commands/RunCommand';
-import { CreateClientSession } from '../application/use-cases/clients/CreateClientSession';
+import { RegisterClient } from '../application/use-cases/clients/RegisterClient';
 import { IServerConfig } from '../application/ports/services/IServerConfig';
 import { IScriptRunner } from '../application/ports/services/IScriptRunner';
 import { IModuleManager } from '../application/ports/services/IModuleManager';
@@ -59,6 +59,7 @@ import { SetMailFlags } from '../application/use-cases/mail/SetMailFlags';
 import { MailContextService } from '../infrastructure/services/context-services/MailContextService';
 import { FindMailByTag } from '../application/use-cases/mail/FindMailByTag';
 import { UserContextService } from '../infrastructure/services/context-services/UserContextService';
+import { TextEditorProcessController } from '../infrastructure/controllers/TextEditorProcessController';
 
 /**
  * To as a new use case, port ...,
@@ -86,7 +87,7 @@ export interface Cradle {
     authenticateUser: AuthenticateUser;
     destroyClient: DestroyClient;
     sendClientMessage: SendClientMessage;
-    createClientSession: CreateClientSession;
+    registerClient: RegisterClient;
     // use cases command
     runCommand: RunCommand;
     // use cases mail
@@ -122,6 +123,9 @@ export interface Cradle {
     // values
     jsonDatabaseStructure: JsonDatabaseStructure;
 
+    // ClientProcessController
+    textEditorProcessController: TextEditorProcessController;
+
     // Api context services
     mailContextService: MailContextService;
     userContextService: UserContextService;
@@ -149,7 +153,7 @@ container.register({
     // use cases : clients
     destroyClient: asClass(DestroyClient).singleton(),
     sendClientMessage: asClass(SendClientMessage).singleton(),
-    createClientSession: asClass(CreateClientSession).singleton(),
+    registerClient: asClass(RegisterClient).singleton(),
 
     // use cases : commands
     runCommand: asClass(RunCommand).singleton(),
@@ -168,8 +172,6 @@ container.register({
 
     // controllers : API
     apiUserController: asClass(ApiUserController).singleton(),
-    // controllers : Telnet
-    telnetClientController: asClass(TelnetClientController).singleton(),
 
     // services
     encryptor: asClass(Encryptor).singleton(),
@@ -182,12 +184,32 @@ container.register({
     scriptRunner: asClass(ScriptRunner).singleton(),
     moduleManager: asClass(ModuleManager).singleton(),
     serverConfig: asClass(ServerConfig).singleton(),
-    apiContextBuilder: asClass(ApiContextBuilder).singleton(),
 
     // values
     jsonDatabaseStructure: asValue(jsonDatabaseStructure),
+
+    /****** CLIENT SCOPED ****** CLIENT SCOPED ****** CLIENT SCOPED ****** CLIENT SCOPED ******/
+    /****** CLIENT SCOPED ****** CLIENT SCOPED ****** CLIENT SCOPED ****** CLIENT SCOPED ******/
+    /****** CLIENT SCOPED ****** CLIENT SCOPED ****** CLIENT SCOPED ****** CLIENT SCOPED ******/
+    apiContextBuilder: asClass(ApiContextBuilder).scoped(),
+
+    // controllers : Telnet
+    telnetClientController: asClass(TelnetClientController).scoped(),
 
     // Api context services
     mailContextService: asClass(MailContextService).scoped(),
     userContextService: asClass(UserContextService).scoped(),
 });
+
+/**
+ * This is the same cradle as above but dedicated to a specific client
+ */
+export interface ClientCradle extends Cradle {
+    idClient: string;
+}
+
+export function createClientContainer(idClient: string): AwilixContainer<ClientCradle> {
+    const c = container.createScope<ClientCradle>();
+    c.register('idClient', asValue(idClient));
+    return c;
+}

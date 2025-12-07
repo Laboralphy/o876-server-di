@@ -4,7 +4,7 @@ import {
     CheckMailInbox,
     CheckMailInboxEntry,
 } from '../../../application/use-cases/mail/CheckMailInbox';
-import { ScopedCradle } from '../ApiContextBuilder';
+import { ClientCradle } from '../../../boot/container';
 import { AbstractContextService } from './AbstractContextService';
 import { FindMailByTag } from '../../../application/use-cases/mail/FindMailByTag';
 import { SetMailFlags } from '../../../application/use-cases/mail/SetMailFlags';
@@ -16,7 +16,7 @@ export class MailContextService extends AbstractContextService {
     private readonly findMailByTag: FindMailByTag;
     private readonly setMailFlags: SetMailFlags;
 
-    constructor(cradle: ScopedCradle) {
+    constructor(cradle: ClientCradle) {
         super(cradle);
         this.sendMail = cradle.sendMail;
         this.checkMailInbox = cradle.checkMailInbox;

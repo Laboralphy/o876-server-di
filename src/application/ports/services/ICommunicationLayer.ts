@@ -10,6 +10,12 @@ export interface ICommunicationLayer {
     linkClientSession(clientSession: ClientSession): void;
 
     /**
+     * Dissociate a clientsession
+     * @param clientSession
+     */
+    unlinkClientSession(clientSession: ClientSession): void;
+
+    /**
      * Get session data from a connected client. Returns undefined if client does not exist
      * @param idClient
      */
