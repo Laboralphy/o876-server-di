@@ -1,11 +1,9 @@
 {{!--
-@param topic message topic
 @param body message body
 @param sender name of user who sent this message
 @param date
 --}}
-{{t "mail.inboxHeaderTopic"}}: {{ topic }}
-{{t "mail.inboxHeaderFrom"}}: {{ sender }} - {{t "mail.inboxHeaderDate"}}: {{ date }}
-
+💬 {{t "mail.mailReceived" name=sender}} - {{t "mail.inboxHeaderDate"}}: {{date ts}}
 {{ body }}
---- {{t "mail.endOfMessage"}} ---
+---
+{{t "mail.unreadMessage" count=remaining}}

@@ -44,23 +44,20 @@
         "reason": "Reason : {{ reason }}",
         "noReason": "Reason : unspecified"
     },
+    "textEditor": {
+        "starting": "Text editor mode. Please type \".\" on empty line to exit this mode.",
+        "exceedCapacity": "Maximum size reached : {{ lines }} max lines, {{ chars }} max chars."
+    },
     "mail": {
-        "mailReceived": "Received mail from : {{ sender }}.",
-        "youHaveMail_one": "You have mail : {{ count }} unread message.",
-        "youHaveMail_other": "You have mail : {{ count }} unread messages.",
-        "youHaveMail": "You have mail : $t(mail.unreadMessage).",
-        "inboxHeaderTag": "#",
-        "inboxHeaderFlags": "Flags",
-        "inboxHeaderFrom": "Sender",
-        "inboxHeaderTopic": "Topic",
+        "youHaveMail_one": "You have an unread message.",
+        "youHaveMail_other": "You have {{ count }} unread messages.",
         "inboxHeaderDate": "Date",
-        "inboxEmpty": "Inbox is empty",
-        "notFoundUsers_one": "Recipient not found",
-        "notFoundUsers_other": "Recipients not found",
-        "sent": "Message sent to",
-        "expectedTagParam": "Expected parameter must be a message tag.",
-        "endOfMessage": "End of message",
-        "messageCannotBeAccessed": "Message content deleted, or message sender deleted"
+        "inboxEmpty": "Inbox is empty.",
+        "recipientNotFound": "Recipient not found",
+        "mailSent": "Message sent to {{ name }}.",
+        "mailReceived": "Received mail from {{ sender }}",
+        "emptyMailNotSent": "Empty message will not be sent.",
+        "endOfMessage": "End of message"
     },
     "passwd": {
         "mustBeLobby": "You must be in Lobby mode in order to change your password."

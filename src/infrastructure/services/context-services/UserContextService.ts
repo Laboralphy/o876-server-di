@@ -1,17 +1,17 @@
 import { AbstractContextService } from './AbstractContextService';
-import { ScopedCradle } from '../ApiContextBuilder';
 import { GetUserList } from '../../../application/use-cases/users/GetUserList';
 import { User } from '../../../domain/entities/User';
 import { FindUser } from '../../../application/use-cases/users/FindUser';
 import { CLIENT_STATES } from '../../../domain/enums/client-states';
 import { SetUserPassword } from '../../../application/use-cases/user-secrets/SetUserPassword';
+import { ClientCradle } from '../../../boot/container';
 
 export class UserContextService extends AbstractContextService {
     private readonly getUserList: GetUserList;
     private readonly setUserPassword: SetUserPassword;
     private readonly findUser: FindUser;
 
-    constructor(cradle: ScopedCradle) {
+    constructor(cradle: ClientCradle) {
         super(cradle);
         this.getUserList = cradle.getUserList;
         this.setUserPassword = cradle.setUserPassword;
@@ -70,11 +70,6 @@ export class UserContextService extends AbstractContextService {
             // Send a message
             // Put client in state CHANGE_PASSWORD
             clientSession.state = CLIENT_STATES.CHANGE_PASSWORD;
-            clientSession.processRegistry.set('phase', 0);
-            clientSession.processRegistry.set('changePasswordStruct', {
-                currentPassword: '',
-                newPassword: '',
-            });
             // Sends message
             // Sends echo off
             await this.sendClientMessage.execute(

@@ -1,5 +1,4 @@
 import { JsonObject } from '../../../domain/types/JsonStruct';
-import { User } from '../../../domain/entities/User';
 import { IClientContextServices } from './IClientContextServices';
 
 export interface IClientContext extends IClientContextServices {
@@ -24,7 +23,7 @@ export interface IClientContext extends IClientContextServices {
 
     /**
      * Gets information about server time.
-     * date: The date now
+     * now: The current timestamp
      * timezone: An iso string describing the timezone where the server is located at
      * moon: Various astronomic data about the moon phase and age
      * moon.age: lunar periodic age (in days)
@@ -32,7 +31,7 @@ export interface IClientContext extends IClientContextServices {
      * moon.label: an i18n string describing moon phase.
      */
     getServerTime(): {
-        date: Date;
+        now: number;
         timezone: string;
         moon: { age: string; glyph: string; label: string };
     };

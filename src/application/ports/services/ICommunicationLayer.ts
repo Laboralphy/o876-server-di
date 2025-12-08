@@ -1,4 +1,3 @@
-import { IClientSocket } from '../../../domain/ports/adapters/IClientSocket';
 import { ClientSession } from '../../../domain/types/ClientSession';
 import { User } from '../../../domain/entities/User';
 
@@ -8,6 +7,12 @@ export interface ICommunicationLayer {
      * @param clientSession client socket instance
      */
     linkClientSession(clientSession: ClientSession): void;
+
+    /**
+     * Dissociate a clientsession
+     * @param clientSession
+     */
+    unlinkClientSession(clientSession: ClientSession): void;
 
     /**
      * Get session data from a connected client. Returns undefined if client does not exist

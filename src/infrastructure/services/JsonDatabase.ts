@@ -66,10 +66,7 @@ export class JsonDatabase implements IDatabaseAdapter {
         debugDb('json-database structure initialized');
     }
 
-    async find<T extends JsonObject>(
-        table: string,
-        query: { [p: string]: ScalarValue }
-    ): Promise<T[]> {
+    async find<T extends JsonObject>(table: string, query: JsonObject): Promise<T[]> {
         const collection: Collection<T> = this.getCollection(table);
         const cursor = await collection.find(query);
         return cursor.fetchAll();

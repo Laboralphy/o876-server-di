@@ -2,16 +2,14 @@ import z from 'zod';
 
 export const ServerConfigOptionsSchema = z
     .object({
-        loginNewUser: z.string(),
-        mailMaxExpirationDays: z.number().int(),
-        mailMaxPinnedMessages: z.number().int(),
-        mailMaxMessageLength: z.number().int(),
-        mailMaxTopicLength: z.number().int(),
         name: z.string(),
         version: z.string(),
         author: z.string(),
         license: z.string(),
         description: z.string(),
+        loginNewUser: z.string(),
+        mailMaxExpirationDays: z.number().int(),
+        mailMaxMessageLength: z.number().int(),
     })
     .strict();
 

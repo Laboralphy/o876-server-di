@@ -9,15 +9,28 @@ import { debug } from '../../libs/o876-debug';
 import { UserName } from '../../domain/schemas/UserName';
 import { DisplayName } from '../../domain/schemas/DisplayName';
 import { EmailString } from '../../domain/schemas/EmailString';
+import { ClientCradle } from '../../boot/container';
+import { IClientContext } from '../../application/ports/classes/IClientContext';
+import { IApiContextBuilder } from '../../application/ports/services/IApiContextBuilder';
 
 const debugTelnet = debug('srv:telnet');
 
-function echo(csd: ClientSession, b: boolean): Promise<void> {
-    const clientSocket = csd.clientSocket;
-    return b
-        ? clientSocket.send(Buffer.from([0xff, 0xfc, 0x01])) // reactivate echo
-        : clientSocket.send(Buffer.from([0xff, 0xfb, 0x01])); // deactivate echo
+enum PHASES {
+    NONE,
+    EXPECT_LOGIN,
+    EXPECT_PASSWORD,
+    EXPECT_USERNAME,
+    EXPECT_EMAIL_ADDRESS,
+    EXPECT_DISPLAY_NAME,
+    EXPECT_CURRENT_PASSWORD,
+    EXPECT_NEW_PASSWORD,
+    EXPECT_CONFIRM_PASSWORD,
 }
+
+type ChangePasswordStruct = {
+    currentPassword: string;
+    newPassword: string;
+};
 
 /**
  * This class managed all inputs from client
@@ -25,11 +38,35 @@ function echo(csd: ClientSession, b: boolean): Promise<void> {
  * (example : kicking client, or sending message to client, except response)
  */
 export class TelnetClientController extends AbstractClientController {
-    #echoValue: boolean = true;
+    private readonly apiContextBuilder: IApiContextBuilder;
+    private readonly idClient: string;
+    private phase: PHASES;
+    private changePasswordStruct: ChangePasswordStruct;
+    private createAccountStruct: CreateUserDto;
+
+    constructor(cradle: ClientCradle) {
+        super(cradle);
+        this.idClient = cradle.idClient;
+        this.phase = PHASES.NONE;
+        this.changePasswordStruct = {
+            currentPassword: '',
+            newPassword: '',
+        };
+        this.createAccountStruct = {
+            name: '',
+            password: '',
+            displayName: '',
+            email: '',
+        };
+        this.apiContextBuilder = cradle.apiContextBuilder;
+    }
 
     async echo(idClient: string, b: boolean): Promise<void> {
-        this.#echoValue = b;
-        return echo(this.getClientSession(idClient), b);
+        const csd = this.getClientSession(idClient);
+        const clientSocket = csd.clientSocket;
+        return b
+            ? clientSocket.send(Buffer.from([0xff, 0xfc, 0x01])) // reactivate echo
+            : clientSocket.send(Buffer.from([0xff, 0xfb, 0x01])); // deactivate echo
     }
 
     async exitPasswordMode(idClient: string) {
@@ -49,18 +86,14 @@ export class TelnetClientController extends AbstractClientController {
     }
 
     async loginProcess(clientSession: ClientSession, message: string = ''): Promise<void> {
-        enum PHASES {
-            EXPECT_LOGIN,
-            EXPECT_PASSWORD,
-        }
-        if (!clientSession.processRegistry.has('phase')) {
+        if (this.phase == PHASES.NONE) {
             debugTelnet('client %s is entering login process', clientSession.id);
             // entering login process for the first time
             // displaying prompt, setting phase, and exit
-            clientSession.processRegistry.set('phase', PHASES.EXPECT_LOGIN);
+            this.phase = PHASES.EXPECT_LOGIN;
             return this.askString(clientSession.id, 'welcome.login');
         }
-        switch (clientSession.processRegistry.get('phase') as PHASES) {
+        switch (this.phase) {
             case PHASES.EXPECT_LOGIN: {
                 // client is expected to enter login or "new"
                 if (
@@ -68,7 +101,7 @@ export class TelnetClientController extends AbstractClientController {
                     this.getServerConfig().getVariables().loginNewUser.toLowerCase()
                 ) {
                     debugTelnet('client %s : is asking for account creation', clientSession.id);
-                    clientSession.processRegistry.clear();
+                    this.phase = PHASES.NONE;
                     // client has entered the "new" word
                     // Will now branch to account creation process
                     clientSession.state = CLIENT_STATES.CREATE_ACCOUNT;
@@ -80,7 +113,7 @@ export class TelnetClientController extends AbstractClientController {
                     clientSession.login = message;
                     // prompt the "enter password" message
                     await this.askPassword(clientSession.id, 'welcome.password');
-                    clientSession.processRegistry.set('phase', PHASES.EXPECT_PASSWORD);
+                    this.phase = PHASES.EXPECT_PASSWORD;
                 }
                 break;
             }
@@ -106,7 +139,7 @@ export class TelnetClientController extends AbstractClientController {
                     await this.sendMessage(clientSession.id, 'welcome.badLogin');
                     await this.dropClient(clientSession.id);
                 }
-                clientSession.processRegistry.clear();
+                this.phase = PHASES.NONE;
                 break;
             }
 
@@ -117,31 +150,20 @@ export class TelnetClientController extends AbstractClientController {
     }
 
     async createAccountProcess(clientSession: ClientSession, message: string = '') {
-        enum PHASES {
-            EXPECT_USERNAME,
-            EXPECT_PASSWORD,
-            EXPECT_CONFIRM_PASSWORD,
-            EXPECT_EMAIL_ADDRESS,
-            EXPECT_DISPLAY_NAME,
-        }
-        if (!clientSession.processRegistry.has('phase')) {
+        if (this.phase == PHASES.NONE) {
             // entering account creation process for the first time
             // displaying prompt, setting phase, and exit
-            clientSession.processRegistry.set('phase', PHASES.EXPECT_USERNAME);
-            const createUserDto: CreateUserDto = {
+            this.phase = PHASES.EXPECT_USERNAME;
+            this.createAccountStruct = {
                 name: '',
                 displayName: '',
                 email: '',
                 password: '',
             };
-            clientSession.processRegistry.set('createUserDto', createUserDto);
             return this.askString(clientSession.id, 'createNewAccount.username');
         }
-        const createUserDto: CreateUserDto = clientSession.processRegistry.get(
-            'createUserDto'
-        )! as CreateUserDto;
 
-        switch (clientSession.processRegistry.get('phase') as PHASES) {
+        switch (this.phase) {
             case PHASES.EXPECT_USERNAME: {
                 // client is expected to enter username
                 // check username at once for availability
@@ -160,8 +182,8 @@ export class TelnetClientController extends AbstractClientController {
                     return this.askString(clientSession.id, 'createNewAccount.username');
                 } else {
                     // username seems ok
-                    createUserDto.name = message;
-                    clientSession.processRegistry.set('phase', PHASES.EXPECT_PASSWORD);
+                    this.createAccountStruct.name = message;
+                    this.phase = PHASES.EXPECT_PASSWORD;
                     await this.askPassword(clientSession.id, 'createNewAccount.password');
                 }
                 break;
@@ -176,18 +198,18 @@ export class TelnetClientController extends AbstractClientController {
                 } else {
                     // ok password
                     await this.askPassword(clientSession.id, 'createNewAccount.confirmPassword');
-                    clientSession.processRegistry.set('phase', PHASES.EXPECT_CONFIRM_PASSWORD);
-                    createUserDto.password = message;
+                    this.phase = PHASES.EXPECT_CONFIRM_PASSWORD;
+                    this.createAccountStruct.password = message;
                 }
                 break;
             }
 
             case PHASES.EXPECT_CONFIRM_PASSWORD: {
                 await this.exitPasswordMode(clientSession.id);
-                if (message === createUserDto.password && message !== '') {
+                if (message === this.createAccountStruct.password && message !== '') {
                     // passwords match
                     // go to the new phase
-                    clientSession.processRegistry.set('phase', PHASES.EXPECT_EMAIL_ADDRESS);
+                    this.phase = PHASES.EXPECT_EMAIL_ADDRESS;
                     await this.askString(clientSession.id, 'createNewAccount.email');
                 } else {
                     // passwords don't match
@@ -200,9 +222,9 @@ export class TelnetClientController extends AbstractClientController {
 
             case PHASES.EXPECT_EMAIL_ADDRESS: {
                 if (EmailString.safeParse(message).success) {
-                    createUserDto.email = message;
+                    this.createAccountStruct.email = message;
                     // goto next phase
-                    clientSession.processRegistry.set('phase', PHASES.EXPECT_DISPLAY_NAME);
+                    this.phase = PHASES.EXPECT_DISPLAY_NAME;
                     // now asking for display name
                     await this.askString(clientSession.id, 'createNewAccount.displayName');
                 } else {
@@ -230,11 +252,11 @@ export class TelnetClientController extends AbstractClientController {
                     } else {
                         // Display name ok and available
                         // Try create user account
-                        createUserDto.displayName = message;
+                        this.createAccountStruct.displayName = message;
                         try {
                             const user = await this.createNewAccount(
                                 clientSession.id,
-                                createUserDto
+                                this.createAccountStruct
                             );
                             if (user) {
                                 // user creation seems ok
@@ -243,11 +265,11 @@ export class TelnetClientController extends AbstractClientController {
                                     clientSession.id,
                                     'createNewAccount.success',
                                     {
-                                        name: createUserDto.name,
+                                        name: this.createAccountStruct.name,
                                     }
                                 );
                                 clientSession.state = CLIENT_STATES.LOGIN;
-                                clientSession.processRegistry.clear();
+                                this.phase = PHASES.NONE;
                                 await this.loginProcess(clientSession);
                             } else {
                                 // something went wrong during character creation
@@ -282,34 +304,21 @@ export class TelnetClientController extends AbstractClientController {
 
     async changePasswordProcess(clientSession: ClientSession, message: string = '') {
         // User wants to change its password
-        enum PHASES {
-            EXPECT_CURRENT_PASSWORD,
-            EXPECT_NEW_PASSWORD,
-            EXPECT_CONFIRM_PASSWORD,
-        }
-        type ChangePasswordStruct = {
-            currentPassword: string;
-            newPassword: string;
-        };
-        if (!clientSession.processRegistry.has('phase')) {
-            clientSession.processRegistry.set('phase', PHASES.EXPECT_CURRENT_PASSWORD);
-            const changePasswordStruct: ChangePasswordStruct = {
+        if (this.phase == PHASES.NONE) {
+            this.phase = PHASES.EXPECT_CURRENT_PASSWORD;
+            this.changePasswordStruct = {
                 currentPassword: '',
                 newPassword: '',
             };
-            clientSession.processRegistry.set('changePasswordStruct', changePasswordStruct);
             await this.askPassword(clientSession.id, 'changePassword.enterPreviousPassword');
         }
-        const changePasswordStruct: ChangePasswordStruct = clientSession.processRegistry.get(
-            'changePasswordStruct'
-        )! as ChangePasswordStruct;
 
-        switch (clientSession.processRegistry.get('phase')) {
+        switch (this.phase) {
             case PHASES.EXPECT_CURRENT_PASSWORD: {
-                changePasswordStruct.currentPassword = message;
+                this.changePasswordStruct.currentPassword = message;
                 await this.exitPasswordMode(clientSession.id);
                 await this.askPassword(clientSession.id, 'changePassword.enterNewPassword');
-                clientSession.processRegistry.set('phase', PHASES.EXPECT_NEW_PASSWORD);
+                this.phase = PHASES.EXPECT_NEW_PASSWORD;
                 break;
             }
             case PHASES.EXPECT_NEW_PASSWORD: {
@@ -318,21 +327,21 @@ export class TelnetClientController extends AbstractClientController {
                     await this.sendMessage(clientSession.id, 'createNewAccount.emptyPassword');
                     await this.askPassword(clientSession.id, 'changePassword.enterNewPassword');
                 } else {
-                    changePasswordStruct.newPassword = message;
+                    this.changePasswordStruct.newPassword = message;
                     await this.askPassword(clientSession.id, 'changePassword.confirmNewPassword');
-                    clientSession.processRegistry.set('phase', PHASES.EXPECT_CONFIRM_PASSWORD);
+                    this.phase = PHASES.EXPECT_CONFIRM_PASSWORD;
                 }
                 break;
             }
             case PHASES.EXPECT_CONFIRM_PASSWORD: {
                 await this.exitPasswordMode(clientSession.id);
-                if (message == changePasswordStruct.newPassword) {
+                if (message == this.changePasswordStruct.newPassword) {
                     // Client has confirmed new password
                     // Try to change password with use case
                     const bSuccess = await this.changePassword(
                         clientSession.id,
-                        changePasswordStruct.newPassword,
-                        changePasswordStruct.currentPassword
+                        this.changePasswordStruct.newPassword,
+                        this.changePasswordStruct.currentPassword
                     );
                     await this.sendMessage(
                         clientSession.id,
@@ -341,7 +350,7 @@ export class TelnetClientController extends AbstractClientController {
                 } else {
                     await this.sendMessage(clientSession.id, 'changePassword.passwordMismatch');
                 }
-                clientSession.processRegistry.clear();
+                this.phase = PHASES.NONE;
                 clientSession.state = CLIENT_STATES.AUTHENTICATED;
                 break;
             }
@@ -349,6 +358,11 @@ export class TelnetClientController extends AbstractClientController {
                 break;
             }
         }
+    }
+
+    async textEditorProcess(clientSession: ClientSession, message: string = '') {
+        // user is expected to enter lines of text
+        // text editor process ends when a single period sign is entered
     }
 
     /**
@@ -359,9 +373,9 @@ export class TelnetClientController extends AbstractClientController {
     async connect(socket: TelnetClient) {
         const clientSocket = new TelnetClientSocket(socket);
         // create new client session
-        const clientSession = this.initClientSession(clientSocket);
-        const idClient = clientSession.id;
-        const clientContext = clientSession.clientContext;
+        const idClient = this.idClient;
+        const clientContext: IClientContext = this.apiContextBuilder.buildApiContext();
+        const clientSession = this.initClientSession(idClient, clientSocket, clientContext);
         const serverConfig = this.getServerConfig();
         const newAccountCode = serverConfig.getVariables().loginNewUser;
         await clientContext.print('server-welcome', {
@@ -371,7 +385,7 @@ export class TelnetClientController extends AbstractClientController {
         });
         await this.echo(idClient, true);
         // Initializing loginProcess
-        clientSession.processRegistry.clear();
+        this.phase = PHASES.NONE;
         await this.loginProcess(clientSession);
 
         clientSocket.onMessage(async (message: string) => {

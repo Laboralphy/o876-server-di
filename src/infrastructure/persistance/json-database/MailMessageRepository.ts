@@ -33,4 +33,14 @@ export class MailMessageRepository implements IMailMessageRepository {
     async forEach(callback: ForEachCallback<MailMessage>): Promise<void> {
         await this.database.forEach(COLLECTION_NAME, callback);
     }
+
+    async findUserMessages(userId: string): Promise<MailMessage[]> {
+        return this.database.find(COLLECTION_NAME, { recipientId: userId });
+    }
+
+    async findExpiredMessages(ts: number): Promise<MailMessage[]> {
+        return this.database.find<MailMessage>(COLLECTION_NAME, {
+            tsSent: { $lte: ts },
+        });
+    }
 }

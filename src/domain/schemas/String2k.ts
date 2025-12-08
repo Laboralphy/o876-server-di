@@ -1,3 +1,3 @@
 import z from 'zod';
 
-export const String1k = z.string().max(1024);
+export const String2k = z.string().max(2048);

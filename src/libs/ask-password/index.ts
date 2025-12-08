@@ -41,7 +41,7 @@ export async function askPassword(sPrompt: string): Promise<string> {
             stdin.setRawMode(false);
             stdin.pause();
             resolve(input);
-            console.log('');
+            console.log(''); // appending new line
         }
         function ctrlc() {
             stdin.removeListener('data', pn);

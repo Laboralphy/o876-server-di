@@ -25,6 +25,7 @@ import { parseCSVLine } from '../../libs/parse-csv';
 import { TableRenderer } from '../../libs/table-renderer';
 import { ICellString } from '../../libs/table-renderer/ICellString';
 import stringWidth from 'string-width';
+import { ITime } from '../../application/ports/services/ITime';
 
 export class StylizedString implements ICellString {
     private readonly _length;
@@ -68,15 +69,25 @@ export class StylizedString implements ICellString {
 
 export class HbsTemplateRepository implements ITemplateRepository {
     private readonly stringRepository: IStringRepository;
+    private readonly time: ITime;
     private readonly registry: Map<string, HandlebarsTemplateDelegate> = new Map();
     constructor(cradle: Cradle) {
         this.stringRepository = cradle.stringRepository;
+        this.time = cradle.time;
     }
 
     init(): void {
         const stringRepository = this.stringRepository;
+        const time = this.time;
         handlebars.registerHelper('t', function (key: string, options: HelperOptions) {
             return stringRepository.render(key, { ...options.data.root, ...options.hash });
+        });
+        handlebars.registerHelper('date', function (ts: string, format: string | HelperOptions) {
+            console.log();
+            if (typeof format !== 'string') {
+                format = 'ymd hm';
+            }
+            return time.renderDate(parseInt(ts), format);
         });
         handlebars.registerHelper('underline', function (this: unknown, options: HelperOptions) {
             const content = options.fn(this);

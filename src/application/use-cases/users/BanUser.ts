@@ -51,7 +51,7 @@ export class BanUser {
             await Promise.all(
                 aClients.map(async (client) => {
                     await this.sendClientMessage.execute(client, 'user-banned', {
-                        date: forever ? null : this.time.renderDate(tsEnd, 'ymd hm'),
+                        date: forever ? null : tsEnd,
                         reason: dto.reason,
                     });
                     return this.destroyClient.execute(client);

@@ -45,42 +45,14 @@ export const jsonDatabaseStructure: JsonDatabaseStructure = {
                     size: 0,
                     caseInsensitive: true,
                 },
-                tsCreation: {
-                    type: INDEX_TYPES.NUMERIC,
-                    precision: 24 * 3600 * 1000, // one day
-                },
-            },
-        },
-        {
-            name: 'mail-inboxes',
-            storage: 'disk',
-            indexes: {
-                messageId: {
+                recipientId: {
                     type: INDEX_TYPES.PARTIAL,
                     size: 0,
                     caseInsensitive: true,
                 },
-                tag: {
-                    type: INDEX_TYPES.NUMERIC,
-                    precision: 1,
-                },
-                userId: {
-                    type: INDEX_TYPES.PARTIAL,
-                    size: 0,
-                    caseInsensitive: true,
-                },
-                tsReceived: {
+                tsSent: {
                     type: INDEX_TYPES.NUMERIC,
                     precision: 24 * 3600 * 1000, // one day
-                },
-                deleted: {
-                    type: INDEX_TYPES.BOOLEAN,
-                },
-                pinned: {
-                    type: INDEX_TYPES.BOOLEAN,
-                },
-                read: {
-                    type: INDEX_TYPES.BOOLEAN,
                 },
             },
         },

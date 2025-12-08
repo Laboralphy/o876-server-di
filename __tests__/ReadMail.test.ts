@@ -3,19 +3,15 @@ import { User } from '../src/domain/entities/User';
 import { ROLES } from '../src/domain/enums/roles';
 import { MailMessage } from '../src/domain/entities/MailMessage';
 import { ServerConfigOptions } from '../src/domain/types/ServerConfig';
-import { JsonObject } from '../src/domain/types/JsonStruct';
-import { SendMail } from '../src/application/use-cases/mail/SendMail';
+import { ReadMail } from '../src/application/use-cases/mail/ReadMail';
 
-describe('SendMail', () => {
+describe('ReadMail', () => {
     let container: AwilixContainer<any>;
     const currentDate = new Date();
-    let logPrint: string[] = [];
     const mailMessages = new Map<string, MailMessage>();
     const users = new Map<string, User>();
     beforeEach(() => {
         currentDate.setTime(Date.now());
-        logPrint = [];
-        let uniqueIdGenerated = 0;
         container = createContainer();
         users.clear();
         users.set('a', {
@@ -104,60 +100,84 @@ describe('SendMail', () => {
                     };
                 },
             }),
-            idGenerator: asValue({
-                generateUID: () => (++uniqueIdGenerated).toString(),
-            }),
-            communicationLayer: asValue({
-                getUserClients: () => [],
-            }),
-            sendClientMessage: asValue({
-                execute: async (
-                    idClient: string,
-                    key: string,
-                    params?: JsonObject
-                ): Promise<void> => {
-                    logPrint.push(`${key} ${JSON.stringify(params)}`);
-                },
-            }),
-            sendMail: asClass(SendMail).singleton(),
+            readMail: asClass(ReadMail).singleton(),
         });
     });
 
-    it('message should be stored when alice when send message to bob', async () => {
-        expect(mailMessages.size).toBe(0);
-        const sendMail = container.resolve<SendMail>('sendMail');
-        await sendMail.execute('a', 'b', 'message from alice to bob');
-        expect(mailMessages.size).toBe(1);
-        expect(Array.from(mailMessages.values())[0]).toMatchObject({
-            id: '1',
-            senderId: 'a',
+    it('should read mail from alice to bob, and should delete message after', async () => {
+        mailMessages.set('100', {
+            id: '100',
+            tsSent: currentDate.getTime(),
             recipientId: 'b',
+            senderId: 'a',
             content: 'message from alice to bob',
         });
+        expect(mailMessages.size).toBe(1);
+        const readMail = container.resolve<ReadMail>('readMail');
+        const x = await readMail.execute('b');
+        expect(x).toBeDefined();
+        if (x) {
+            expect(x.message).toBe('message from alice to bob');
+        }
+        expect(mailMessages.size).toBe(0);
     });
 
-    it('message should not be stored when alice when send message to an unexisting user', async () => {
+    it('should delete old mails prior to read mails', async () => {
+        mailMessages.set('100', {
+            id: '100',
+            tsSent: currentDate.getTime() - 50 * 24 * 3600 * 1000,
+            recipientId: 'b',
+            senderId: 'a',
+            content: 'this mail from alice to bob will be deleted because too old (50 days)',
+        });
+        mailMessages.set('101', {
+            id: '101',
+            tsSent: currentDate.getTime(),
+            recipientId: 'b',
+            senderId: 'a',
+            content: 'message from alice to bob',
+        });
+        expect(mailMessages.size).toBe(2);
+        const readMail = container.resolve<ReadMail>('readMail');
+        const x = await readMail.execute('b');
+        expect(x).toBeDefined();
+        if (x) {
+            expect(x.message).toBe('message from alice to bob');
+        }
         expect(mailMessages.size).toBe(0);
-        const sendMail = container.resolve<SendMail>('sendMail');
-        await expect(
-            sendMail.execute('a', 'x', 'message from alice to an unknown user')
-        ).rejects.toThrow('ENTITY_NOT_FOUND user : x');
-        expect(mailMessages.size).toBe(0);
+        const x2 = await readMail.execute('b');
+        expect(x2).toBeUndefined();
     });
 
-    it('message should not be stored when alice when send message to bob when bob is online', async () => {
-        container.register(
-            'communicationLayer',
-            asValue({
-                // Bob should be online now
-                getUserClients: (u: User) => [{ user: u }],
-            })
-        );
-        const sendMail = container.resolve<SendMail>('sendMail');
-        await sendMail.execute('a', 'b', 'message from alice to bob');
-        expect(mailMessages.size).toBe(0);
-        expect(logPrint[0]).toBe(
-            'mail-instant {"sender":"Bob","message":"message from alice to bob"}'
-        );
+    it('should read mail from alice to bob, ordered by timestamp', async () => {
+        mailMessages.set('100', {
+            id: '100',
+            tsSent: currentDate.getTime() - 60 * 1000,
+            recipientId: 'b',
+            senderId: 'a',
+            content: 'older message from alice to bob',
+        });
+        mailMessages.set('101', {
+            id: '101',
+            tsSent: currentDate.getTime(),
+            recipientId: 'b',
+            senderId: 'a',
+            content: 'new message from alice to bob',
+        });
+        const readMail = container.resolve<ReadMail>('readMail');
+        const x1 = await readMail.execute('b');
+        expect(x1).toBeDefined();
+        if (x1) {
+            expect(x1.message).toBe('older message from alice to bob');
+            expect(x1.remaining).toBe(1);
+        }
+        const x2 = await readMail.execute('b');
+        expect(x2).toBeDefined();
+        if (x2) {
+            expect(x2.message).toBe('new message from alice to bob');
+            expect(x2.remaining).toBe(0);
+        }
+        const x3 = await readMail.execute('b');
+        expect(x3).toBeUndefined();
     });
 });
