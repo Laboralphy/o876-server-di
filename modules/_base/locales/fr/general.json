@@ -52,10 +52,10 @@
         "unreadMessage_one": "{{ count }} message non lu",
         "unreadMessage_other": "{{ count }} messages non lus",
         "inboxHeaderDate": "Date",
-        "inboxEmpty": "Boîte de réception vide",
+        "inboxEmpty": "Boîte de réception vide.",
         "recipientNotFound": "Destinataire inexistant",
-        "mailSent": "Message envoyé à : {{ name }}",
-        "mailReceived": "Message reçu de : {{ sender }}.",
+        "mailSent": "Message envoyé à {{ name }}.",
+        "mailReceived": "Message reçu de {{ sender }}",
         "emptyMailNotSent": "Message vide : envoi annulé.",
         "endOfMessage": "Fin du message"
     },

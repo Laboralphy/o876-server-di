@@ -52,10 +52,10 @@
         "youHaveMail_one": "You have an unread message.",
         "youHaveMail_other": "You have {{ count }} unread messages.",
         "inboxHeaderDate": "Date",
-        "inboxEmpty": "Inbox is empty",
+        "inboxEmpty": "Inbox is empty.",
         "recipientNotFound": "Recipient not found",
         "mailSent": "Message sent to {{ name }}.",
-        "mailReceived": "Received mail from {{ sender }}.",
+        "mailReceived": "Received mail from {{ sender }}",
         "emptyMailNotSent": "Empty message will not be sent.",
         "endOfMessage": "End of message"
     },

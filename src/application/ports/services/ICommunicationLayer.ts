@@ -1,4 +1,3 @@
-import { IClientSocket } from '../../../domain/ports/adapters/IClientSocket';
 import { ClientSession } from '../../../domain/types/ClientSession';
 import { User } from '../../../domain/entities/User';
 

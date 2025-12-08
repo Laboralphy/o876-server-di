@@ -5,6 +5,7 @@ import { IEncryptor } from '../../ports/services/IEncryptor';
 import { User } from '../../../domain/entities/User';
 import { ITime } from '../../ports/services/ITime';
 import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
+import { ICommunicationLayer } from '../../ports/services/ICommunicationLayer';
 
 /**
  * This use case will check if specified client-login & password
@@ -17,12 +18,14 @@ export class AuthenticateUser {
     private readonly userSecretRepository: IUserSecretRepository;
     private readonly encryptor: IEncryptor;
     private readonly time: ITime;
+    private readonly communicationLayer: ICommunicationLayer;
 
     constructor(cradle: Cradle) {
         this.userRepository = cradle.userRepository;
         this.userSecretRepository = cradle.userSecretRepository;
         this.encryptor = cradle.encryptor;
         this.time = cradle.time;
+        this.communicationLayer = cradle.communicationLayer;
     }
 
     async execute(login: string, password: string): Promise<User> {
@@ -30,6 +33,10 @@ export class AuthenticateUser {
         const user: User | undefined = await this.userRepository.findByName(login);
         if (!user) {
             throw new Error(USE_CASE_ERRORS.ENTITY_NOT_FOUND + ` User : ${login}`);
+        }
+        if (this.communicationLayer.getUserClients(user).length > 1) {
+            // This user is already connected
+            throw new Error(USE_CASE_ERRORS.FORBIDDEN + ` User ${login} already connected`);
         }
         const userSecret = await this.userSecretRepository.get(user.id);
         if (!userSecret) {
