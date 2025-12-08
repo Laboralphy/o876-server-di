@@ -49,14 +49,13 @@
         "exceedCapacity": "Maximum size reached : {{ lines }} max lines, {{ chars }} max chars."
     },
     "mail": {
-        "mailReceived": "Received mail from : {{ sender }}.",
         "youHaveMail_one": "You have an unread message.",
         "youHaveMail_other": "You have {{ count }} unread messages.",
-        "inboxHeaderFrom": "Sender",
         "inboxHeaderDate": "Date",
         "inboxEmpty": "Inbox is empty",
         "recipientNotFound": "Recipient not found",
-        "mailSent": "Message sent to : {{ name }}",
+        "mailSent": "Message sent to {{ name }}.",
+        "mailReceived": "Received mail from {{ sender }}.",
         "emptyMailNotSent": "Empty message will not be sent.",
         "endOfMessage": "End of message"
     },

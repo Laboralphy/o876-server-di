@@ -1,4 +1,4 @@
-import { JsonObject, ScalarValue } from '../../types/JsonStruct';
+import { JsonObject } from '../../types/JsonStruct';
 
 export type DatabaseInitOptions = {
     host: string;
@@ -46,10 +46,7 @@ export interface IDatabaseAdapter {
      * @param table
      * @param query
      */
-    find<T extends JsonObject>(
-        table: string,
-        query: { [property: string]: ScalarValue }
-    ): Promise<T[]>;
+    find<T extends JsonObject>(table: string, query: JsonObject): Promise<T[]>;
 
     /**
      * A general purpose iteration mechanism

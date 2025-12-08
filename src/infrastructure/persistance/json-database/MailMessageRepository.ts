@@ -37,4 +37,10 @@ export class MailMessageRepository implements IMailMessageRepository {
     async findUserMessages(userId: string): Promise<MailMessage[]> {
         return this.database.find(COLLECTION_NAME, { recipientId: userId });
     }
+
+    async findExpiredMessages(ts: number): Promise<MailMessage[]> {
+        return this.database.find<MailMessage>(COLLECTION_NAME, {
+            tsSent: { $lte: ts },
+        });
+    }
 }

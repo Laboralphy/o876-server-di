@@ -49,14 +49,13 @@
         "exceedCapacity": "Taille maximum atteinte : {{ lines }} lignes max, {{ chars }} caractères max."
     },
     "mail": {
-        "mailReceived": "Message reçu de la part de : {{ sender }}.",
-        "unreadMessage_one": "Vous avez {{ count }} message non lu",
-        "unreadMessage_other": "Vous avez {{ count }} messages non lus",
-        "inboxHeaderFrom": "Expéditeur",
+        "unreadMessage_one": "{{ count }} message non lu",
+        "unreadMessage_other": "{{ count }} messages non lus",
         "inboxHeaderDate": "Date",
         "inboxEmpty": "Boîte de réception vide",
         "recipientNotFound": "Destinataire inexistant",
         "mailSent": "Message envoyé à : {{ name }}",
+        "mailReceived": "Message reçu de : {{ sender }}.",
         "emptyMailNotSent": "Message vide : envoi annulé.",
         "endOfMessage": "Fin du message"
     },

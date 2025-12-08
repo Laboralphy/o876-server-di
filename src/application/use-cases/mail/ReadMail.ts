@@ -30,6 +30,14 @@ export class ReadMail {
      * @param userId
      */
     async execute(userId: string): Promise<ReadMessageResult | undefined> {
+        // Delete expired messages
+        const tsExpire =
+            this.time.now() -
+            this.serverConfig.getVariables().mailMaxExpirationDays * 24 * 3600 * 1000;
+        const aExpiredMessages = await this.mailMessageRepository.findExpiredMessages(tsExpire);
+        await Promise.all(aExpiredMessages.map((m) => this.mailMessageRepository.delete(m)));
+
+        // Read user message
         const aMessages = await this.mailMessageRepository.findUserMessages(userId);
         aMessages.sort((m1, m2) => m1.tsSent - m2.tsSent);
         const message = aMessages.shift();

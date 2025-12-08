@@ -3,7 +3,7 @@
 @param sender name of user who sent this message
 @param date
 --}}
-{{t "mail.inboxHeaderFrom"}}: {{ sender }} - {{t "mail.inboxHeaderDate"}}: {{date ts}}
+💬 {{t "mail.mailReceived" name=sender}} - {{t "mail.inboxHeaderDate"}}: {{date ts}}
 {{ body }}
 ---
-{{t "mail.inboxRemaining" count=remaining}}
+{{t "mail.unreadMessage" count=remaining}}
