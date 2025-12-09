@@ -55,9 +55,9 @@ export class ModuleManager implements IModuleManager {
         }
     }
 
-    defineAssetScript(name: string, source: string) {
+    defineAssetScript(name: string, source: string, sFullPath: string) {
         this.addStatCountSize('scripts', 1, source.length);
-        this.scriptRunner.compile(name, source);
+        this.scriptRunner.compile(name, source, sFullPath);
     }
 
     defineAssetData(key: string, data: string) {
@@ -134,7 +134,7 @@ export class ModuleManager implements IModuleManager {
             const contentBuffer = await fs.readFile(sFullPath);
             switch (sType) {
                 case 'scripts': {
-                    this.defineAssetScript(sId, contentBuffer.toString());
+                    this.defineAssetScript(sId, contentBuffer.toString(), path.dirname(sFullPath));
                     break;
                 }
                 case 'locales': {

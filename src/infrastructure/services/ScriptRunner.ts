@@ -1,8 +1,15 @@
 import { NodeVM, VMScript } from 'vm2';
 import { IScriptRunner } from '../../application/ports/services/IScriptRunner';
+import path from 'node:path';
+import fs from 'node:fs';
+
+type ScriptStruct = {
+    program: VMScript;
+    path: string;
+};
 
 export class ScriptRunner implements IScriptRunner {
-    private readonly scripts = new Map<string, VMScript>();
+    private readonly scripts = new Map<string, ScriptStruct>();
     private readonly baseContext: Record<string, unknown> = {};
 
     /**
@@ -18,10 +25,13 @@ export class ScriptRunner implements IScriptRunner {
      * @param id script identifier
      * @param sSource js source of script
      */
-    compile(id: string, sSource: string) {
+    compile(id: string, sSource: string, sScriptFullPath: string) {
         // Avec vm2, on ne "compile" pas à l'avance comme avec SandboxJS,
         // mais on stocke le source pour l'exécuter plus tard avec le contexte.
-        this.scripts.set(id, new VMScript(sSource));
+        this.scripts.set(id, {
+            program: new VMScript(sSource),
+            path: sScriptFullPath,
+        });
     }
 
     async run(id: string, context: Record<string, any>) {
@@ -35,9 +45,16 @@ export class ScriptRunner implements IScriptRunner {
                 console: 'inherit', // Capture les logs
                 sandbox: ctx, // Contexte vide par défaut
                 require: {
-                    external: false, // Désactive les modules externes
+                    external: false, // Active/Désactive les modules externes
                     builtin: [console], // Désactive les modules built-in
-                    root: './',
+                    customRequire: (id: string) => {
+                        console.log(id);
+                        throw new Error('CUSTOM_REQUIRE');
+                    },
+                    resolve: (moduleName: string, baseDir: string) => {
+                        console.log(moduleName, baseDir);
+                        throw new Error('RESOLVE');
+                    },
                 },
                 timeout: 1000, // Timeout en ms
                 allowAsync: true, // Autorise les opérations asynchrones si nécessaire
@@ -46,7 +63,7 @@ export class ScriptRunner implements IScriptRunner {
             });
             try {
                 // Exécute le script dans le contexte
-                await vm.run(script);
+                await vm.run(script.program);
             } catch (err) {
                 console.error(
                     `Erreur lors de l'exécution du script ${id}:`,

@@ -9,10 +9,12 @@ export interface IScriptRunner {
     /**
      * Compiles a script source code.
      * You must provide an identifier to fetch script at later moment
+     * the full path is usefull for "require" calls
      * @param id script identifier
      * @param sSource script source code (js)
+     * @param sFullPath script full path for require
      */
-    compile(id: string, sSource: string): void;
+    compile(id: string, sSource: string, sFullPath: string): void;
 
     /**
      * Run a specific script with a specific partial context.
