@@ -8,6 +8,8 @@ export class Channel {
     private readonly messages: Message[] = [];
     private readonly _events = new EventEmitter();
     public maxLines: number = 1000;
+    public readonly whiteList = new Set<string>();
+    public readonly blackList = new Set<string>();
 
     constructor(
         public readonly id: string,
@@ -16,6 +18,10 @@ export class Channel {
 
     get events(): EventEmitter {
         return this._events;
+    }
+
+    get isRestricted(): boolean {
+        return this.whiteList.size > 0;
     }
 
     /**
@@ -30,6 +36,9 @@ export class Channel {
         if (user) {
             return user;
         } else {
+            if (this.blackList.has(idUser) || (this.isRestricted && !this.whiteList.has(idUser))) {
+                throw new Error(`User ${idUser} is not allowed to access this channel.`);
+            }
             const user = new UserPresence(idUser);
             this.events.emit('joined', { recv: idUser });
             this.users.forEach((u: UserPresence) => {
