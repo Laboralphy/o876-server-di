@@ -19,7 +19,7 @@ export class RunCommand {
         const parameters = quoteSplit(command);
         const opcode = parameters.shift()?.toLowerCase() ?? '';
         try {
-            return this.scriptRunner.run(opcode, {
+            return this.scriptRunner.run('commands/' + opcode, {
                 parameters,
                 context: clientSession.clientContext,
             });

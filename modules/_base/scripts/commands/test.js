@@ -1,5 +1,13 @@
-const oIncluded = require('./time.js');
+/**
+ * @var include {function(id: string)}
+ * @var context {IClientContext}
+ * @var parameters {string[]}
+ */
 
-function main() {}
+const { inc1 } = include('includes/inc1');
+
+async function main() {
+    inc1();
+}
 
 module.exports = main(context, parameters);

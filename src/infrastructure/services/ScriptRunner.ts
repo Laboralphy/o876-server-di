@@ -3,13 +3,8 @@ import { IScriptRunner } from '../../application/ports/services/IScriptRunner';
 import path from 'node:path';
 import fs from 'node:fs';
 
-type ScriptStruct = {
-    program: VMScript;
-    path: string;
-};
-
 export class ScriptRunner implements IScriptRunner {
-    private readonly scripts = new Map<string, ScriptStruct>();
+    private readonly scripts = new Map<string, VMScript>();
     private readonly baseContext: Record<string, unknown> = {};
 
     /**
@@ -25,37 +20,24 @@ export class ScriptRunner implements IScriptRunner {
      * @param id script identifier
      * @param sSource js source of script
      */
-    compile(id: string, sSource: string, sScriptFullPath: string) {
+    compile(id: string, sSource: string) {
         // Avec vm2, on ne "compile" pas à l'avance comme avec SandboxJS,
         // mais on stocke le source pour l'exécuter plus tard avec le contexte.
-        this.scripts.set(id, {
-            program: new VMScript(sSource),
-            path: sScriptFullPath,
-        });
+        this.scripts.set(id, new VMScript(sSource));
     }
 
-    async run(id: string, context: Record<string, any>) {
+    run(id: string, context: Record<string, any>) {
         const script = this.scripts.get(id);
         if (script) {
             const ctx = {
                 ...this.baseContext,
                 ...context,
+                include: (id: string) => this.run(id, context),
             };
             const vm = new NodeVM({
                 console: 'inherit', // Capture les logs
                 sandbox: ctx, // Contexte vide par défaut
-                require: {
-                    external: false, // Active/Désactive les modules externes
-                    builtin: [console], // Désactive les modules built-in
-                    customRequire: (id: string) => {
-                        console.log(id);
-                        throw new Error('CUSTOM_REQUIRE');
-                    },
-                    resolve: (moduleName: string, baseDir: string) => {
-                        console.log(moduleName, baseDir);
-                        throw new Error('RESOLVE');
-                    },
-                },
+                require: false,
                 timeout: 1000, // Timeout en ms
                 allowAsync: true, // Autorise les opérations asynchrones si nécessaire
                 eval: false, // Désactive eval et Function
@@ -63,7 +45,7 @@ export class ScriptRunner implements IScriptRunner {
             });
             try {
                 // Exécute le script dans le contexte
-                await vm.run(script.program);
+                return vm.run(script);
             } catch (err) {
                 console.error(
                     `Erreur lors de l'exécution du script ${id}:`,
