@@ -1,5 +1,8 @@
 import { IClientSocket } from '../../domain/ports/adapters/IClientSocket';
 import { Client as TelnetClient } from 'telnet2';
+import { TextEncoder } from 'node:util';
+
+const encoder = new TextEncoder();
 
 export class TelnetClientSocket implements IClientSocket {
     constructor(private readonly socket: TelnetClient) {}
@@ -23,6 +26,8 @@ export class TelnetClientSocket implements IClientSocket {
                 resolve();
                 return;
             }
+            // const utf8String = Buffer.from(encoder.encode(message.toString()));
+            // const bWriteOk = socket.write(utf8String);
             const bWriteOk = socket.write(message);
             if (!bWriteOk) {
                 // Buffer is full : data not sent : waiting for 'drain' event

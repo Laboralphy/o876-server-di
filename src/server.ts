@@ -30,7 +30,9 @@ export class Server {
         telnet.OPTION_NAMES['201'] = 'gmcp';
         // at client connection :
         // socket.do.gmcp()
-        return telnet.createServer({ convertLF: false });
+        return telnet.createServer({
+            convertLF: false,
+        });
     }
 
     async initLocales() {
@@ -108,7 +110,7 @@ export class Server {
         debugServer('starting telnet service');
         this.telnetServer.on('client', async (client: TelnetClient) => {
             try {
-                client.do.transmit_binary(); // easier unicode character transmission (that what the legend says)
+                client.do.transmit_binary(); // easier unicode character transmission
                 client.do.window_size(); // make the client emit 'window size' events
                 client.do.gmcp(); // accept GMCP client
                 const uidg = container.resolve('idGenerator');

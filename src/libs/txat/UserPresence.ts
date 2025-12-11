@@ -1,4 +1,3 @@
-import { Channel } from 'node:diagnostics_channel';
 import { POWERS } from './powers';
 
 /**
@@ -14,10 +13,12 @@ export class UserPresence {
 
     grant(power: POWERS) {
         this.powers.add(power);
+        return this;
     }
 
     revoke(power: POWERS) {
         this.powers.delete(power);
+        return this;
     }
 
     hasPower(power: POWERS) {
