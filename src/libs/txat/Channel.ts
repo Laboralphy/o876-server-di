@@ -2,6 +2,7 @@ import { EventEmitter } from 'node:events';
 import { UserPresence } from './UserPresence';
 import { POWERS } from './powers';
 import { Message } from './Message';
+import { CHANNEL_ATRIBUTES } from './channel-attributes';
 
 export class Channel {
     private readonly _users = new Map<string, UserPresence>();
@@ -10,10 +11,11 @@ export class Channel {
     public maxLines: number = 1000;
     public readonly whiteList = new Set<string>();
     public readonly blackList = new Set<string>();
+    public readonly attributes = new Set<CHANNEL_ATRIBUTES>();
 
     constructor(
         public readonly id: string,
-        public readonly name: string
+        public readonly tag: string = ''
     ) {}
 
     /**
@@ -35,13 +37,20 @@ export class Channel {
     }
 
     /**
+     * one user cannot join two channels of the same tag
+     */
+    get tagged(): boolean {
+        return this.tag !== '';
+    }
+
+    /**
      * Adds a new user to this channel
      * This user will now be able to read channel content, and, if granted, write messages
      * @param idUser joining user id
      * @return UserPresence the instance of user presence is return so another system may
      * update this instance to reflect user privileges on this channel
      */
-    linkUser(idUser: string) {
+    addUser(idUser: string) {
         const user = this._users.get(idUser);
         if (user) {
             return user;
@@ -65,7 +74,7 @@ export class Channel {
      * @return UserPresence client app should store this objet to keep track of user
      * privileges on this channel
      */
-    unlinkUser(idUser: string) {
+    removeUser(idUser: string) {
         const user = this._users.get(idUser);
         if (user) {
             this._users.delete(idUser);

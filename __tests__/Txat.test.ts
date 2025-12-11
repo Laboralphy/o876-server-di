@@ -41,13 +41,13 @@ describe('UserPresence', () => {
 describe('Channel', () => {
     describe('postMessage', () => {
         it('should not be able to post message when user is not in channel', () => {
-            const c = new Txat.Channel('c1', 'chan1');
-            expect(() => c.postMessage('c1', 'chan1')).toThrow();
+            const c = new Txat.Channel('c1');
+            expect(() => c.postMessage('c1', '***')).toThrow();
         });
         it('should keep the last 5 message when maxLines is set to 5', () => {
-            const c = new Txat.Channel('c1', 'chan1');
+            const c = new Txat.Channel('c1');
             c.maxLines = 5;
-            c.linkUser('u1').grant(POWERS.WRITE).grant(POWERS.READ);
+            c.addUser('u1').grant(POWERS.WRITE).grant(POWERS.READ);
             expect(c.getMessages().length).toBe(0);
             c.postMessage('u1', 'msg1');
             expect(c.getMessages().length).toBe(1);
@@ -73,14 +73,14 @@ describe('Channel', () => {
             c.postMessage('u1', 'msg8');
         });
         it('should not be able to post if user has no write power', () => {
-            const c = new Txat.Channel('c1', 'chan1');
-            c.linkUser('u1');
+            const c = new Txat.Channel('c1');
+            c.addUser('u1');
             expect(() => c.postMessage('u1', 'msg1')).toThrow();
         });
         it('should be able to receive message only if user has read power', () => {
-            const c = new Txat.Channel('c1', 'chan1');
-            c.linkUser('u1').grant(POWERS.READ).grant(POWERS.WRITE);
-            const u2 = c.linkUser('u2');
+            const c = new Txat.Channel('c1');
+            c.addUser('u1').grant(POWERS.READ).grant(POWERS.WRITE);
+            const u2 = c.addUser('u2');
             u2.grant(POWERS.READ);
             const log: string[] = [];
 
@@ -112,19 +112,19 @@ describe('Channel', () => {
     });
     describe('linkUser/unlkinkUSer', () => {
         it('should add/remove users', () => {
-            const c = new Txat.Channel('c1', 'chan1');
+            const c = new Txat.Channel('c1');
             expect(c.users.length).toBe(0);
-            c.linkUser('u1');
+            c.addUser('u1');
             expect(c.users.length).toBe(1);
             expect(c.users[0]).toMatchObject({
                 id: 'u1',
             });
-            c.linkUser('u2');
+            c.addUser('u2');
             expect(c.users.length).toBe(2);
             expect(c.users[1]).toMatchObject({
                 id: 'u2',
             });
-            c.unlinkUser('u1');
+            c.removeUser('u1');
             expect(c.users.length).toBe(1);
             expect(c.users[0]).toMatchObject({
                 id: 'u2',
@@ -133,17 +133,17 @@ describe('Channel', () => {
     });
     describe('Private channels', () => {
         it('should return true only when whitelist is modified', () => {
-            const c = new Txat.Channel('c1', 'chan1');
+            const c = new Txat.Channel('c1');
             expect(c.private).toBe(false);
             c.whiteList.add('u1');
             expect(c.private).toBe(true);
         });
         it('should not be able to enter channel if blacklisted', () => {
-            const c = new Txat.Channel('c1', 'chan1');
+            const c = new Txat.Channel('c1');
             c.blackList.add('u1');
-            expect(() => c.linkUser('u1')).toThrow();
+            expect(() => c.addUser('u1')).toThrow();
             expect(c.users.length).toBe(0);
-            expect(() => c.linkUser('u2')).not.toThrow();
+            expect(() => c.addUser('u2')).not.toThrow();
             expect(c.users.length).toBe(1);
         });
     });
