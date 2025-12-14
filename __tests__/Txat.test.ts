@@ -1,5 +1,6 @@
 import * as Txat from '../src/libs/txat';
 import { POWERS, UserPresence } from '../src/libs/txat';
+import { TXAT_EVENTS } from '../src/libs/txat/events';
 
 describe('Txat', () => {
     it('should create an instance without error', () => {
@@ -85,7 +86,7 @@ describe('Channel', () => {
             const log: string[] = [];
 
             c.events.on(
-                'message.post',
+                TXAT_EVENTS.MESSAGE_POST,
                 ({
                     message,
                     user,

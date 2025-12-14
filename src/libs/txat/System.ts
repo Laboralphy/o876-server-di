@@ -3,6 +3,10 @@ import { EventEmitter } from 'node:events';
 import { CHANNEL_ATRIBUTES } from './channel-attributes';
 import { POWERS } from './powers';
 import { User } from './User';
+import { id } from 'zod/locales';
+import { TXAT_EVENTS } from './events';
+import { MessagePostDto } from './event-dto/message-post.dto';
+import { ChannelClosedDto } from './event-dto/channel-closed.dto';
 
 export class System {
     private readonly channels = new Map<string, Channel>();
@@ -22,17 +26,17 @@ export class System {
     addChannel(id: string): Channel {
         if (!this.channels.has(id)) {
             const channel = new Channel(id);
-            channel.events.on('joined', ({ recv }) =>
-                this._events.emit('channel.joined', { recv, channel })
+            channel.events.on(TXAT_EVENTS.JOINED, ({ recv }) =>
+                this._events.emit(TXAT_EVENTS.YOU_JOINED, { recv, channel })
             );
-            channel.events.on('left', ({ recv }) =>
-                this._events.emit('channel.left', { recv, channel })
+            channel.events.on(TXAT_EVENTS.LEFT, ({ recv }) =>
+                this._events.emit(TXAT_EVENTS.YOU_LEFT, { recv, channel })
             );
-            channel.events.on('user.joined', ({ recv, user }) =>
-                this._events.emit('channel.joined', { recv, channel, user })
+            channel.events.on(TXAT_EVENTS.USER_JOINED, ({ recv, user }) =>
+                this._events.emit(TXAT_EVENTS.CHANNEL_JOINED, { recv, channel, user })
             );
-            channel.events.on('user.left', ({ recv, user }) => {
-                this._events.emit('channel.left', { recv, channel, user });
+            channel.events.on(TXAT_EVENTS.USER_LEFT, ({ recv, user }) => {
+                this._events.emit(TXAT_EVENTS.CHANNEL_LEFT, { recv, channel, user });
                 if (
                     !channel.attributes.has(CHANNEL_ATRIBUTES.PERSISTANT) &&
                     channel.users.length <= 0
@@ -40,12 +44,22 @@ export class System {
                     this.removeChannel(id);
                 }
             });
-            channel.events.on('message.post', ({ recv, user, message }) =>
-                this._events.emit('channel.left', { recv, channel, user, message })
-            );
-            channel.events.on('closed', ({ recv }) =>
-                this._events.emit('channel.left', { recv, channel })
-            );
+            channel.events.on(TXAT_EVENTS.MESSAGE_POST, ({ recv, user, message }) => {
+                const dto: MessagePostDto = {
+                    recv,
+                    channel,
+                    user,
+                    message,
+                };
+                this._events.emit(TXAT_EVENTS.MESSAGE_POST, dto);
+            });
+            channel.events.on(TXAT_EVENTS.CLOSED, ({ recv }) => {
+                const dto: ChannelClosedDto = {
+                    channel,
+                    recv,
+                };
+                this._events.emit(TXAT_EVENTS.CLOSED, dto);
+            });
             this.channels.set(id, channel);
             return channel;
         } else {
@@ -99,6 +113,12 @@ export class System {
         );
     }
 
+    /**
+     * A user will joinne an existing channel
+     * (both user and channel must exist)
+     * @param idUser
+     * @param idChannel
+     */
     userJoinChannel(idUser: string, idChannel: string) {
         const user = this.users.get(idUser);
         if (!user) {
@@ -108,10 +128,30 @@ export class System {
         if (!channel) {
             throw new Error(`Channel id ${idChannel} does not exist`);
         }
+        if (user.joinedChannels.has(channel)) {
+            return;
+        }
+        // try to determine if the new channel is a tagged one
+        const sTag = channel.tag;
+        if (sTag != '') {
+            // this channel has a tag : if user is already in another channel with the same tag
+            // leaver the former channel
+            const aJoinedChannels: Channel[] = Array.from(user.joinedChannels);
+            aJoinedChannels
+                .filter((channel) => channel.tag == sTag)
+                .forEach((channel) => {
+                    this.userLeaveChannel(user.id, channel.id);
+                });
+        }
         channel.addUser(idUser).grant(POWERS.READ).grant(POWERS.WRITE);
-        user.channelJoined.add(channel);
+        user.joinedChannels.add(channel);
     }
 
+    /**
+     * An existing user is leaving a channel
+     * @param idUser
+     * @param idChannel
+     */
     userLeaveChannel(idUser: string, idChannel: string) {
         const user = this.users.get(idUser);
         if (!user) {
@@ -122,21 +162,40 @@ export class System {
             throw new Error(`Channel id ${idChannel} does not exist`);
         }
         channel.removeUser(idUser);
-        user.channelJoined.delete(channel);
+        user.joinedChannels.delete(channel);
     }
 
+    /**
+     * Register a new user in the system
+     * @param id
+     */
     registerUser(id: string) {
         const user = new User(id);
         this.users.set(id, user);
+        return user;
     }
 
-    dropUser(idUser: string) {
+    /**
+     * Return true if user is properly registrered
+     * @param idUser
+     */
+    isUserRegistered(idUser: string): boolean {
+        return this.users.has(idUser);
+    }
+
+    /**
+     * Unregister a user, and make it leave all channels
+     * @param idUser
+     */
+    unregisterUser(idUser: string) {
         // remove this user from all joined channels
         const user = this.users.get(idUser);
         if (!user) {
             throw new Error(`User ${idUser} does not exist`);
         }
-        user.channelJoined.forEach((channel) => channel.removeUser(idUser));
+        user.joinedChannels.forEach((channel) => {
+            channel.removeUser(idUser);
+        });
         this.users.delete(idUser);
     }
 }

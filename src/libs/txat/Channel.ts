@@ -3,6 +3,7 @@ import { UserPresence } from './UserPresence';
 import { POWERS } from './powers';
 import { Message } from './Message';
 import { CHANNEL_ATRIBUTES } from './channel-attributes';
+import { TXAT_EVENTS } from './events';
 
 export class Channel {
     private readonly _users = new Map<string, UserPresence>();
@@ -59,9 +60,9 @@ export class Channel {
                 throw new Error(`User ${idUser} is not allowed to access this channel.`);
             }
             const user = new UserPresence(idUser);
-            this.events.emit('joined', { recv: idUser });
+            this.events.emit(TXAT_EVENTS.JOINED, { recv: idUser });
             this._users.forEach((u: UserPresence) => {
-                this.events.emit('user.joined', { recv: u.id, user });
+                this.events.emit(TXAT_EVENTS.USER_JOINED, { recv: u.id, user });
             });
             this._users.set(idUser, user);
             return user;
@@ -78,9 +79,9 @@ export class Channel {
         const user = this._users.get(idUser);
         if (user) {
             this._users.delete(idUser);
-            this.events.emit('left', { recv: idUser });
+            this.events.emit(TXAT_EVENTS.LEFT, { recv: idUser });
             this._users.forEach((u: UserPresence) => {
-                this.events.emit('user.left', { recv: u.id, user });
+                this.events.emit(TXAT_EVENTS.USER_LEFT, { recv: u.id, user });
             });
         }
         return user;
@@ -102,7 +103,7 @@ export class Channel {
             Array.from(this._users.values())
                 .filter((u: UserPresence) => u.hasPower(POWERS.READ))
                 .forEach((u: UserPresence) => {
-                    this.events.emit('message.post', {
+                    this.events.emit(TXAT_EVENTS.MESSAGE_POST, {
                         recv: u.id,
                         user,
                         message,
@@ -118,7 +119,7 @@ export class Channel {
      */
     close() {
         this._users.forEach((u: UserPresence) => {
-            this.events.emit('closed', {
+            this.events.emit(TXAT_EVENTS.CLOSED, {
                 recv: u.id,
             });
         });
