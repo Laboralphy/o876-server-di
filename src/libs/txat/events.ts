@@ -1,6 +1,4 @@
 export enum TXAT_EVENTS {
-    CHANNEL_JOINED = 'channel.joined',
-    CHANNEL_LEFT = 'channel.left',
     MESSAGE_POST = 'message.post',
     JOINED = 'joined',
     LEFT = 'left',

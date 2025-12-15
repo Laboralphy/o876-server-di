@@ -79,5 +79,11 @@
             "waningCrescent": "Dernier croissant"
         },
         "label": "$t(moon.labels.{{ label }})"
+    },
+    "chat": {
+        "youJoined": "Vous avez rejoint le canal {{ channel }}.",
+        "youLeft": "Vous avez quitté le canal {{ channel }}.",
+        "userJoined": "{{ user }} a rejoint le canal {{ channel }}.",
+        "userLeft": "{{ user }} a quitté le canal {{ channel }}."
     }
 }

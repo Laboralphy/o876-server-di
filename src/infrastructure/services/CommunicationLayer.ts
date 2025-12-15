@@ -1,6 +1,7 @@
 import { ICommunicationLayer } from '../../application/ports/services/ICommunicationLayer';
 import { ClientSession } from '../../domain/types/ClientSession';
 import { User } from '../../domain/entities/User';
+import { CLIENT_STATES } from '../../domain/enums/client-states';
 
 /**
  * This class is used by the use-case application layer to easily perform low level network operations
@@ -48,11 +49,11 @@ export class CommunicationLayer implements ICommunicationLayer {
      */
     async dropClient(idClient: string): Promise<void> {
         const cs = this.clientSessions.get(idClient);
-        if (cs) {
-            this.unlinkClientSession(cs);
-            this.clientSessions.delete(idClient);
+        if (cs && cs.state !== CLIENT_STATES.LOGOUT) {
+            cs.state = CLIENT_STATES.LOGOUT;
             await cs.clientContext.closeConnection();
             cs.clientSocket.close(); // will cause a "onDisconnect" event
+            this.unlinkClientSession(cs);
         }
     }
 

@@ -1,4 +1,4 @@
-import { createContainer, asClass, asValue, AwilixContainer } from 'awilix';
+import { asClass, asValue, AwilixContainer, createContainer } from 'awilix';
 import { UserRepository } from '../infrastructure/persistance/json-database/UserRepository';
 
 import { Encryptor } from '../infrastructure/services/Encryptor';
@@ -57,6 +57,8 @@ import { MailContextService } from '../infrastructure/services/context-services/
 import { UserContextService } from '../infrastructure/services/context-services/UserContextService';
 import { ReadMail } from '../application/use-cases/mail/ReadMail';
 import { SendUserMessage } from '../application/use-cases/users/SendUserMessage';
+import { ChatManager } from '../infrastructure/services/ChatManager';
+import { IChatManager } from '../application/ports/services/IChatManager';
 
 /**
  * To as a new use case, port ...,
@@ -81,13 +83,16 @@ export interface Cradle {
     unbanUser: UnbanUser;
     removeUserRoles: RemoveUserRoles;
     sendUserMessage: SendUserMessage;
+
     // use cases : clients
     authenticateUser: AuthenticateUser;
     destroyClient: DestroyClient;
     sendClientMessage: SendClientMessage;
     registerClient: RegisterClient;
+
     // use cases : command
     runCommand: RunCommand;
+
     // use cases : mail
     sendMail: SendMail;
     readMail: ReadMail;
@@ -112,6 +117,8 @@ export interface Cradle {
     scriptRunner: IScriptRunner;
     moduleManager: IModuleManager;
     serverConfig: IServerConfig;
+    chatManager: IChatManager;
+
     // Api Context
     apiContextBuilder: IApiContextBuilder;
 
@@ -129,6 +136,7 @@ export const container = createContainer<Cradle>();
 container.register({
     // use cases : user secret
     setUserPassword: asClass(SetUserPassword).singleton(),
+
     // use cases : users
     createUser: asClass(CreateUser).singleton(),
     modifyUser: asClass(ModifyUser).singleton(),
@@ -174,6 +182,7 @@ container.register({
     scriptRunner: asClass(ScriptRunner).singleton(),
     moduleManager: asClass(ModuleManager).singleton(),
     serverConfig: asClass(ServerConfig).singleton(),
+    chatManager: asClass(ChatManager).singleton(),
 
     // values
     jsonDatabaseStructure: asValue(jsonDatabaseStructure),

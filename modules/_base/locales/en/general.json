@@ -79,5 +79,11 @@
             "waningCrescent": "Waning crescent"
         },
         "label": "$t(moon.labels.{{ label }})"
+    },
+    "chat": {
+        "youJoined": "You have joined channel {{ channel }}.",
+        "youLeft": "You have left channel {{ channel }}.",
+        "userJoined": "{{ user }} has joined channel {{ channel }}.",
+        "userLeft": "{{ user }} has left channel {{ channel }}."
     }
 }

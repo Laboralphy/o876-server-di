@@ -108,7 +108,7 @@ describe('SendMail', () => {
                 generateUID: () => (++uniqueIdGenerated).toString(),
             }),
             communicationLayer: asValue({
-                getUserClients: () => [],
+                getUserClient: () => undefined,
             }),
             sendClientMessage: asValue({
                 execute: async (
@@ -150,7 +150,9 @@ describe('SendMail', () => {
             'communicationLayer',
             asValue({
                 // Bob should be online now
-                getUserClients: (u: User) => [{ user: u }],
+                getUserClient: (u: User): { user: User } => ({
+                    user: u,
+                }),
             })
         );
         const sendMail = container.resolve<SendMail>('sendMail');

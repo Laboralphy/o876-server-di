@@ -23,13 +23,27 @@ export class System {
         return this._events;
     }
 
+    getUser(idUser: string): User {
+        const user = this.users.get(idUser);
+        if (user) {
+            return user;
+        } else {
+            throw new ReferenceError(`User ${idUser} not registered`);
+        }
+    }
+
+    postMessage(idSender: string, idChannel: string, message: string) {
+        this.getChannel(idChannel).postMessage(idSender, message);
+    }
+
     /**
      * Adds a new channel to the system
      * @param id channel identifier
+     * @param tag
      */
-    addChannel(id: string): Channel {
+    addChannel(id: string, tag: string = ''): Channel {
         if (!this.channels.has(id)) {
-            const channel = new Channel(id);
+            const channel = new Channel(id, tag);
             channel.events.on(TXAT_EVENTS.JOINED, ({ recv }) => {
                 const dto: YouJoinedDto = {
                     recv,
@@ -50,7 +64,7 @@ export class System {
                     user,
                     channel,
                 };
-                this._events.emit(TXAT_EVENTS.CHANNEL_JOINED, dto);
+                this._events.emit(TXAT_EVENTS.USER_JOINED, dto);
             });
             channel.events.on(TXAT_EVENTS.USER_LEFT, ({ recv, user }) => {
                 const dto: ChannelLeftDto = {
@@ -58,7 +72,7 @@ export class System {
                     channel,
                     user,
                 };
-                this._events.emit(TXAT_EVENTS.CHANNEL_LEFT, dto);
+                this._events.emit(TXAT_EVENTS.USER_LEFT, dto);
                 if (
                     !channel.attributes.has(CHANNEL_ATRIBUTES.PERSISTANT) &&
                     channel.users.length <= 0
@@ -141,17 +155,11 @@ export class System {
      * @param idUser
      * @param idChannel
      */
-    userJoinChannel(idUser: string, idChannel: string) {
-        const user = this.users.get(idUser);
-        if (!user) {
-            throw new Error(`User ${idUser} does not exist`);
-        }
+    userJoinChannel(idUser: string, idChannel: string): Channel {
+        const user = this.getUser(idUser);
         const channel = this.getChannel(idChannel);
-        if (!channel) {
-            throw new Error(`Channel id ${idChannel} does not exist`);
-        }
         if (user.joinedChannels.has(channel)) {
-            return;
+            throw new Error(`user ${idUser} is already on channel ${idChannel}`);
         }
         // try to determine if the new channel is a tagged one
         const sTag = channel.tag;
@@ -167,6 +175,7 @@ export class System {
         }
         channel.addUser(idUser).grant(POWERS.READ).grant(POWERS.WRITE);
         user.joinedChannels.add(channel);
+        return channel;
     }
 
     /**
@@ -175,10 +184,7 @@ export class System {
      * @param idChannel
      */
     userLeaveChannel(idUser: string, idChannel: string) {
-        const user = this.users.get(idUser);
-        if (!user) {
-            throw new Error(`User ${idUser} does not exist`);
-        }
+        const user = this.getUser(idUser);
         const channel = this.getChannel(idChannel);
         if (!channel) {
             throw new Error(`Channel id ${idChannel} does not exist`);
@@ -212,10 +218,7 @@ export class System {
      */
     unregisterUser(idUser: string) {
         // remove this user from all joined channels
-        const user = this.users.get(idUser);
-        if (!user) {
-            throw new Error(`User ${idUser} does not exist`);
-        }
+        const user = this.getUser(idUser);
         user.joinedChannels.forEach((channel) => {
             channel.removeUser(idUser);
         });
