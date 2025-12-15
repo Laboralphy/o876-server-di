@@ -39,5 +39,5 @@ export interface ICommunicationLayer {
      */
     dropAllClients(): void;
 
-    getUserClients(user: User): string[];
+    getUserClient(user: User): ClientSession | undefined;
 }

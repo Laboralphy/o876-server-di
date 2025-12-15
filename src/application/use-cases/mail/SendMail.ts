@@ -37,11 +37,10 @@ export class SendMail {
             throw new Error(USE_CASE_ERRORS.ENTITY_NOT_FOUND + ` user : ${recipientId}`);
         }
         // checks if online
-        const aUserClients = this.communicationLayer.getUserClients(userRecipient);
-        const userClient = aUserClients.shift();
+        const userClient = this.communicationLayer.getUserClient(userRecipient);
         if (userClient) {
             // immediately display message
-            await this.sendClientMessage.execute(userClient, 'mail-instant', {
+            await this.sendClientMessage.execute(userClient.id, 'mail-instant', {
                 sender: userRecipient.displayName,
                 message: content,
             });

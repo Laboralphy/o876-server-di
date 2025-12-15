@@ -1,0 +1,10 @@
+{{!--
+This templates renders a chat message posted by a user on a channel.
+
+@param chanColor cssColor color of the channel name
+@param channel string, channel name
+@param userColor cssColor color of the user if any
+@param user string user display name
+@param message string message content
+--}}
+💬 {{color chanColor}}[{{ channel }}]{{color ""}} {{#bold}}{{color userColor}}{{ user }}:{{/bold}} {{ message }}{{color ""}}

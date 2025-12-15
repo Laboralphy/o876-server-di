@@ -47,16 +47,14 @@ export class BanUser {
                 bannedBy: bannedBy == '' ? null : bannedBy,
             };
             await this.userRepository.save(user);
-            const aClients = this.communicationLayer.getUserClients(user);
-            await Promise.all(
-                aClients.map(async (client) => {
-                    await this.sendClientMessage.execute(client, 'user-banned', {
-                        date: forever ? null : tsEnd,
-                        reason: dto.reason,
-                    });
-                    return this.destroyClient.execute(client);
-                })
-            );
+            const client = this.communicationLayer.getUserClient(user);
+            if (client) {
+                await this.sendClientMessage.execute(client.id, 'user-banned', {
+                    date: forever ? null : tsEnd,
+                    reason: dto.reason,
+                });
+                this.destroyClient.execute(client.id);
+            }
             return user;
         } else {
             throw new Error(USE_CASE_ERRORS.ENTITY_NOT_FOUND + ` User : ${idUser}`);

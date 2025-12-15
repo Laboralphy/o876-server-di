@@ -31,14 +31,13 @@ export class CommunicationLayer implements ICommunicationLayer {
      * Retrieve all clients id from a user instance.
      * @param user user instance
      */
-    getUserClients(user: User): string[] {
-        const aClients: string[] = [];
-        for (const [idClient, clientSession] of this.clientSessions.entries()) {
+    getUserClient(user: User): ClientSession | undefined {
+        for (const [, clientSession] of this.clientSessions.entries()) {
             if (clientSession.user?.id === user.id) {
-                aClients.push(idClient);
+                return clientSession;
             }
         }
-        return aClients;
+        return undefined;
     }
 
     /**

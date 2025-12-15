@@ -34,7 +34,7 @@ export class AuthenticateUser {
         if (!user) {
             throw new Error(USE_CASE_ERRORS.ENTITY_NOT_FOUND + ` User : ${login}`);
         }
-        if (this.communicationLayer.getUserClients(user).length > 1) {
+        if (this.communicationLayer.getUserClient(user)) {
             // This user is already connected
             throw new Error(USE_CASE_ERRORS.FORBIDDEN + ` User ${login} already connected`);
         }

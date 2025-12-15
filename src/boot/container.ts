@@ -56,6 +56,7 @@ import { SendMail } from '../application/use-cases/mail/SendMail';
 import { MailContextService } from '../infrastructure/services/context-services/MailContextService';
 import { UserContextService } from '../infrastructure/services/context-services/UserContextService';
 import { ReadMail } from '../application/use-cases/mail/ReadMail';
+import { SendUserMessage } from '../application/use-cases/users/SendUserMessage';
 
 /**
  * To as a new use case, port ...,
@@ -68,7 +69,7 @@ export interface Cradle {
     // use case user secret
     setUserPassword: SetUserPassword;
 
-    // use cases
+    // use cases : users
     createUser: CreateUser;
     modifyUser: ModifyUser;
     getUserList: GetUserList;
@@ -79,14 +80,15 @@ export interface Cradle {
     banUser: BanUser;
     unbanUser: UnbanUser;
     removeUserRoles: RemoveUserRoles;
-    // use cases clients
+    sendUserMessage: SendUserMessage;
+    // use cases : clients
     authenticateUser: AuthenticateUser;
     destroyClient: DestroyClient;
     sendClientMessage: SendClientMessage;
     registerClient: RegisterClient;
-    // use cases command
+    // use cases : command
     runCommand: RunCommand;
-    // use cases mail
+    // use cases : mail
     sendMail: SendMail;
     readMail: ReadMail;
 
@@ -139,6 +141,7 @@ container.register({
     unbanUser: asClass(UnbanUser).singleton(),
     authenticateUser: asClass(AuthenticateUser).singleton(),
     removeUserRoles: asClass(RemoveUserRoles).singleton(),
+    sendUserMessage: asClass(SendUserMessage).singleton(),
 
     // use cases : clients
     destroyClient: asClass(DestroyClient).singleton(),

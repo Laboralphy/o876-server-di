@@ -7,6 +7,10 @@ import { id } from 'zod/locales';
 import { TXAT_EVENTS } from './events';
 import { MessagePostDto } from './event-dto/message-post.dto';
 import { ChannelClosedDto } from './event-dto/channel-closed.dto';
+import { ChannelJoinedDto } from './event-dto/channel-joined.dto';
+import { YouLeftDto } from './event-dto/you-left';
+import { YouJoinedDto } from './event-dto/you-joined';
+import { ChannelLeftDto } from './event-dto/channel-left';
 
 export class System {
     private readonly channels = new Map<string, Channel>();
@@ -26,17 +30,35 @@ export class System {
     addChannel(id: string): Channel {
         if (!this.channels.has(id)) {
             const channel = new Channel(id);
-            channel.events.on(TXAT_EVENTS.JOINED, ({ recv }) =>
-                this._events.emit(TXAT_EVENTS.YOU_JOINED, { recv, channel })
-            );
-            channel.events.on(TXAT_EVENTS.LEFT, ({ recv }) =>
-                this._events.emit(TXAT_EVENTS.YOU_LEFT, { recv, channel })
-            );
-            channel.events.on(TXAT_EVENTS.USER_JOINED, ({ recv, user }) =>
-                this._events.emit(TXAT_EVENTS.CHANNEL_JOINED, { recv, channel, user })
-            );
+            channel.events.on(TXAT_EVENTS.JOINED, ({ recv }) => {
+                const dto: YouJoinedDto = {
+                    recv,
+                    channel,
+                };
+                this._events.emit(TXAT_EVENTS.YOU_JOINED, dto);
+            });
+            channel.events.on(TXAT_EVENTS.LEFT, ({ recv }) => {
+                const dto: YouLeftDto = {
+                    recv,
+                    channel,
+                };
+                this._events.emit(TXAT_EVENTS.YOU_LEFT, dto);
+            });
+            channel.events.on(TXAT_EVENTS.USER_JOINED, ({ recv, user }) => {
+                const dto: ChannelJoinedDto = {
+                    recv,
+                    user,
+                    channel,
+                };
+                this._events.emit(TXAT_EVENTS.CHANNEL_JOINED, dto);
+            });
             channel.events.on(TXAT_EVENTS.USER_LEFT, ({ recv, user }) => {
-                this._events.emit(TXAT_EVENTS.CHANNEL_LEFT, { recv, channel, user });
+                const dto: ChannelLeftDto = {
+                    recv,
+                    channel,
+                    user,
+                };
+                this._events.emit(TXAT_EVENTS.CHANNEL_LEFT, dto);
                 if (
                     !channel.attributes.has(CHANNEL_ATRIBUTES.PERSISTANT) &&
                     channel.users.length <= 0
@@ -168,9 +190,10 @@ export class System {
     /**
      * Register a new user in the system
      * @param id
+     * @param name
      */
-    registerUser(id: string) {
-        const user = new User(id);
+    registerUser(id: string, name: string = '') {
+        const user = new User(id, name === '' ? id : name);
         this.users.set(id, user);
         return user;
     }

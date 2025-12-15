@@ -28,7 +28,7 @@ export class UserContextService extends AbstractContextService {
      * @param user user instance
      */
     isConnected(user: User): boolean {
-        return this.communicationLayer.getUserClients(user).length > 0;
+        return !!this.communicationLayer.getUserClient(user);
     }
 
     /**
