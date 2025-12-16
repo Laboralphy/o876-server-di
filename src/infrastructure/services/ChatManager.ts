@@ -5,6 +5,9 @@ import { SendUserMessage } from '../../application/use-cases/users/SendUserMessa
 import { IChatManager } from '../../application/ports/services/IChatManager';
 import { CHANNEL_ATRIBUTES } from '../../libs/txat/channel-attributes';
 import { User } from '../../domain/entities/User';
+import { debug } from '../../libs/o876-debug';
+
+const debugTxat = debug('srv:txat');
 
 const SCOPED_CHANNEL_SEPARATOR = '#';
 
@@ -65,6 +68,7 @@ export class ChatManager implements IChatManager {
     }
 
     registerUser(user: User) {
+        debugTxat('registering user %s to chat system', user.id);
         this._txat.registerUser(user.id, user.displayName);
         for (const cd of this.channelDefinitions.values()) {
             if (cd.autojoin) {
@@ -74,6 +78,7 @@ export class ChatManager implements IChatManager {
     }
 
     unregisterUser(user: User) {
+        debugTxat('removing user %s from chat system', user.id);
         this._txat.unregisterUser(user.id);
     }
 
