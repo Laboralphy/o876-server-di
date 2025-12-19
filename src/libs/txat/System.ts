@@ -28,7 +28,7 @@ export class System {
         if (user) {
             return user;
         } else {
-            throw new ReferenceError(`User ${idUser} not registered`);
+            throw new ReferenceError(`User ${idUser} not registered in chat system`);
         }
     }
 

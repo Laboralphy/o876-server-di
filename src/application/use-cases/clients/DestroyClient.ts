@@ -23,6 +23,8 @@ export class DestroyClient {
         const cs = this.communicationLayer.getClientSession(idClient);
         const user = cs.user;
         if (user) {
+            if (this.chatManager) {
+            }
             this.chatManager.unregisterUser(user);
         }
         this.communicationLayer.dropClient(idClient);
