@@ -1,6 +1,7 @@
 import { Cradle } from '../../../boot/container';
 import { ICommunicationLayer } from '../../ports/services/ICommunicationLayer';
 import { IChatManager } from '../../ports/services/IChatManager';
+import { CLIENT_STATES } from '../../../domain/enums/client-states';
 
 /**
  * This use case destroys a registered client, because its connection has been close.
@@ -20,13 +21,13 @@ export class DestroyClient {
     execute(idClient: string): void {
         // If this use case is initiated by the server, then the client socket dropping will certainly
         // trigger the use case a second time, but as the client will be dropped, nothing serious will occur.
-        const cs = this.communicationLayer.getClientSession(idClient);
-        const user = cs.user;
-        if (user) {
-            if (this.chatManager) {
+        try {
+            const cs = this.communicationLayer.getClientSession(idClient);
+            const user = cs.user;
+            if (user) {
+                this.chatManager.unregisterUser(user);
             }
-            this.chatManager.unregisterUser(user);
-        }
-        this.communicationLayer.dropClient(idClient);
+            this.communicationLayer.dropClient(idClient);
+        } catch {}
     }
 }

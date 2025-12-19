@@ -23,7 +23,7 @@ export type ChannelDefinition = {
 
 export class ChatManager implements IChatManager {
     private readonly _txat = new Txat.System();
-    private channelDefinitions = new Map<string, ChannelDefinition>();
+    private readonly channelDefinitions = new Map<string, ChannelDefinition>();
     private readonly sendUserMessage: SendUserMessage;
     private readonly scopedChannelPrefixes = new Map<string, ChannelDefinition>();
 
@@ -47,13 +47,15 @@ export class ChatManager implements IChatManager {
             this.onYouLeft(recv, channel)
         );
 
-        txatEvents.on(TXAT_EVENTS.USER_JOINED, ({ recv, channel, user }: Txat.ChannelJoinedDto) =>
-            this.onUserJoined(recv, user, channel)
-        );
+        // too much verbosity for the users
 
-        txatEvents.on(TXAT_EVENTS.USER_LEFT, ({ recv, channel, user }: Txat.ChannelLeftDto) =>
-            this.onUserLeft(recv, user, channel)
-        );
+        // txatEvents.on(TXAT_EVENTS.USER_JOINED, ({ recv, channel, user }: Txat.ChannelJoinedDto) =>
+        //     this.onUserJoined(recv, user, channel)
+        // );
+        //
+        // txatEvents.on(TXAT_EVENTS.USER_LEFT, ({ recv, channel, user }: Txat.ChannelLeftDto) =>
+        //     this.onUserLeft(recv, user, channel)
+        // );
     }
 
     defineChannel(cd: ChannelDefinition) {
@@ -69,12 +71,12 @@ export class ChatManager implements IChatManager {
 
     registerUser(user: User) {
         this._txat.registerUser(user.id, user.displayName);
-        debugTxat('user %s is registered to chat system', user.id);
         for (const cd of this.channelDefinitions.values()) {
             if (cd.autojoin) {
                 this.joinChannel(user.id, cd.id);
             }
         }
+        debugTxat('user %s is registered to chat system', user.id);
     }
 
     unregisterUser(user: User) {
@@ -188,11 +190,12 @@ export class ChatManager implements IChatManager {
      * @param channel
      */
     async onUserJoined(recv: string, user: Txat.UserPresence, channel: Txat.Channel) {
-        const u = this._txat.getUser(user.id);
-        await this.sendUserMessage.execute(recv, 'chat.userJoined', {
-            user: u.name,
-            channel: channel.id,
-        });
+        // This is way too verbose
+        // const u = this._txat.getUser(user.id);
+        // await this.sendUserMessage.execute(recv, 'chat.userJoined', {
+        //     user: u.name,
+        //     channel: channel.id,
+        // });
     }
 
     /**
@@ -202,10 +205,11 @@ export class ChatManager implements IChatManager {
      * @param channel
      */
     async onUserLeft(recv: string, user: Txat.UserPresence, channel: Txat.Channel) {
-        const u = this._txat.getUser(user.id);
-        await this.sendUserMessage.execute(recv, 'chat.userLeft', {
-            user: u.name,
-            channel: channel.id,
-        });
+        // This is way too verbose
+        // const u = this._txat.getUser(user.id);
+        // await this.sendUserMessage.execute(recv, 'chat.userLeft', {
+        //     user: u.name,
+        //     channel: channel.id,
+        // });
     }
 }

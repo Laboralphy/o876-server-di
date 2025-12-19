@@ -21,9 +21,12 @@ export class SendUserMessage {
             throw new ReferenceError(`User ${userId} not found`);
         }
         const client = this.communicationLayer.getUserClient(user);
-        if (!client) {
-            throw new ReferenceError(`User ${userId} not connected`);
+        if (client) {
+            return this.sendClientMessage.execute(client.id, key, parameters);
         }
-        return this.sendClientMessage.execute(client.id, key, parameters);
+        // if there is no client attached to the user then maybe the user has just been disconnected
+        // and the SendUserMessage.execute has been somehow delayed.
+        // This happens when a user disconnected and the chat system is trying to notify the departing user
+        // that he has left all previously joined channel
     }
 }

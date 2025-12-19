@@ -8,6 +8,7 @@ import { getMoonPhase } from '../../libs/moon-phase';
 import { debug } from '../../libs/o876-debug';
 import { MailContextService } from './context-services/MailContextService';
 import { UserContextService } from './context-services/UserContextService';
+import { ChatContextService } from './context-services/ChatContextService';
 
 const debugCtx = debug('srv:apictx');
 
@@ -17,6 +18,7 @@ export class ApiContextBuilder implements IApiContextBuilder {
     private readonly idClient: string;
     private readonly mailContextService: MailContextService;
     private readonly userContextService: UserContextService;
+    private readonly chatContextService: ChatContextService;
 
     constructor(cradle: ClientCradle) {
         // use cases
@@ -29,6 +31,7 @@ export class ApiContextBuilder implements IApiContextBuilder {
         // context services
         this.mailContextService = cradle.mailContextService;
         this.userContextService = cradle.userContextService;
+        this.chatContextService = cradle.chatContextService;
     }
 
     buildApiContext(): IClientContext {
@@ -73,6 +76,7 @@ export class ApiContextBuilder implements IApiContextBuilder {
 
             mail: this.mailContextService,
             user: this.userContextService,
+            chat: this.chatContextService,
         };
         return cmdContext;
     }

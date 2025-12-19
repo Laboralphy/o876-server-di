@@ -19,7 +19,7 @@ export enum CHANNEL_TAGS {
 
 export const CHANNEL_DEFINITION: ChannelDefinition[] = [
     {
-        id: 'general',
+        id: 'global',
         tag: '',
         persistent: true,
         readonly: false,
@@ -37,7 +37,7 @@ export const CHANNEL_DEFINITION: ChannelDefinition[] = [
         autojoin: true,
     },
     {
-        id: 'answers',
+        id: 'questions',
         tag: '',
         persistent: true,
         readonly: false,

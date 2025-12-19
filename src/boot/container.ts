@@ -59,6 +59,9 @@ import { ReadMail } from '../application/use-cases/mail/ReadMail';
 import { SendUserMessage } from '../application/use-cases/users/SendUserMessage';
 import { ChatManager } from '../infrastructure/services/ChatManager';
 import { IChatManager } from '../application/ports/services/IChatManager';
+import { ChatJoinChannel } from '../application/use-cases/chat/ChatJoinChannel';
+import { ChatPostMessage } from '../application/use-cases/chat/ChatPostMessage';
+import { ChatContextService } from '../infrastructure/services/context-services/ChatContextService';
 
 /**
  * To as a new use case, port ...,
@@ -68,6 +71,11 @@ import { IChatManager } from '../application/ports/services/IChatManager';
 
 export interface Cradle {
     // use cases
+
+    // chat manager use cases
+    chatJoinChannel: ChatJoinChannel;
+    chatPostMessage: ChatPostMessage;
+
     // use case user secret
     setUserPassword: SetUserPassword;
 
@@ -128,12 +136,17 @@ export interface Cradle {
     // Api context services
     mailContextService: MailContextService;
     userContextService: UserContextService;
+    chatContextService: ChatContextService;
 }
 // Container creation
 export const container = createContainer<Cradle>();
 
 // Registering dependencies
 container.register({
+    // use cases : chat manager
+    chatJoinChannel: asClass(ChatJoinChannel).singleton(),
+    chatPostMessage: asClass(ChatPostMessage).singleton(),
+
     // use cases : user secret
     setUserPassword: asClass(SetUserPassword).singleton(),
 
@@ -198,6 +211,7 @@ container.register({
     // Api context services
     mailContextService: asClass(MailContextService).scoped(),
     userContextService: asClass(UserContextService).scoped(),
+    chatContextService: asClass(ChatContextService).scoped(),
 });
 
 /**

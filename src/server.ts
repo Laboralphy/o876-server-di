@@ -2,6 +2,7 @@ import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import { userRoutes } from './infrastructure/web/routes/user.routes';
 import { container, createClientContainer } from './boot/container';
+import { CHANNEL_DEFINITION } from './boot/channels';
 import { scopePerRequest } from 'awilix-koa';
 import { debug } from './libs/o876-debug';
 import { getEnv } from './boot/dotenv';
@@ -68,7 +69,7 @@ export class Server {
     }
 
     async initDatabase() {
-        debugServer('json-database init phase');
+        debugServer('initializing json-database');
         const database = container.resolve('database');
         await database.init({
             host: this.env.SERVER_DB_HOST ?? '',
@@ -77,6 +78,15 @@ export class Server {
             port: parseInt(this.env.SERVER_DB_PORT ?? ''),
             name: this.env.SERVER_DB_NAME ?? '',
         });
+    }
+
+    async initChatService() {
+        debugServer('initializing chat service');
+        const chatManager = container.resolve('chatManager');
+        for (const cd of CHANNEL_DEFINITION) {
+            debugServer('- chat channel %s', cd.id);
+            chatManager.defineChannel(cd);
+        }
     }
 
     /**
@@ -161,6 +171,7 @@ export class Server {
         await this.initHbs();
         await this.initDataDirectory();
         await this.initDatabase();
+        await this.initChatService();
         await this.initApiService();
         await this.initTelnetService();
         await this.initWebsocketService();
