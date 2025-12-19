@@ -108,7 +108,6 @@ export class TelnetClientController extends AbstractClientController {
                     // And send a message
                     await this.createAccountProcess(clientSession);
                 } else {
-                    debugTelnet('client %s : submits username %s', clientSession.id, message);
                     // regular username
                     clientSession.login = message;
                     // prompt the "enter password" message
@@ -127,7 +126,6 @@ export class TelnetClientController extends AbstractClientController {
                 if (user) {
                     // authentication ok
                     // send a welcome message
-                    debugTelnet('client %s : is authenticated as %s', clientSession.id, user.name);
                     await this.sendMessage(clientSession.id, 'welcome.authenticated', {
                         name: user.name,
                     });

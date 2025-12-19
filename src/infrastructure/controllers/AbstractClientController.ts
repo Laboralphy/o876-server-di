@@ -19,6 +19,7 @@ import { FindUser } from '../../application/use-cases/users/FindUser';
 import { JsonObject } from '../../domain/types/JsonStruct';
 import { SetUserPassword } from '../../application/use-cases/user-secrets/SetUserPassword';
 import { IClientContext } from '../../application/ports/classes/IClientContext';
+import { id } from 'zod/locales';
 
 const debugClient = debug('srv:client');
 
@@ -62,6 +63,7 @@ export abstract class AbstractClientController {
 
     execCommand(idClient: string, sCommand: string) {
         const csd = this.communicationLayer.getClientSession(idClient);
+        debugClient('%s : %s > %s', csd.user?.name, sCommand);
         return this.runCommand.execute(csd, sCommand);
     }
 
@@ -143,7 +145,7 @@ export abstract class AbstractClientController {
     async setLoginPassword(idClient: string, password: string) {
         const csd = this.communicationLayer.getClientSession(idClient);
         try {
-            debugClient('client %s password : ********', idClient);
+            debugClient('client %s login as %s password : ********', idClient, csd.login);
             csd.user = await this.authenticateUser.execute(csd.login, password);
             const ban = await this.getUserBan.execute(csd.user.id);
             if (ban) {

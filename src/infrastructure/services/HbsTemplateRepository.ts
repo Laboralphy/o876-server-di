@@ -83,7 +83,6 @@ export class HbsTemplateRepository implements ITemplateRepository {
             return stringRepository.render(key, { ...options.data.root, ...options.hash });
         });
         handlebars.registerHelper('date', function (ts: string, format: string | HelperOptions) {
-            console.log();
             if (typeof format !== 'string') {
                 format = 'ymd hm';
             }
