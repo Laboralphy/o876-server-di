@@ -11,8 +11,10 @@ async function main() {
     yargs(hideBin(process.argv))
         .locale(sLang)
         .command('user', render('userCmd.describe'), user)
-        .help()
+        .demandCommand(1)
+        .help('help')
         .alias('h', 'help')
+        .showHelpOnFail(true, render('helpOnFail.message'))
         .parseAsync()
         .catch((err) => {
             console.error('Error:', err.message);

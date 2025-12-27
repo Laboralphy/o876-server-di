@@ -17,4 +17,5 @@ export function user(yargs: Argv) {
     banCommand(yargs);
     unbanCommand(yargs);
     passwordCommand(yargs);
+    return yargs.demandCommand(1);
 }

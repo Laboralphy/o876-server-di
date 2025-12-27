@@ -4,16 +4,15 @@ import { User } from '../../../../domain/entities/User';
 import { PatchUserDto } from '../../../web/dto/PatchUserDto';
 import { render } from '../../../../libs/i18n-loader';
 import { ROLES } from '../../../../domain/enums/roles';
-import YAML from 'yaml';
 import { fetchUserInfo } from './info';
 
 interface IUserModifyArgs extends Arguments {
     user: string;
     email?: string;
     name?: string;
-    displayName?: string;
-    grant?: string;
-    revoke?: string;
+    displayname?: string;
+    grant?: 'm' | 'g' | 'a';
+    revoke?: 'm' | 'g' | 'a';
 }
 
 export function modifyCommand(yargs: Argv): Argv {
@@ -39,7 +38,7 @@ export function modifyCommand(yargs: Argv): Argv {
                     alias: 'm',
                     demandOption: false,
                 })
-                .option('display-name', {
+                .option('displayname', {
                     type: 'string',
                     describe: render('userModifyCmd.displayNameOpt'),
                     alias: 'd',
@@ -66,8 +65,8 @@ export function modifyCommand(yargs: Argv): Argv {
                 if (argv.email) {
                     oPayload.email = argv.email;
                 }
-                if (argv.displayName) {
-                    oPayload.displayName = argv.displayName;
+                if (argv.displayname) {
+                    oPayload.displayName = argv.displayname;
                 }
                 const roles = new Set<ROLES>(user.roles);
                 switch (argv.grant) {

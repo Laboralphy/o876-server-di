@@ -9,6 +9,10 @@ import { debug } from '../../libs/o876-debug';
 import { MailContextService } from './context-services/MailContextService';
 import { UserContextService } from './context-services/UserContextService';
 import { ChatContextService } from './context-services/ChatContextService';
+import { ITemplateRepository } from '../../application/ports/services/ITemplateRepository';
+import { IStringRepository } from '../../application/ports/services/IStringRepository';
+import { TimeContextService } from './context-services/TimeContextService';
+import { IScriptRunner } from '../../application/ports/services/IScriptRunner';
 
 const debugCtx = debug('srv:apictx');
 
@@ -19,6 +23,9 @@ export class ApiContextBuilder implements IApiContextBuilder {
     private readonly mailContextService: MailContextService;
     private readonly userContextService: UserContextService;
     private readonly chatContextService: ChatContextService;
+    private readonly stringRepository: IStringRepository;
+    private readonly timeContextService: TimeContextService;
+    private readonly scriptRunner: IScriptRunner;
 
     constructor(cradle: ClientCradle) {
         // use cases
@@ -32,13 +39,29 @@ export class ApiContextBuilder implements IApiContextBuilder {
         this.mailContextService = cradle.mailContextService;
         this.userContextService = cradle.userContextService;
         this.chatContextService = cradle.chatContextService;
+        this.timeContextService = cradle.timeContextService;
+
+        // repositories
+        this.stringRepository = cradle.stringRepository;
+
+        // services
+        this.scriptRunner = cradle.scriptRunner;
     }
 
     buildApiContext(): IClientContext {
         const idClient = this.idClient;
+
+        const strref = (key: string, parameters?: JsonObject): string => {
+            return this.stringRepository.render(key, parameters);
+        };
+
         const print = (key: string, parameters?: JsonObject): Promise<void> => {
             return this.sendClientMessage.execute(idClient, key, parameters);
         };
+
+        const aCommandNames: string[] = this.scriptRunner.scriptNames
+            .filter((c) => c.startsWith('commands/'))
+            .map((c) => c.substring(9));
 
         let closingClient: boolean = false;
 
@@ -50,24 +73,17 @@ export class ApiContextBuilder implements IApiContextBuilder {
             /****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ******/
 
             print,
+            strref,
+
+            get commandNames() {
+                return aCommandNames;
+            },
 
             closeConnection: async () => {
                 if (!closingClient) {
                     closingClient = true;
                     this.destroyClient.execute(idClient);
                 }
-            },
-
-            getServerTime: () => {
-                const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                const date = new Date();
-                const now = date.getTime();
-                const moon = getMoonPhase(date);
-                return {
-                    now,
-                    timezone,
-                    moon,
-                };
             },
 
             /****** API CONTEXT SERVICES ****** API CONTEXT SERVICES ****** API CONTEXT SERVICES ******/
@@ -77,6 +93,7 @@ export class ApiContextBuilder implements IApiContextBuilder {
             mail: this.mailContextService,
             user: this.userContextService,
             chat: this.chatContextService,
+            time: this.timeContextService,
         };
         return cmdContext;
     }

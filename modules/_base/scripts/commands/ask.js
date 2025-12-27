@@ -12,7 +12,11 @@ const COLOR_GREEN = ESC + ANSI_COLOR_FG + '46m';
  * @param params {string[]}
  */
 function main(ctx, params) {
-    ctx.chat.postMessage('questions', COLOR_ORANGE + params.join(' '));
+    const CHANNEL = 'questions';
+    if (!ctx.chat.isChannelActive(CHANNEL)) {
+        ctx.chat.switchChannel(CHANNEL, true);
+    }
+    ctx.chat.postMessage(CHANNEL, COLOR_ORANGE + params.join(' '));
 }
 
 main(context, parameters);

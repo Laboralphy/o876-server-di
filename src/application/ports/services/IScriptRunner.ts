@@ -7,6 +7,11 @@ export interface IScriptRunner {
     setContext(context: Record<string, never>): void;
 
     /**
+     * Returns all script names
+     */
+    get scriptNames(): string[];
+
+    /**
      * Compiles a script source code.
      * You must provide an identifier to fetch script at later moment
      * the full path is usefull for "require" calls

@@ -25,11 +25,17 @@ enum PHASES {
     EXPECT_CURRENT_PASSWORD,
     EXPECT_NEW_PASSWORD,
     EXPECT_CONFIRM_PASSWORD,
+    EXPECT_TEXT_LINE,
 }
 
 type ChangePasswordStruct = {
     currentPassword: string;
     newPassword: string;
+};
+
+type TextEditorStruct = {
+    lines: string[];
+    prevState: CLIENT_STATES;
 };
 
 /**
@@ -43,6 +49,7 @@ export class TelnetClientController extends AbstractClientController {
     private phase: PHASES;
     private changePasswordStruct: ChangePasswordStruct;
     private createAccountStruct: CreateUserDto;
+    private textEditorStruct: TextEditorStruct;
 
     constructor(cradle: ClientCradle) {
         super(cradle);
@@ -57,6 +64,10 @@ export class TelnetClientController extends AbstractClientController {
             password: '',
             displayName: '',
             email: '',
+        };
+        this.textEditorStruct = {
+            lines: [],
+            prevState: CLIENT_STATES.NONE,
         };
         this.apiContextBuilder = cradle.apiContextBuilder;
     }
@@ -121,9 +132,9 @@ export class TelnetClientController extends AbstractClientController {
                 // exit password mode
                 await this.exitPasswordMode(clientSession.id);
                 // client is expected to enter password
-                await this.setLoginPassword(clientSession.id, message);
-                const user = this.getAuthenticatedUser(clientSession.id);
-                if (user) {
+                const bLogInResult = await this.setLoginPassword(clientSession.id, message);
+                if (bLogInResult) {
+                    const user = this.getAuthenticatedUser(clientSession.id)!;
                     // authentication ok
                     // send a welcome message
                     await this.sendMessage(clientSession.id, 'welcome.authenticated', {
@@ -132,10 +143,17 @@ export class TelnetClientController extends AbstractClientController {
                     // Change client state
                     clientSession.state = CLIENT_STATES.AUTHENTICATED;
                 } else {
-                    debugTelnet('client %s : authentication failed', clientSession.id);
-                    await this.pauseClient(clientSession.id, 1250);
-                    await this.sendMessage(clientSession.id, 'welcome.badLogin');
+                    if (clientSession.state === CLIENT_STATES.BANNED) {
+                        debugTelnet('client %s : user banned', clientSession.id);
+                        await this.pauseClient(clientSession.id, 100);
+                    } else {
+                        debugTelnet('client %s : authentication failed', clientSession.id);
+                        await this.pauseClient(clientSession.id, 100);
+                        await this.sendMessage(clientSession.id, 'welcome.badLogin');
+                    }
                     await this.dropClient(clientSession.id);
+                    this.phase = PHASES.NONE;
+                    break;
                 }
                 this.phase = PHASES.NONE;
                 break;
@@ -361,6 +379,21 @@ export class TelnetClientController extends AbstractClientController {
     async textEditorProcess(clientSession: ClientSession, message: string = '') {
         // user is expected to enter lines of text
         // text editor process ends when a single period sign is entered
+        if (this.phase == PHASES.NONE) {
+            this.phase = PHASES.EXPECT_TEXT_LINE;
+            this.textEditorStruct = {
+                lines: [message.replace(/\|$/, '').trim()],
+                prevState: clientSession.state,
+            };
+            clientSession.state = CLIENT_STATES.TEXT_EDITOR;
+            await this.sendMessage(clientSession.id, 'textEditor.starting');
+        } else if (message == '.') {
+            // end of text editor mode
+            clientSession.state = this.textEditorStruct.prevState;
+            await this.execCommand(clientSession.id, this.textEditorStruct.lines.join('\n').trim());
+        } else {
+            this.textEditorStruct.lines.push(message);
+        }
     }
 
     /**
@@ -417,7 +450,19 @@ export class TelnetClientController extends AbstractClientController {
 
                     case CLIENT_STATES.AUTHENTICATED: {
                         // When client is authenticated, all message are passed to th command interpreter
-                        await this.execCommand(idClient, message);
+                        if (message.endsWith('|')) {
+                            await this.textEditorProcess(
+                                clientSession,
+                                message.slice(0, message.length - 1)
+                            );
+                        } else {
+                            await this.execCommand(idClient, message);
+                        }
+                        break;
+                    }
+
+                    case CLIENT_STATES.TEXT_EDITOR: {
+                        await this.textEditorProcess(csd, message);
                         break;
                     }
 

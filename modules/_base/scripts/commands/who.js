@@ -37,6 +37,7 @@ async function main(ctx, params) {
                 moderator: user.roles.includes('MODERATOR'),
                 gameMaster: user.roles.includes('GAME_MASTER'),
             }))
+            .slice(0, 25)
             .sort((a, b) => {
                 if (a.online === b.online) {
                     return a.name.localeCompare(b.name);
@@ -46,7 +47,7 @@ async function main(ctx, params) {
             }),
         params[0]
     );
-    await ctx.print('user-list', { users: userFoundList });
+    await ctx.print('user-list', { users: userFoundList, more: users > 25 });
 }
 
 module.exports = main(context, parameters);

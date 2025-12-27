@@ -8,4 +8,5 @@ export enum CLIENT_STATES {
     CHANGE_PASSWORD, // user has requested to change password
     PAUSE, // client is temporary in pause ignoring any message
     LOGOUT, // client is loging out
+    BANNED, // client could not log in because user is banned
 }

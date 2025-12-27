@@ -49,6 +49,7 @@ export class BanUser {
             await this.userRepository.save(user);
             const client = this.communicationLayer.getUserClient(user);
             if (client) {
+                client.user = user;
                 await this.sendClientMessage.execute(client.id, 'user-banned', {
                     date: forever ? null : tsEnd,
                     reason: dto.reason,

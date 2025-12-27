@@ -2,12 +2,15 @@ import { IUserRepository } from '../../../domain/ports/repositories/IUserReposit
 import { ModifyUserDto, ModifyUserDtoSchema } from '../../dto/ModifyUserDto';
 import { Cradle } from '../../../boot/container';
 import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
+import { ICommunicationLayer } from '../../ports/services/ICommunicationLayer';
 
 export class ModifyUser {
     private readonly userRepository: IUserRepository;
+    private readonly communicationLayer: ICommunicationLayer;
 
     constructor(cradle: Cradle) {
         this.userRepository = cradle.userRepository;
+        this.communicationLayer = cradle.communicationLayer;
     }
 
     async execute(idUser: string, dto: ModifyUserDto) {
@@ -30,8 +33,16 @@ export class ModifyUser {
                 user.roles = dto.roles;
                 modified = true;
             }
+            if (typeof dto.female == 'boolean') {
+                user.female = dto.female;
+                modified = true;
+            }
             if (modified) {
                 await this.userRepository.save(user);
+                const clientSession = this.communicationLayer.getUserClient(user);
+                if (clientSession) {
+                    clientSession.user = user;
+                }
             }
             return user;
         } else {

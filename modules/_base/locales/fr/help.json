@@ -1,0 +1,191 @@
+{
+    "help": {
+        "general": {
+            "description": "Description",
+            "syntax": "Syntaxe",
+            "parameters": "Paramètres",
+            "noParam": "Pas de paramètres"
+        },
+        "answer": {
+            "shortdesc": "Répond à un utilisateur sur le canal \"questions\".",
+            "description": "Permet d'envoyer un message sur le canal \"questions\". Ce message sera coloré en vert pour indiquer qu'il s'agit d'une réponse à une précédente question posée par un autre utilisateur.",
+            "syntax": "<réponse>",
+            "parameters": [
+                {
+                    "name": "réponse",
+                    "description": "Contenu de la réponse qui sera affiché tel quel sur le canal \"questions\"."
+                }
+            ]
+        },
+        "ask": {
+            "shortdesc": "Demande assistance sur le canal \"questions\".",
+            "description": "Permet de poser une question sur le canal \"questions\", tous les utilisateur qui écoute ce canal recevront la question, et peuvent y répondre avec la commande \"answer\". Sur ce canal, les question sont colorée en orange pour pouvoir les distinguer des réponses.",
+            "syntax": "<question>",
+            "parameters": [
+                {
+                    "name": "question",
+                    "description": "Question qui sera postée (colorisée en orange) dans le canal \"questions\"."
+                }
+            ]
+        },
+        "broadcast": {
+            "shortdesc": "(mod, gm, admin) Diffuse un message sur le canal \"info\".",
+            "description": "Commande accessible aux modérateurs, game masters, et administrateurs. Permet de poster des messages d'annonce à destination de tous les autres utilisateurs connectés. Il s'agit généralement de message d'annonce concernant la maintenance du service, ou des évènements à venir.",
+            "syntax": "<annonce>",
+            "parameters": [
+                {
+                    "name": "annonce",
+                    "description": "Contenu de l'annonce qui sera diffusée sur le canal \"info\""
+                }
+            ]
+        },
+        "bugreport": {
+            "shortdesc": "Envoie la description d'un bug sur le canal \"bugreports\".",
+            "description": "Permet à quiconque de poster un message rapportant une anomalie du service rencontrée par l'utilisateur, cela signalera le problème à un administrateur qui pourra tenter de le corriger.",
+            "syntax": "<message>",
+            "parameters": [
+                {
+                    "name": "message",
+                    "description": "Brève description de l'erreur rencontrée."
+                }
+            ]
+        },
+        "channels": {
+            "shortdesc": "Affiche la liste des canaux de discussions.",
+            "description": "Affiche la liste des canaux auxquels l'utilisateur est connecté ; ainsi que, pour chaque canal, s'il est actif ou pas. Certains canaux peuvent être rendu inactifs par l'utilisateur qui ne souhaite plus recevoir de message.",
+            "syntax": "",
+            "parameters": []
+        },
+        "echo": {
+            "shortdesc": "Affiche ce qui a été tapé en paramètre",
+            "description": "Affiche ce qui a été tapé en paramètre de cette commande.",
+            "syntax": "<texte>",
+            "parameters": [
+                {
+                    "name": "texte",
+                    "description": "Chaîne de caractères à afficher."
+                }
+            ]
+        },
+        "logout": {
+            "shortdesc": "Déconnexion.",
+            "description": "L'utilisateur se déconnecte du service.",
+            "syntax": "",
+            "parameters": []
+        },
+        "global": {
+            "shortdesc": "Poste un message sur le canal \"global\".",
+            "description": "Permet à l'utilisateur de poster un message public sur le canal de discussion \"global\", à destination de tous les autres utilisateurs connectés. L'utilisattion de ce canal est principalement OOC (out-of-character) et les discussions les plus diverse ont lieu sur ce canal.",
+            "syntax": "<message>",
+            "parameters": [
+                {
+                    "name": "message",
+                    "description": "Contenu du message à afficher sur le canal \"global\""
+                }
+            ]
+        },
+        "gossip": {
+            "shortdesc": "Poste un message sur le canal \"rumors\".",
+            "description": "Permet à l'utilisateur de poster une message sur le canal de discussion \"rumors\", à destination de tous les autres utilisateurs connectés. L'utilisattion de ce canal est principalement IC (in-character) et Role Play",
+            "syntax": "<message>",
+            "parameters": [
+                {
+                    "name": "message",
+                    "description": "Contenu du message à poster sur le canal \"rumors\"."
+                }
+            ]
+        },
+        "passwd": {
+            "shortdesc": "Change le mot de passe utilisateur (interactif).",
+            "description": "Procède au changement du mot de passe de l'utilisateur. Notez que la commande ne prend pas de paramètres : le système demandera l'ancien et le nouveau mot de passe de manière interactive.",
+            "syntax": "",
+            "parameters": []
+        },
+        "questions": {
+            "shortdesc": "Active/Désactive le canal \"questions\".",
+            "description": "Active ou désactive alternativement l'écoute sur le canal \"questions\". Lorsque l'écoute est désactivée l'utilisateur ne reçois plus de essage en provenance de ce canal et l'utilisation de la commande \"answer\" est également désactivée. Si l'utilisateur tente d'utiliser la commande \"ask\" l'écoute se réactive automatiquement.",
+            "syntax": "",
+            "parameters": []
+        },
+        "readmsg": {
+            "shortdesc": "Lecture des messages privés.",
+            "description": "Affiche le plus ancien message privé non lu, envoyé par un autre utilisateur. Voir la commande \"sendmsg\" pour savoir comment envoyer des message privé à destination d'utilisateur non connectés.",
+            "syntax": "",
+            "parameters": []
+        },
+        "sendmsg": {
+            "shortdesc": "Envoi d'un message privé.",
+            "description": "Permet d'envoyer un message privé à un autre utilisateur, qu'il soit connecté ou pas. S'il l'utilisateur destinataire est connecté, il recevra le message immédiatement. Si l'utilisateur destinataire n'est pas connecté, le message sera stocké, et le destinataire pourra le lire en utilisant la commande \"readmsg\".",
+            "syntax": "<destinataire> <message>",
+            "parameters": [
+                {
+                    "name": "destinataire",
+                    "description": "Nom de l'utilisateur destinataire du message."
+                },
+                {
+                    "name": "message",
+                    "description": "Message à transmettre au destinataire."
+                }
+            ]
+        },
+        "time": {
+            "shortdesc": "Affiche l'heure du serveur.",
+            "description": "Affiche l'heure du serveur, le fuseau horaire, et la phase de la lune.",
+            "syntax": "",
+            "parameters": []
+        },
+        "who": {
+            "shortdesc": "Affiche la liste des utilisateurs.",
+            "description": "Affiche la liste des utilisateur enregistré sur le serveur, la liste est triée, les utilisateur connecté apparaissent en tête de liste. Il est possible d'affiner la recher en entrant quelque caractères paramètre, dans ce cas, seul les utilisateurs dont le nom comporte cette suite de caractère seront affichés.",
+            "syntax": "[filtre]",
+            "parameters": [
+                {
+                    "name": "filtre",
+                    "description": "Si spécifié, seuls s'afficheront les utilisateur dont le nom contient le filtre spécifié."
+                }
+            ]
+        },
+        "ban": {
+            "shortdesc": "(mod) Banni un utilisateur.",
+            "description": "Commande accessible aux modérateurs. Bannissement temporaire d'un utilisateur. Ce dernier est immédiatement déconnecté s'il était connecté et ne pourra plus accéder au service jusqu'à ce que le délai spécifié se soit écoulé. Néanmoins le bannissement peut être levé prématurément avec la commande \"unban\". Seuls les utilisateurs ayant le rôle \"modérateurs\" peuvent bannir. Il n'est pas nécessaire qu l'utilisateur visé par le bannissement soit connecté. Tous les utilisateurs connecté sont immédiatement mis au courant de l'opération via le canal \"info\"",
+            "syntax": "<utilisateur> <durée> <raison>",
+            "parameters": [
+                {
+                    "name": "utilisateur",
+                    "description": "Nom de l'utilisateur à bannir."
+                },
+                {
+                    "name": "durée",
+                    "description": "Un nombre suivi d'une unité de temps (h pour heure, d pour jour) ; ex : 1d pour 1 jour, 12h pour douze haures."
+                },
+                {
+                    "name": "raison",
+                    "description": "Rainson pour laquelle le bannissement a été effectuée"
+                }
+            ]
+        },
+        "unban": {
+            "shortdesc": "(mod) Lève le bannissement d'un utilisateur.",
+            "description": "Commande accessible aux modérateurs. A utiliser pour mettre prématurément fin au bannissement d'un utilisateur et permettre à ce dernier de pouvoir se reconnecter au service immédiatement. Tous les utilisateurs sont mis au courant de l'opération via le canal \"info\".",
+            "syntax": "<utilisateur>",
+            "parameters": [
+                {
+                    "name": "utilisateur",
+                    "description": "Nom de l'utilisateur visé par le bannissement."
+                }
+            ]
+        },
+        "female": {
+            "shortdesc": "Accorde au féminin les messages envoyés à l'utilisatrice.",
+            "description": "Défini si les message envoyé à l'utilisateur seront accordés ou pas au féminin; ceci pour des questions d'internationalisation de chaînes de caractères pour des langues telles que français ou espagnol qui ont des accords en genre.",
+            "syntax": "",
+            "parameters": []
+        },
+        "commands": {
+            "shortdesc": "Affiche la liste des commandes.",
+            "description": "Affiche la liste des commandes disponnible pour les utilisateurs par l'ordre alphabétique.",
+            "syntax": "",
+            "parameters": []
+        }
+    }
+}

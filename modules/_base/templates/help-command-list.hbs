@@ -1,0 +1,7 @@
+{{!--
+Display a list of commands and a short description
+@param commands {{name: string, description: string}[]}
+--}}
+{{#each commands}}
+{{#bold}}{{ name }}{{/bold}}: {{ description }}
+{{/each}}

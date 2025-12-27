@@ -1,4 +1,7 @@
 {
+    "helpOnFail": {
+        "message": "Tapez --help pour obtenir de l'aide"
+    },
     "userCmd": {
         "describe": "Gestion des utilisateurs"
     },

@@ -63,7 +63,7 @@ export abstract class AbstractClientController {
 
     execCommand(idClient: string, sCommand: string) {
         const csd = this.communicationLayer.getClientSession(idClient);
-        debugClient('%s : %s > %s', csd.user?.name, sCommand);
+        debugClient('%s > %s', csd.user?.name, sCommand);
         return this.runCommand.execute(csd, sCommand);
     }
 
@@ -164,7 +164,7 @@ export abstract class AbstractClientController {
                     ban.reason
                 );
                 // destroy client socket, then exit function
-                csd.state = CLIENT_STATES.NONE;
+                csd.state = CLIENT_STATES.BANNED;
                 return false;
             }
             csd.state = CLIENT_STATES.AUTHENTICATED;

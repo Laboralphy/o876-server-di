@@ -12,6 +12,7 @@ export class UnbanUser {
     async execute(idUser: string) {
         const user = await this.userRepository.get(idUser);
         if (user) {
+            // this user is not supposed to be connected, so no clientSession.user update needed
             user.ban = null;
             await this.userRepository.save(user);
             return user;

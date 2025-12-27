@@ -8,7 +8,7 @@
  * @param ctx {IClientContext}
  * @param parameters {string[]}
  */
-async function sendMsg(ctx, parameters) {
+async function main(ctx, parameters) {
     const [recipientName, ...aMessageParts] = parameters;
     const sMessage = aMessageParts.join(' ').trim();
     if (sMessage.length === 0) {
@@ -24,4 +24,4 @@ async function sendMsg(ctx, parameters) {
     await ctx.print('mail.mailSent', { name: recipientUser.displayName });
 }
 
-module.exports = sendMsg(context, parameters);
+module.exports = main(context, parameters);

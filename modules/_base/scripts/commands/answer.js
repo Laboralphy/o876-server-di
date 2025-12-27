@@ -11,6 +11,10 @@ const COLOR_GREEN = ESC + ANSI_COLOR_FG + '46m';
  * @param params {string[]}
  */
 function main(ctx, params) {
+    const CHANNEL = 'questions';
+    if (!ctx.chat.isChannelActive(CHANNEL)) {
+        return;
+    }
     ctx.chat.postMessage('questions', COLOR_GREEN + params.join(' '));
 }
 

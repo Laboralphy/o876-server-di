@@ -4,6 +4,12 @@ import { ICommunicationLayer } from '../../../application/ports/services/ICommun
 import { SendClientMessage } from '../../../application/use-cases/clients/SendClientMessage';
 import { ClientCradle } from '../../../boot/container';
 
+export type ServerTimeResult = {
+    now: number;
+    timezone: string;
+    moon: { age: string; glyph: string; label: string };
+};
+
 export abstract class AbstractContextService {
     protected readonly communicationLayer: ICommunicationLayer;
     protected sendClientMessage: SendClientMessage;

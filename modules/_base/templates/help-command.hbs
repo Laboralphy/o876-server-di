@@ -1,0 +1,22 @@
+{{!--
+Command help template
+
+@param command {string} command name
+@param description {string} command description
+@param syntax {string}command syntax details
+@param parameters {{name: string, description: string}[]} list of parameters
+--}}
+{{#bold}}{{ command }}{{/bold}}
+    {{t descriptionRef }}
+
+{{t "help.general.syntax"}}:
+    {{ command }} {{t syntaxRef }}
+
+{{t "help.general.parameters" }}:
+{{#if cmdParameters}}
+    {{#each cmdParameters}}
+    - {{ name }}: {{ description }}
+    {{/each}}
+{{ else }}
+    {{color "#777"}}{{t "help.general.noParam"}}{{color ""}}
+{{/if}}

@@ -23,6 +23,5 @@ export default tseslint.config(
                 sourceType: 'module',
             },
         },
-        ignorePatterns: ['modules/', 'node_modules/'],
     }
 );

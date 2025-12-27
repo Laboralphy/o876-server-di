@@ -42,7 +42,18 @@
         "forever": "Bannissement permanent",
         "date": "Bannissement actif jusqu'au {{ date }}",
         "reason": "Raison : {{ reason }}",
-        "noReason": "Raison non spécifiée"
+        "noReason": "Raison non spécifiée",
+        "d_one": "jour",
+        "d_other": "jours",
+        "h_one": "heure",
+        "h_other": "heures",
+        "broadcast": "{{ name }} est banni pendant {{ count }} $t(userBanned.{{ unit }}) ; raison : {{ reason }}",
+        "broadcast_female": "{{ name }} est bannie pendant {{ count }} $t(userBanned.{{ unit }}) ; raison : {{ reason }}"
+    },
+    "userUnbanned": {
+        "notBanned": "{{ name }} n'est pas banni.",
+        "notBanned_female": "{{ name }} n'est pas bannie.",
+        "broadcast": "Le bannissement de {{ name }} a été levé."
     },
     "textEditor": {
         "starting": "Mode édition de texte. Saisissez \".\" sur une ligne vide pour quitter le mode.",
@@ -81,9 +92,13 @@
         "label": "$t(moon.labels.{{ label }})"
     },
     "chat": {
-        "youJoined": "Vous avez rejoint le canal {{ channel }}.",
-        "youLeft": "Vous avez quitté le canal {{ channel }}.",
-        "userJoined": "{{ user }} a rejoint le canal {{ channel }}.",
-        "userLeft": "{{ user }} a quitté le canal {{ channel }}."
-    }
+        "channelActive": "[X]",
+        "channelInactive": "[ ]",
+        "channelListItemName": "Canal",
+        "channelListItemActive": "Actif",
+        "channelSwitchActive": "Le canal {{ channel }} est désormais actif.",
+        "channelSwitchInactive": "Le canal {{ channel }} est désormais inactif."
+    },
+    "female": "Les messages vous concernant sont accordés au masculin.",
+    "female_female": "Les messages vous concernant sont accordés au féminin."
 }

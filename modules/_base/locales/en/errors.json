@@ -1,5 +1,10 @@
 {
-  "error": {
-    "commandRuntime": "Error during command runtime"
-  }
+    "error": {
+        "commandRuntime": "Error during command runtime",
+        "commandAdminOnly": "This command is for administrators only",
+        "commandModeratorOnly": "This command is for moderators only",
+        "badArgumentCount": "Bad argument count",
+        "badArgumentFormat": "Argument #{{ n }} is incorrect",
+        "userNotFound": "User {{ name }} not found"
+    }
 }

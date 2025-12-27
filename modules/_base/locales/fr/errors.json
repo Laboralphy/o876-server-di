@@ -1,5 +1,10 @@
 {
     "error": {
-        "commandRuntime": "Erreur lors de l'exécution de la commande"
+        "commandRuntime": "Erreur lors de l'exécution de la commande",
+        "commandAdminOnly": "Commande réservée aux administrateurs",
+        "commandModeratorOnly": "Commande réservée aux modérateurs",
+        "badArgumentCount": "Nombre d'arguments incorrect",
+        "badArgumentFormat": "Argument #{{ n }} incorrect",
+        "userNotFound": "Utilisateur {{ name }} introuvable"
     }
 }

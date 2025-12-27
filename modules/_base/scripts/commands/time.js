@@ -3,8 +3,8 @@
  * data like moon phase and moon age
  * @param ctx {IClientContext}
  */
-async function time(ctx) {
-    const st = ctx.getServerTime();
+async function main(ctx) {
+    const st = ctx.time.getServerTime();
     await ctx.print('server-time', {
         ts: st.now,
         timezone: st.timezone,
@@ -17,4 +17,4 @@ async function time(ctx) {
 /**
  * @var context {IClientContext}
  */
-module.exports = time(context);
+module.exports = main(context);

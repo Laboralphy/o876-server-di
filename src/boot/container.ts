@@ -48,7 +48,6 @@ import { IScriptRunner } from '../application/ports/services/IScriptRunner';
 import { IModuleManager } from '../application/ports/services/IModuleManager';
 import { ServerConfig } from '../infrastructure/services/ServerConfig';
 import { MailMessageRepository } from '../infrastructure/persistance/json-database/MailMessageRepository';
-import { RemoveUserRoles } from '../application/use-cases/users/RemoveUserRoles';
 import { jsonDatabaseStructure, JsonDatabaseStructure } from './json-database-structure';
 import { IApiContextBuilder } from '../application/ports/services/IApiContextBuilder';
 import { ApiContextBuilder } from '../infrastructure/services/ApiContextBuilder';
@@ -62,6 +61,8 @@ import { IChatManager } from '../application/ports/services/IChatManager';
 import { ChatJoinChannel } from '../application/use-cases/chat/ChatJoinChannel';
 import { ChatPostMessage } from '../application/use-cases/chat/ChatPostMessage';
 import { ChatContextService } from '../infrastructure/services/context-services/ChatContextService';
+import { ChatGetChannels } from '../application/use-cases/chat/ChatGetChannels';
+import { TimeContextService } from '../infrastructure/services/context-services/TimeContextService';
 
 /**
  * To as a new use case, port ...,
@@ -75,6 +76,7 @@ export interface Cradle {
     // chat manager use cases
     chatJoinChannel: ChatJoinChannel;
     chatPostMessage: ChatPostMessage;
+    chatGetChannels: ChatGetChannels;
 
     // use case user secret
     setUserPassword: SetUserPassword;
@@ -89,7 +91,6 @@ export interface Cradle {
     getUser: GetUser;
     banUser: BanUser;
     unbanUser: UnbanUser;
-    removeUserRoles: RemoveUserRoles;
     sendUserMessage: SendUserMessage;
 
     // use cases : clients
@@ -137,6 +138,7 @@ export interface Cradle {
     mailContextService: MailContextService;
     userContextService: UserContextService;
     chatContextService: ChatContextService;
+    timeContextService: TimeContextService;
 }
 // Container creation
 export const container = createContainer<Cradle>();
@@ -146,6 +148,7 @@ container.register({
     // use cases : chat manager
     chatJoinChannel: asClass(ChatJoinChannel).singleton(),
     chatPostMessage: asClass(ChatPostMessage).singleton(),
+    chatGetChannels: asClass(ChatGetChannels).singleton(),
 
     // use cases : user secret
     setUserPassword: asClass(SetUserPassword).singleton(),
@@ -161,7 +164,6 @@ container.register({
     banUser: asClass(BanUser).singleton(),
     unbanUser: asClass(UnbanUser).singleton(),
     authenticateUser: asClass(AuthenticateUser).singleton(),
-    removeUserRoles: asClass(RemoveUserRoles).singleton(),
     sendUserMessage: asClass(SendUserMessage).singleton(),
 
     // use cases : clients
@@ -212,6 +214,7 @@ container.register({
     mailContextService: asClass(MailContextService).scoped(),
     userContextService: asClass(UserContextService).scoped(),
     chatContextService: asClass(ChatContextService).scoped(),
+    timeContextService: asClass(TimeContextService).scoped(),
 });
 
 /**

@@ -1,8 +1,9 @@
 import * as Txat from '../../libs/txat';
+import { POWERS } from '../../libs/txat';
 import { Cradle } from '../../boot/container';
 import { TXAT_EVENTS } from '../../libs/txat/events';
 import { SendUserMessage } from '../../application/use-cases/users/SendUserMessage';
-import { IChatManager } from '../../application/ports/services/IChatManager';
+import { ChannelListItem, IChatManager } from '../../application/ports/services/IChatManager';
 import { CHANNEL_ATRIBUTES } from '../../libs/txat/channel-attributes';
 import { User } from '../../domain/entities/User';
 import { debug } from '../../libs/o876-debug';
@@ -39,23 +40,11 @@ export class ChatManager implements IChatManager {
                 this.onMessagePost(recv, channel, user, message)
         );
 
-        txatEvents.on(TXAT_EVENTS.YOU_JOINED, ({ recv, channel }: Txat.YouJoinedDto) =>
-            this.onYouJoined(recv, channel)
-        );
-
-        txatEvents.on(TXAT_EVENTS.YOU_LEFT, ({ recv, channel }: Txat.YouLeftDto) =>
-            this.onYouLeft(recv, channel)
-        );
-
-        // too much verbosity for the users
-
-        // txatEvents.on(TXAT_EVENTS.USER_JOINED, ({ recv, channel, user }: Txat.ChannelJoinedDto) =>
-        //     this.onUserJoined(recv, user, channel)
-        // );
-        //
-        // txatEvents.on(TXAT_EVENTS.USER_LEFT, ({ recv, channel, user }: Txat.ChannelLeftDto) =>
-        //     this.onUserLeft(recv, user, channel)
-        // );
+        // Other possible events :
+        // TXAT_EVENTS.YOU_JOINED
+        // TXAT_EVENTS.YOU_LEFT
+        // TXAT_EVENTS.USER_JOINED
+        // TXAT_EVENTS.USER_LEFT
     }
 
     defineChannel(cd: ChannelDefinition) {
@@ -63,6 +52,51 @@ export class ChatManager implements IChatManager {
             this.scopedChannelPrefixes.set(cd.tag, cd);
         }
         this.channelDefinitions.set(cd.id, cd);
+    }
+
+    /**
+     * Turns a channel on or off
+     * when turned off, the user is not notified of messages
+     * @param idUser
+     * @param idChannel
+     * @param bValue
+     */
+    switchChannel(idUser: string, idChannel: string, bValue: boolean): void {
+        const channel = this._txat.getChannel(idChannel);
+        const user = channel.getUser(idUser);
+        if (user) {
+            if (bValue) {
+                user.grant(POWERS.READ);
+            } else {
+                user.revoke(POWERS.READ);
+            }
+        }
+    }
+
+    grantUserWrite(idUser: string, idChannel: string): void {
+        const channel = this._txat.getChannel(idChannel);
+        const user = channel.getUser(idUser);
+        if (user) {
+            user.grant(POWERS.WRITE);
+        }
+    }
+
+    revokeUserWrite(idUser: string, idChannel: string): void {
+        const channel = this._txat.getChannel(idChannel);
+        const user = channel.getUser(idUser);
+        if (user) {
+            user.revoke(POWERS.WRITE);
+        }
+    }
+
+    checkUserWrite(idUser: string, idChannel: string): boolean {
+        const channel = this._txat.getChannel(idChannel);
+        const user = channel.getUser(idUser);
+        if (user) {
+            return user.hasPower(POWERS.WRITE);
+        } else {
+            return false;
+        }
     }
 
     postMessage(idSender: string, idChannel: string, message: string) {
@@ -137,6 +171,30 @@ export class ChatManager implements IChatManager {
         }
     }
 
+    getUserJoinedChannels(idUser: string): ChannelListItem[] {
+        const user = this._txat.getUser(idUser);
+        if (user) {
+            return Array.from(user.joinedChannels).map((channel) => {
+                const userPresence = channel.getUser(idUser);
+                if (userPresence) {
+                    return {
+                        id: channel.id,
+                        tag: channel.tag,
+                        read: userPresence.hasPower(POWERS.READ),
+                        write: userPresence.hasPower(POWERS.WRITE),
+                        moderate: userPresence.hasPower(POWERS.MODERATE),
+                    };
+                } else {
+                    throw new Error(
+                        `user ${idUser} is not present in channel ${channel.id} as it should be`
+                    );
+                }
+            });
+        } else {
+            throw new ReferenceError(`user ${idUser} is not registered is chat system`);
+        }
+    }
+
     /**
      * User has sent a message on a specific channel
      * @param recv
@@ -163,53 +221,5 @@ export class ChatManager implements IChatManager {
         } else {
             throw new Error(`Unknown channel id: ${channel.id}`);
         }
-    }
-
-    /**
-     * User has joined a specific channel
-     * @param recv
-     * @param channel
-     */
-    async onYouJoined(recv: string, channel: Txat.Channel) {
-        await this.sendUserMessage.execute(recv, 'chat.youJoined', { channel: channel.id });
-    }
-
-    /**
-     * User has left a specific channel
-     * @param recv
-     * @param channel
-     */
-    async onYouLeft(recv: string, channel: Txat.Channel) {
-        await this.sendUserMessage.execute(recv, 'chat.youLeft', { channel: channel.id });
-    }
-
-    /**
-     * User has joined a specific channel
-     * @param recv
-     * @param user
-     * @param channel
-     */
-    async onUserJoined(recv: string, user: Txat.UserPresence, channel: Txat.Channel) {
-        // This is way too verbose
-        // const u = this._txat.getUser(user.id);
-        // await this.sendUserMessage.execute(recv, 'chat.userJoined', {
-        //     user: u.name,
-        //     channel: channel.id,
-        // });
-    }
-
-    /**
-     * User has left a specific channel
-     * @param recv
-     * @param user
-     * @param channel
-     */
-    async onUserLeft(recv: string, user: Txat.UserPresence, channel: Txat.Channel) {
-        // This is way too verbose
-        // const u = this._txat.getUser(user.id);
-        // await this.sendUserMessage.execute(recv, 'chat.userLeft', {
-        //     user: u.name,
-        //     channel: channel.id,
-        // });
     }
 }

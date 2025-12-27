@@ -2,8 +2,8 @@
  * This command will lead the client to enter interactive mode and change its password
  * @param ctx {IClientContext}
  */
-function exit(ctx) {
+function main(ctx) {
     return ctx.changePassword();
 }
 
-module.exports = exit(context);
+module.exports = main(context);

@@ -30,6 +30,10 @@ export class Channel {
         return Array.from(this._users.values());
     }
 
+    getUser(id: string): UserPresence | undefined {
+        return this._users.get(id);
+    }
+
     /**
      * Return true if this channel is not open to anyone
      */

@@ -42,7 +42,16 @@
         "forever": "Permanent ban",
         "date": "Ban active until : {{ date }}",
         "reason": "Reason : {{ reason }}",
-        "noReason": "Reason : unspecified"
+        "noReason": "Reason : unspecified",
+        "d_one": "day",
+        "d_other": "days",
+        "h_one": "hour",
+        "h_other": "hours",
+        "broadcast": "{{ name }} is banned for {{ count }} $t(userBanned.{{ unit }}) ; reason : {{ reason }}"
+    },
+    "userUnbanned": {
+        "notBanned": "User {{ name }} is not banned.",
+        "broadcast": "{{ name }} is now unbanned."
     },
     "textEditor": {
         "starting": "Text editor mode. Please type \".\" on empty line to exit this mode.",
@@ -81,9 +90,13 @@
         "label": "$t(moon.labels.{{ label }})"
     },
     "chat": {
-        "youJoined": "You have joined channel {{ channel }}.",
-        "youLeft": "You have left channel {{ channel }}.",
-        "userJoined": "{{ user }} has joined channel {{ channel }}.",
-        "userLeft": "{{ user }} has left channel {{ channel }}."
-    }
+        "channelActive": "[X]",
+        "channelInactive": "[ ]",
+        "channelListItemName": "Channel",
+        "channelListItemActive": "Active",
+        "channelSwitchActive": "Channel {{ channel }} is now active.",
+        "channelSwitchInactive": "Channel {{ channel }} is now inactive."
+    },
+    "female": "Messages about you are conjugated in the masculine form.",
+    "female_female": "Messages about you are conjugated in the feminine form."
 }

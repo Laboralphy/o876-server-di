@@ -5,17 +5,28 @@ import { FindUser } from '../../../application/use-cases/users/FindUser';
 import { CLIENT_STATES } from '../../../domain/enums/client-states';
 import { SetUserPassword } from '../../../application/use-cases/user-secrets/SetUserPassword';
 import { ClientCradle } from '../../../boot/container';
+import { ROLES } from '../../../domain/enums/roles';
+import { BanUser } from '../../../application/use-cases/users/BanUser';
+import { BanUserDto } from '../../../application/dto/BanUserDto';
+import { ModifyUser } from '../../../application/use-cases/users/ModifyUser';
+import { UnbanUser } from '../../../application/use-cases/users/UnbanUser';
 
 export class UserContextService extends AbstractContextService {
     private readonly getUserList: GetUserList;
     private readonly setUserPassword: SetUserPassword;
     private readonly findUser: FindUser;
+    private readonly banUser: BanUser;
+    private readonly unbanUser: UnbanUser;
+    private readonly modifyUser: ModifyUser;
 
     constructor(cradle: ClientCradle) {
         super(cradle);
         this.getUserList = cradle.getUserList;
         this.setUserPassword = cradle.setUserPassword;
         this.findUser = cradle.findUser;
+        this.banUser = cradle.banUser;
+        this.modifyUser = cradle.modifyUser;
+        this.unbanUser = cradle.unbanUser;
     }
 
     getUsers(): Promise<User[]> {
@@ -85,5 +96,53 @@ export class UserContextService extends AbstractContextService {
         } else {
             throw new Error('Both new password and current password must be specified');
         }
+    }
+
+    /**
+     * Returns true if user has Moderator role
+     */
+    isModerator() {
+        return this.user.roles.includes(ROLES.MODERATOR);
+    }
+
+    /**
+     * Returns true if user has Administrator role
+     */
+    isAdmin() {
+        return this.user.roles.includes(ROLES.ADMIN);
+    }
+
+    /**
+     * Ban a user
+     * @param userToBan user
+     * @param reason reason why user is banned
+     * @param duration how long (in ms) user is banned
+     */
+    ban(userToBan: User, reason: string, duration: number) {
+        const dto: BanUserDto = {
+            reason,
+            bannedBy: this.user.id,
+            duration,
+        };
+        return this.banUser.execute(userToBan.id, dto);
+    }
+
+    /**
+     * Unban a user
+     * @param userToUnban
+     */
+    unban(userToUnban: User) {
+        return this.unbanUser.execute(userToUnban.id);
+    }
+
+    /**
+     * Change user gender : switch user gender from "non-female" to "female" and vice versa.
+     * Gender are managed for string internationalization purpose.
+     * User are only in one of these two categories : either "female" or "non-female"
+     * @param user {User}
+     * @param female {boolean}
+     */
+    setUserFemale(user: User, female: boolean) {
+        return this.modifyUser.execute(user.id, { female });
     }
 }

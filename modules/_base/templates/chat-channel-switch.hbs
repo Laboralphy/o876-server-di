@@ -1,0 +1,9 @@
+{{!--
+Displays a channel activity (either "active" or "inactive")
+@param channel channel id
+@param value boolean - if true, channel is active (message are broadcast to user), else channel is inactive, ignored...
+--}}
+{{#line}}
+    {{#if value}}{{color "#2f2"}}{{t "chat.channelActive"}}{{color ""}} {{t "chat.channelSwitchActive"}}
+    {{ else }}{{color "#999"}}{{t "chat.channelInactive"}}{{color ""}} {{t "chat.channelSwitchActive"}}{{/if}}
+{{/line}}

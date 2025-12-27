@@ -17,22 +17,17 @@ export interface IClientContext extends IClientContextServices {
     print(key: string, parameters?: JsonObject): Promise<void>;
 
     /**
+     * Synchronous call
+     * Fetch the string referenced by the "key" parameter.
+     * @param key string reference
+     * @param parameters i18n completion object
+     */
+    strref(key: string, parameters?: JsonObject): string;
+
+    get commandNames(): string[];
+
+    /**
      * Close client connection to server.
      */
     closeConnection(): Promise<void>;
-
-    /**
-     * Gets information about server time.
-     * now: The current timestamp
-     * timezone: An iso string describing the timezone where the server is located at
-     * moon: Various astronomic data about the moon phase and age
-     * moon.age: lunar periodic age (in days)
-     * moon.glyph: a unicode character matching the current moon phase
-     * moon.label: an i18n string describing moon phase.
-     */
-    getServerTime(): {
-        now: number;
-        timezone: string;
-        moon: { age: string; glyph: string; label: string };
-    };
 }

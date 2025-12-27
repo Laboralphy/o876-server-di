@@ -1,0 +1,185 @@
+{
+    "help": {
+        "general": {
+            "description": "Description",
+            "syntax": "Syntax",
+            "parameters": "Parameters",
+            "noParam": "No parameters"
+        },
+        "answer": {
+            "shortdesc": "Post an answer on the \"questions\" channel.",
+            "description": "Allows sending a message on the \"questions\" channel. This message will be colored green to indicate it is a response to a previous question asked by another user.",
+            "syntax": "<answer>",
+            "parameters": [
+                {
+                    "name": "answer",
+                    "description": "Content of the answer, which will be displayed as-is on the \"questions\" channel."
+                }
+            ]
+        },
+        "ask": {
+            "shortdesc": "Post a question on the \"questions\" channel.",
+            "description": "Allows asking a question on the \"questions\" channel. All users listening to this channel will receive the question and can respond using the \"answer\" command. On this channel, questions are colored orange to distinguish them from answers.",
+            "syntax": "<question>",
+            "parameters": [
+                {
+                    "name": "question",
+                    "description": "Question to be posted (colored orange) on the \"questions\" channel."
+                }
+            ]
+        },
+        "broadcast": {
+            "shortdesc": "Post an announcement on the \"info\" channel.",
+            "description": "Allows administrators or service accounts to post announcement messages to all other connected users. These messages typically concern service maintenance or upcoming events.",
+            "syntax": "<announcement>",
+            "parameters": [
+                {
+                    "name": "announcement",
+                    "description": "Content of the announcement to be broadcast on the \"info\" channel."
+                }
+            ]
+        },
+        "bugreport": {
+            "shortdesc": "Post a bug report",
+            "description": "Allows anyone to report a service issue encountered by the user. This will notify an administrator, who can attempt to fix the problem.",
+            "syntax": "<message>",
+            "parameters": [
+                {
+                    "name": "message",
+                    "description": "Brief description of the encountered error."
+                }
+            ]
+        },
+        "channels": {
+            "shortdesc": "Display a list of active channels.",
+            "description": "Displays the list of channels the user is connected to, along with whether each channel is active or not. Some channels can be deactivated by the user if they no longer wish to receive messages from them.",
+            "syntax": "",
+            "parameters": []
+        },
+        "echo": {
+            "shortdesc": "Display parameters.",
+            "description": "Repeats what was typed as a parameter for this command.",
+            "syntax": "<text>",
+            "parameters": [
+                {
+                    "name": "text",
+                    "description": "String to display."
+                }
+            ]
+        },
+        "logout": {
+            "shortdesc": "Disconnect user",
+            "description": "The user disconnects from the service.",
+            "syntax": "",
+            "parameters": []
+        },
+        "global": {
+            "shortdesc": "Post a message on the \"global\" channel (mostly ooc).",
+            "description": "Allows the user to post a public message on the \"global\" discussion channel, intended for all other connected users. This channel is primarily used for OOC (out-of-character) discussions and hosts a wide variety of conversations.",
+            "syntax": "<message>",
+            "parameters": [
+                {
+                    "name": "message",
+                    "description": "Content of the message to display on the \"global\" channel."
+                }
+            ]
+        },
+        "gossip": {
+            "shortdesc": "Post a message on the \"rumors\" channel (mostly ic).",
+            "description": "Allows the user to post a message on the \"rumors\" discussion channel, intended for all other connected users. This channel is primarily used for IC (in-character) and role-playing discussions.",
+            "syntax": "<message>",
+            "parameters": [
+                {
+                    "name": "message",
+                    "description": "Content of the message to post on the \"rumors\" channel."
+                }
+            ]
+        },
+        "passwd": {
+            "shortdesc": "Change user password",
+            "description": "Changes the user's password. Note that this command does not take parameters: the system will interactively prompt for the old and new passwords.",
+            "syntax": "",
+            "parameters": []
+        },
+        "questions": {
+            "shortdesc": "Switch \"questions\" channel on or off.",
+            "description": "Toggles listening on the \"questions\" channel. When listening is disabled, the user no longer receives messages from this channel, and the use of the \"answer\" command is also disabled. If the user attempts to use the \"ask\" command, listening is automatically reactivated.",
+            "syntax": "",
+            "parameters": []
+        },
+        "sendmsg": {
+            "shortdesc": "Send private message to online/offline users",
+            "description": "Allows sending a private message to another user, whether they are connected or not. If the recipient is connected, they will receive the message immediately. If the recipient is not connected, the message will be stored, and the recipient can read it later using the \"readmsg\" command.",
+            "syntax": "<recipient> <message>",
+            "parameters": [
+                {
+                    "name": "recipient",
+                    "description": "Name of the user receiving the message."
+                },
+                {
+                    "name": "message",
+                    "description": "Message to send to the recipient."
+                }
+            ]
+        },
+        "time": {
+            "shortdesc": "Display server time",
+            "description": "Displays the server time, time zone, and moon phase.",
+            "syntax": "",
+            "parameters": []
+        },
+        "who": {
+            "shortdesc": "Print a list of users (can be filtered)",
+            "description": "Displays the list of users registered on the server. The list is sorted, with connected users appearing at the top. The search can be refined by entering a few characters as a parameter. In this case, only users whose names contain the specified filter will be displayed.",
+            "syntax": "[filter]",
+            "parameters": [
+                {
+                    "name": "filter",
+                    "description": "If specified, only users whose names contain the filter will be displayed."
+                }
+            ]
+        },
+        "ban": {
+            "shortdesc": "(mod) Ban a user for a specific duration/reason.",
+            "description": "Command available to moderators. Temporarily bans a user. The user is immediately disconnected if they are online and will not be able to access the service until the specified duration has elapsed. However, the ban can be lifted early using the \"unban\" command. Only users with the \"moderator\" role can ban others. The targeted user does not need to be connected. All connected users are notified via the \"info\" channel.",
+            "syntax": "<user> <duration> <reason>",
+            "parameters": [
+                {
+                    "name": "user",
+                    "description": "Name of the user to ban."
+                },
+                {
+                    "name": "duration",
+                    "description": "A number followed by a time unit (h for hours, d for days); e.g., 1d for 1 day, 12h for twelve hours."
+                },
+                {
+                    "name": "reason",
+                    "description": "Reason for the ban."
+                }
+            ]
+        },
+        "unban": {
+            "shortdesc": "(mod) Unban a user",
+            "description": "Command available to moderators. When applied to a currently banned user, this command prematurely removes the ban and allows the banned user to regain the possibility to reconnect to the service. All connected users are notified via the \"info\" channel.",
+            "syntax": "<user>",
+            "parameters": [
+                {
+                    "name": "<user>",
+                    "description": "Name of the user to unban."
+                }
+            ]
+        },
+        "female": {
+            "shortdesc": "Set feminine/non-feminine feedback préférences.",
+            "description": "Allows switching from a 'non-feminine' gender to a 'feminine' gender; this is for internationalization purposes in languages such as French or Spanish, which have gender agreements in strings.",
+            "syntax": "",
+            "parameters": []
+        },
+        "commands": {
+            "shortdesc": "Display a list of commands.",
+            "description": "Display a list of commands available to users, and a short description of what the command do. Commands are listed by alphabetic order.",
+            "syntax": "",
+            "parameters": []
+        }
+    }
+}

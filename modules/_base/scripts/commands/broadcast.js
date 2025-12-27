@@ -5,7 +5,7 @@
  * @param params {string[]}
  */
 function main(ctx, params) {
-    ctx.chat.postMessage('bugreports', params.join(' '));
+    ctx.chat.postMessage('info', params.join(' '));
 }
 
 main(context, parameters);

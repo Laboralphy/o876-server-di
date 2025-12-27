@@ -2,6 +2,14 @@ import { JsonObject, JsonValue } from '../../../domain/types/JsonStruct';
 import { getEnv } from '../../../boot/dotenv';
 import { HTTP_STATUS } from '../../../domain/enums/http-status';
 
+type FetchErrorCause = {
+    code: string,
+    address: string,
+    port: number
+}
+
+type FetchError = Error & { cause: FetchErrorCause };
+
 function buildUrl(url: string): string {
     const port = getEnv().SERVER_HTTP_API_PORT;
     return `http://localhost:${port}/${url}`;
@@ -48,8 +56,17 @@ export async function doJsonRequest(
 }
 
 export async function wfGet<T>(url: string): Promise<T> {
-    const data = await doJsonRequest('GET', url);
-    return data as T;
+    try {
+        const data = await doJsonRequest('GET', url);
+        return data as T;
+    } catch (err) {
+        const error = err as FetchError
+        const cause = (error.cause ?? { code: '', address: '', port: 0 })
+        if (cause.code === 'ECONNREFUSED') {
+            console.error('Host unreachable at %s port %d', cause.address, cause.port)
+        }
+        process.exit(2);
+    }
 }
 
 export async function wfPost(url: string, body: JsonObject) {

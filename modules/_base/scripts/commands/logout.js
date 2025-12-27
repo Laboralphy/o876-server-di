@@ -2,8 +2,8 @@
  * This command allows a client to disconnect from the server
  * @param ctx {IClientContext}
  */
-function exit(ctx) {
+function main(ctx) {
     ctx.closeConnection();
 }
 
-exit(context);
+module.exports = main(context);

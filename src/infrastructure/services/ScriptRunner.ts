@@ -1,7 +1,5 @@
 import { NodeVM, VMScript } from 'vm2';
 import { IScriptRunner } from '../../application/ports/services/IScriptRunner';
-import path from 'node:path';
-import fs from 'node:fs';
 
 export class ScriptRunner implements IScriptRunner {
     private readonly scripts = new Map<string, VMScript>();
@@ -13,6 +11,13 @@ export class ScriptRunner implements IScriptRunner {
      */
     setContext(context: Record<string, unknown>) {
         Object.assign(this.baseContext, context);
+    }
+
+    /**
+     * Returns all script names
+     */
+    get scriptNames() {
+        return [...this.scripts.keys()];
     }
 
     /**

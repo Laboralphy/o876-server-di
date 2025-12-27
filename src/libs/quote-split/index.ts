@@ -1,10 +1,1 @@
-/**
- * This function splits a string into words, but preserves substring delimited by quotes
- * @example quoteSplit('abc def "ghi jkl" mno') -> ['abc', 'def', 'ghi jkl', 'mno']
- * @param str {string} input string
- * @return {string[]} output array
- */
-export function quoteSplit(str: string): string[] {
-    const s = str.match(/(?:[^\s"]+|"[^"]*")+/g);
-    return s ? s.map((s) => s.replace(/^"/, '').replace(/"$/, '')) : [str];
-}
+export { quoteSplit } from './quote-split-2';

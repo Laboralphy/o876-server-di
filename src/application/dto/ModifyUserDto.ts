@@ -8,6 +8,7 @@ export const ModifyUserDtoSchema = z
         email: EmailString.optional(),
         displayName: DisplayName.optional(),
         roles: z.array(z.enum(ROLES)).optional(),
+        female: z.boolean().optional(),
     })
     .strict();
 

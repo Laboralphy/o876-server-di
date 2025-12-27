@@ -11,6 +11,7 @@ export const UserSchema = z
         id: EntityId,
         name: UserName,
         displayName: DisplayName,
+        female: z.boolean(),
         email: EmailString,
         tsCreation: z.number(),
         tsLastUsed: z.number(),
