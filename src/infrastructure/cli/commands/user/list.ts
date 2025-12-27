@@ -64,6 +64,7 @@ export function listCommand(yargs: Argv): Argv {
                     .map((row) => [
                         row.id,
                         row.name,
+                        row.displayName,
                         renderDate(new Date(row.tsCreation)),
                         renderDate(new Date(row.tsLastUsed), 'ymd hm'),
                         row.ban ? sBanned : sNotBanned,
@@ -72,6 +73,7 @@ export function listCommand(yargs: Argv): Argv {
                     output.unshift([
                         render('userListCmd.listLabelId'),
                         render('userListCmd.listLabelName'),
+                        render('userListCmd.listLabelDisplayName'),
                         render('userListCmd.listLabelDateCreated'),
                         render('userListCmd.listLabelLastLogin'),
                         render('userListCmd.listLabelBanned'),

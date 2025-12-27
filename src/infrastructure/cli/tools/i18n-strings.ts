@@ -3,8 +3,14 @@ import path from 'node:path';
 
 export async function initI18nStrings(lng: string) {
     await init();
-    await loadStrings(path.join(__dirname, '../../../../assets/locales/en/admin.json'), 'en');
-    await loadStrings(path.join(__dirname, '../../../../assets/locales/fr/admin.json'), 'fr');
+    await loadStrings(
+        path.join(__dirname, '../../../../modules/_admin/locales/en/admin.json'),
+        'en'
+    );
+    await loadStrings(
+        path.join(__dirname, '../../../../modules/_admin/locales/fr/admin.json'),
+        'fr'
+    );
     await setLang(lng);
     return render;
 }

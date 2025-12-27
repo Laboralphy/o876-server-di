@@ -1,3 +1,4 @@
 {
+    "description": "Base module - commands, string assets.",
     "require": []
 }
