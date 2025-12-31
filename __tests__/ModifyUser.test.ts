@@ -13,6 +13,7 @@ describe('ModifyUser', () => {
             id: '1',
             name: 'ralphy',
             displayName: 'Ralphy',
+            female: false,
             ban: null,
             roles: [],
             tsLastUsed: 1000000,
@@ -23,6 +24,7 @@ describe('ModifyUser', () => {
             id: '2',
             name: 'bob',
             displayName: 'Bob',
+            female: false,
             ban: null,
             roles: [ROLES.ADMIN, ROLES.MODERATOR, ROLES.GAME_MASTER],
             tsLastUsed: 1000000,
@@ -30,6 +32,11 @@ describe('ModifyUser', () => {
             email: 'ralphy@localhost.com',
         });
         container.register({
+            communicationLayer: asValue({
+                getUserClient: () => {
+                    return undefined;
+                },
+            }),
             userRepository: asValue({
                 async get(id: string): Promise<User | undefined> {
                     const u = users.get(id);

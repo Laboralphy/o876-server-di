@@ -57,7 +57,7 @@ export class CommunicationLayer implements ICommunicationLayer {
         }
     }
 
-    async sendMessage(idClient: string, message: string): Promise<void> {
+    async sendMessage(idClient: string, message: string | Buffer): Promise<void> {
         return this.getClientSession(idClient).clientSocket.send(message);
     }
 

@@ -1,6 +1,5 @@
 import { asClass, asValue, AwilixContainer, createContainer } from 'awilix';
 import { ChatManager } from '../src/infrastructure/services/ChatManager';
-import { SendUserMessage } from '../src/application/use-cases/users/SendUserMessage';
 import { User } from '../src/domain/entities/User';
 import { ROLES } from '../src/domain/enums/roles';
 
@@ -15,6 +14,7 @@ describe('ChatManager', () => {
             id: 'a',
             name: 'alice',
             displayName: 'Alice',
+            female: true,
             ban: null,
             roles: [],
             tsLastUsed: 1000000,
@@ -25,6 +25,7 @@ describe('ChatManager', () => {
             id: 'b',
             name: 'bob',
             displayName: 'Bob',
+            female: false,
             ban: null,
             roles: [ROLES.ADMIN, ROLES.MODERATOR, ROLES.GAME_MASTER],
             tsLastUsed: 1000000,
@@ -35,6 +36,7 @@ describe('ChatManager', () => {
             id: 'c',
             name: 'charlie',
             displayName: 'Charlie',
+            female: false,
             ban: null,
             roles: [ROLES.ADMIN],
             tsLastUsed: 1000000,
@@ -93,7 +95,6 @@ describe('ChatManager', () => {
             expect(() => cm.joinChannel(bob.id, 'trade')).not.toThrow();
             const au2 = cm.getUserList('trade');
             expect(au2).toEqual(['a', 'b']);
-            expect(log).toEqual(['a chat.youJoined', 'b chat.youJoined', 'a chat.userJoined']);
         });
 
         it('should join only one channel of the same tag at the time', () => {

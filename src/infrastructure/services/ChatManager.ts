@@ -110,13 +110,11 @@ export class ChatManager implements IChatManager {
                 this.joinChannel(user.id, cd.id);
             }
         }
-        debugTxat('user %s is registered to chat system', user.id);
     }
 
     unregisterUser(user: User) {
         if (this._txat.isUserRegistered(user.id)) {
             this._txat.unregisterUser(user.id);
-            debugTxat('user %s is removed from chat system', user.id);
         }
     }
 

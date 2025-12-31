@@ -31,7 +31,7 @@ export interface ICommunicationLayer {
      * @param idClient
      * @param message
      */
-    sendMessage(idClient: string, message: string): Promise<void>;
+    sendMessage(idClient: string, message: string | Buffer): Promise<void>;
 
     /**
      * Immediately drops all connected client.
@@ -39,5 +39,10 @@ export interface ICommunicationLayer {
      */
     dropAllClients(): void;
 
+    /**
+     * Return client associated with a spécific user
+     * if no client found (i.e. user not connected) the method returns undefined
+     * @param user
+     */
     getUserClient(user: User): ClientSession | undefined;
 }

@@ -63,6 +63,8 @@ import { ChatPostMessage } from '../application/use-cases/chat/ChatPostMessage';
 import { ChatContextService } from '../infrastructure/services/context-services/ChatContextService';
 import { ChatGetChannels } from '../application/use-cases/chat/ChatGetChannels';
 import { TimeContextService } from '../infrastructure/services/context-services/TimeContextService';
+import { IGMCPGateway } from '../application/ports/services/IGMCPGateway';
+import { GMCPGateway } from '../infrastructure/services/GMCPGateway';
 
 /**
  * To as a new use case, port ...,
@@ -127,6 +129,7 @@ export interface Cradle {
     moduleManager: IModuleManager;
     serverConfig: IServerConfig;
     chatManager: IChatManager;
+    gmcpGateway: IGMCPGateway;
 
     // Api Context
     apiContextBuilder: IApiContextBuilder;
@@ -198,6 +201,7 @@ container.register({
     moduleManager: asClass(ModuleManager).singleton(),
     serverConfig: asClass(ServerConfig).singleton(),
     chatManager: asClass(ChatManager).singleton(),
+    gmcpGateway: asClass(GMCPGateway).singleton(),
 
     // values
     jsonDatabaseStructure: asValue(jsonDatabaseStructure),

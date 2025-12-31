@@ -3,7 +3,6 @@ import { EventEmitter } from 'node:events';
 import { CHANNEL_ATRIBUTES } from './channel-attributes';
 import { POWERS } from './powers';
 import { User } from './User';
-import { id } from 'zod/locales';
 import { TXAT_EVENTS } from './events';
 import { MessagePostDto } from './event-dto/message-post.dto';
 import { ChannelClosedDto } from './event-dto/channel-closed.dto';
