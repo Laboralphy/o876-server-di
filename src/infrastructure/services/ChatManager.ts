@@ -7,6 +7,7 @@ import { ChannelListItem, IChatManager } from '../../application/ports/services/
 import { CHANNEL_ATRIBUTES } from '../../libs/txat/channel-attributes';
 import { User } from '../../domain/entities/User';
 import { debug } from '../../libs/o876-debug';
+import { SPECIAL_MESSAGE } from '../../domain/enums/special-message';
 
 const debugTxat = debug('srv:txat');
 
@@ -209,6 +210,13 @@ export class ChatManager implements IChatManager {
         const cd = this.channelDefinitions.get(channel.id);
         const sender = this._txat.getUser(user.id);
         if (cd) {
+            await this.sendUserMessage.execute(recv, 'Comm.Channel.Text', {
+                [SPECIAL_MESSAGE.GMCP]: {
+                    channel: channel.id,
+                    talker: sender.name,
+                    text: message.content,
+                },
+            });
             await this.sendUserMessage.execute(recv, 'chat-message-post', {
                 chanColor: cd.color,
                 channel: channel.id,

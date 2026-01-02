@@ -5,6 +5,11 @@ export enum CHANNEL_TAGS {
     TEAM = 'TEAM',
 }
 
+export enum CHANNEL_ID {
+    GLOBAL = 'global',
+    INFO = 'info',
+}
+
 // general
 // info
 // answers

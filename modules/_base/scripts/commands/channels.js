@@ -5,8 +5,12 @@
 function main(ctx) {
     const channelList = ctx.chat.getChannelList().map((c) => ({
         name: c.tag === '' ? c.id : c.tag,
-        active: c.read,
+        enabled: c.read,
+        command: '',
     }));
+    ctx.print('Comm.Channel.List', {
+        _gmcp: [],
+    });
     ctx.print('chat-channel-list', { channelList });
 }
 

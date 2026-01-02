@@ -6,7 +6,7 @@ Displays a list of joined channel
     {{t "chat.channelListItemName"}}, {{t "chat.channelListItemActive"}}
     {{#each channelList}}
         {{#line}}
-            {{#if active}}{{color "#2f2"}}{{ name }}, {{t "chat.channelActive"}}
+            {{#if enabled}}{{color "#2f2"}}{{ name }}, {{t "chat.channelActive"}}
             {{ else }}{{color "#999"}}{{ name }}, {{t "chat.channelInactive"}}{{/if}}{{color ""}}
         {{/line}}
     {{/each}}

@@ -12,6 +12,7 @@ import { EmailString } from '../../domain/schemas/EmailString';
 import { ClientCradle } from '../../boot/container';
 import { IClientContext } from '../../application/ports/classes/IClientContext';
 import { IApiContextBuilder } from '../../application/ports/services/IApiContextBuilder';
+import { SPECIAL_MESSAGE } from '../../domain/enums/special-message';
 
 const debugTelnet = debug('srv:telnet');
 
@@ -86,12 +87,16 @@ export class TelnetClientController extends AbstractClientController {
     }
 
     async askString(idClient: string, key: string, parameters?: JsonObject) {
-        const p = parameters ? { ...parameters, _nolf: true } : { _nolf: true };
+        const p = parameters
+            ? { ...parameters, [SPECIAL_MESSAGE.NOLF]: true }
+            : { [SPECIAL_MESSAGE.NOLF]: true };
         await this.sendMessage(idClient, key, p);
     }
 
     async askPassword(idClient: string, key: string, parameters?: JsonObject) {
-        const p = parameters ? { ...parameters, _nolf: true } : { _nolf: true };
+        const p = parameters
+            ? { ...parameters, [SPECIAL_MESSAGE.NOLF]: true }
+            : { [SPECIAL_MESSAGE.NOLF]: true };
         await this.sendMessage(idClient, key, p);
         await this.echo(idClient, false);
     }

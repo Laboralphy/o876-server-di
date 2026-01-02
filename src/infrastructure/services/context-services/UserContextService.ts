@@ -10,6 +10,7 @@ import { BanUser } from '../../../application/use-cases/users/BanUser';
 import { BanUserDto } from '../../../application/dto/BanUserDto';
 import { ModifyUser } from '../../../application/use-cases/users/ModifyUser';
 import { UnbanUser } from '../../../application/use-cases/users/UnbanUser';
+import { SPECIAL_MESSAGE } from '../../../domain/enums/special-message';
 
 export class UserContextService extends AbstractContextService {
     private readonly getUserList: GetUserList;
@@ -87,7 +88,7 @@ export class UserContextService extends AbstractContextService {
                 this.idClient,
                 'changePassword.enterPreviousPassword',
                 {
-                    _nolf: true,
+                    [SPECIAL_MESSAGE.NOLF]: true,
                 }
             );
             await clientSession.clientSocket.send(Buffer.from([0xff, 0xfb, 0x01]));
