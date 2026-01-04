@@ -3,11 +3,12 @@ Displays a list of joined channel
 @param channelList {{ name: string, active: boolean }[]}
 --}}
 {{#table}}
-    {{t "chat.channelListItemName"}}, {{t "chat.channelListItemActive"}}
+    {{t "chat.channelListItemName"}}, {{t "chat.channelListItemActive"}}, {{t "chat.channelListItemCommand"}}
     {{#each channelList}}
         {{#line}}
             {{#if enabled}}{{color "#2f2"}}{{ name }}, {{t "chat.channelActive"}}
-            {{ else }}{{color "#999"}}{{ name }}, {{t "chat.channelInactive"}}{{/if}}{{color ""}}
+            {{ else }}{{color "#999"}}{{ name }}, {{t "chat.channelInactive"}}{{/if}}{{color ""}},
+            {{ command }}
         {{/line}}
     {{/each}}
 {{/table}}

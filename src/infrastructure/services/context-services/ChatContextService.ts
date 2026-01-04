@@ -49,11 +49,11 @@ export class ChatContextService extends AbstractContextService {
         }
     }
 
-    switchChannel(idChannel: string, value: boolean) {
+    toggleChannel(idChannel: string, value: boolean) {
         const channels = this.getChannelList();
         const channel = channels.find((channel) => channel.id === idChannel);
         if (channel) {
-            this.chatManager.switchChannel(this.user.id, idChannel, value);
+            this.chatManager.toggleChannel(this.user.id, idChannel, value);
         }
     }
 }

@@ -1,89 +1,124 @@
-import { ChannelDefinition } from '../infrastructure/services/ChatManager';
+import { ChannelDefinition } from '../domain/types/ChannelDefinition';
 
 export enum CHANNEL_TAGS {
     CLAN = 'CLAN',
     TEAM = 'TEAM',
 }
 
-export enum CHANNEL_ID {
-    GLOBAL = 'global',
-    INFO = 'info',
-}
+/**
+ * This is a list of channel symbolic ids
+ */
+export enum CHANNEL_SYMBOLIC_ID {
+    // General channels
+    TALK = 'public', // public channel, mostly in-character, discussion about game content, lightly immersive
+    NOOB = 'newbie', // newbie channel, new players welcome here
+    OOC = 'ooc', // out of character discussions, about real life or things not realted to game
 
-// general
-// info
-// answers
-// rumors
-// bugreports
-// Team
-// Guild
-// Role play
-// Rumors / Legend
-// Bug suggestion
-// Newbie
+    // Thematic
+    TRADE = 'trade', // discussions about trading items
+    ROLEPLAY = 'rp', // Role play discussions (always in-character)
+    QUEST = 'quest', // discussion about how to resolve quests
+    RUMOR = 'rumor', // discussion about rumors in game - Mostly in-character
+
+    // Official
+    INFO = 'info', // announcement channel, events, important messages...
+    STAFF = 'staff', // staff private channels
+    TECH = 'tech', // Technical discussion about the server, bug reports, always ooc
+
+    // Clan/Group
+    CLAN = 'clan',
+    TEAM = 'team',
+}
 
 export const CHANNEL_DEFINITION: ChannelDefinition[] = [
     {
-        id: 'global',
+        id: CHANNEL_SYMBOLIC_ID.TALK,
         tag: '',
         persistent: true,
         readonly: false,
         color: '#77b',
         scoped: false,
         autojoin: true,
+        staff: false,
     },
     {
-        id: 'info',
+        id: CHANNEL_SYMBOLIC_ID.OOC,
+        tag: '',
+        persistent: true,
+        readonly: false,
+        color: '#96c',
+        scoped: false,
+        autojoin: true,
+        staff: false,
+    },
+    {
+        id: CHANNEL_SYMBOLIC_ID.INFO,
         tag: '',
         persistent: true,
         readonly: true,
-        color: '#7b7',
+        color: '#ff0',
         scoped: false,
         autojoin: true,
+        staff: false,
     },
     {
-        id: 'questions',
+        id: CHANNEL_SYMBOLIC_ID.NOOB,
         tag: '',
         persistent: true,
         readonly: false,
         color: '#4e6',
         scoped: false,
         autojoin: true,
+        staff: false,
     },
     {
-        id: 'rumors',
+        id: CHANNEL_SYMBOLIC_ID.ROLEPLAY,
         tag: '',
         persistent: true,
         readonly: false,
         color: '#bb9',
         scoped: false,
         autojoin: true,
+        staff: false,
     },
     {
-        id: 'bugreports',
+        id: CHANNEL_SYMBOLIC_ID.TECH,
         tag: '',
         persistent: true,
         readonly: false,
-        color: '#f75',
+        color: '#f53',
         scoped: false,
         autojoin: true,
+        staff: false,
     },
     {
-        id: 'team',
+        id: CHANNEL_SYMBOLIC_ID.STAFF,
+        tag: '',
+        persistent: true,
+        readonly: false,
+        color: '#f90',
+        scoped: false,
+        autojoin: true,
+        staff: true,
+    },
+    {
+        id: CHANNEL_SYMBOLIC_ID.TEAM,
         tag: CHANNEL_TAGS.TEAM,
         persistent: false,
         readonly: false,
         color: '#28f',
         scoped: true,
         autojoin: false,
+        staff: false,
     },
     {
-        id: 'clan',
+        id: CHANNEL_SYMBOLIC_ID.CLAN,
         tag: CHANNEL_TAGS.CLAN,
         persistent: false,
         readonly: false,
         color: '#f8f',
         scoped: true,
         autojoin: false,
+        staff: false,
     },
 ];

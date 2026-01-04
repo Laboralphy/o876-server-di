@@ -6,22 +6,11 @@ import { SendUserMessage } from '../../application/use-cases/users/SendUserMessa
 import { ChannelListItem, IChatManager } from '../../application/ports/services/IChatManager';
 import { CHANNEL_ATRIBUTES } from '../../libs/txat/channel-attributes';
 import { User } from '../../domain/entities/User';
-import { debug } from '../../libs/o876-debug';
 import { SPECIAL_MESSAGE } from '../../domain/enums/special-message';
-
-const debugTxat = debug('srv:txat');
+import { ChannelDefinition } from '../../domain/types/ChannelDefinition';
+import { ROLES } from '../../domain/enums/roles';
 
 const SCOPED_CHANNEL_SEPARATOR = '#';
-
-export type ChannelDefinition = {
-    id: string; // channel id
-    tag: string; // This could be a clan channel, or a localized channel
-    persistent: boolean; // This channel will not be dropped when user count is reduced to zero
-    readonly: boolean; // This channel is for announcements only
-    scoped: boolean; // If true, this channel is scoped to a localization or a membership (clan, area, team...)
-    color: string; // channel default color
-    autojoin: boolean; // if true, all user will join this channel
-};
 
 export class ChatManager implements IChatManager {
     private readonly _txat = new Txat.System();
@@ -62,7 +51,7 @@ export class ChatManager implements IChatManager {
      * @param idChannel
      * @param bValue
      */
-    switchChannel(idUser: string, idChannel: string, bValue: boolean): void {
+    toggleChannel(idUser: string, idChannel: string, bValue: boolean): void {
         const channel = this._txat.getChannel(idChannel);
         const user = channel.getUser(idUser);
         if (user) {
@@ -105,8 +94,15 @@ export class ChatManager implements IChatManager {
     }
 
     registerUser(user: User) {
+        const bUserIsStaff =
+            user.roles.includes(ROLES.MODERATOR) ||
+            user.roles.includes(ROLES.GAME_MASTER) ||
+            user.roles.includes(ROLES.ADMIN);
         this._txat.registerUser(user.id, user.displayName);
         for (const cd of this.channelDefinitions.values()) {
+            if (cd.staff && !bUserIsStaff) {
+                continue;
+            }
             if (cd.autojoin) {
                 this.joinChannel(user.id, cd.id);
             }

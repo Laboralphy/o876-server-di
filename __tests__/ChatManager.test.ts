@@ -68,6 +68,7 @@ describe('ChatManager', () => {
                     scoped: false,
                     color: '#999',
                     autojoin: false,
+                    staff: false,
                 })
             ).not.toThrow();
         });
@@ -88,6 +89,7 @@ describe('ChatManager', () => {
                 scoped: false,
                 color: '#999',
                 autojoin: false,
+                staff: false,
             });
             expect(() => cm.joinChannel(alice.id, 'trade')).not.toThrow();
             const au1 = cm.getUserList('trade');
@@ -109,6 +111,7 @@ describe('ChatManager', () => {
                 scoped: true,
                 color: '#999',
                 autojoin: false,
+                staff: false,
             });
             cm.defineChannel({
                 id: 'trade',
@@ -118,6 +121,7 @@ describe('ChatManager', () => {
                 scoped: false,
                 color: '#999',
                 autojoin: false,
+                staff: false,
             });
             cm.joinChannel(alice.id, 'team#111');
             expect(cm.getUserList('team#111')).toEqual(['a']);

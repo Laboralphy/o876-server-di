@@ -17,8 +17,9 @@ export interface IScriptRunner {
      * the full path is usefull for "require" calls
      * @param id script identifier
      * @param sSource script source code (js)
+     * @param sFullPath is used to resolve relative requires
      */
-    compile(id: string, sSource: string): void;
+    compile(id: string, sSource: string, sFullPath: string): void;
 
     /**
      * Run a specific script with a specific partial context.

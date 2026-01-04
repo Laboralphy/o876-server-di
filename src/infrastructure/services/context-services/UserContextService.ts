@@ -114,6 +114,13 @@ export class UserContextService extends AbstractContextService {
     }
 
     /**
+     * Returns true if user has game master role
+     */
+    isGameMaster() {
+        return this.user.roles.includes(ROLES.GAME_MASTER);
+    }
+
+    /**
      * Ban a user
      * @param userToBan user
      * @param reason reason why user is banned

@@ -1,5 +1,5 @@
-import { ChannelDefinition } from '../../../infrastructure/services/ChatManager';
 import { User } from '../../../domain/entities/User';
+import { ChannelDefinition } from '../../../domain/types/ChannelDefinition';
 
 export type ChannelListItem = {
     id: string;
@@ -15,7 +15,7 @@ export interface IChatManager {
     joinChannel(idUser: string, idChannel: string): void;
     registerUser(user: User): void;
     unregisterUser(user: User): void;
-    switchChannel(idUser: string, idChannel: string, bValue: boolean): void;
+    toggleChannel(idUser: string, idChannel: string, bValue: boolean): void;
     getUserList(idChannel: string): string[];
     getUserJoinedChannels(idUser: string): ChannelListItem[];
     grantUserWrite(idUser: string, idChannel: string): void;

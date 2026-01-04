@@ -6,25 +6,22 @@
             "parameters": "Paramètres",
             "noParam": "Pas de paramètres"
         },
-        "answer": {
-            "shortdesc": "Répond à un utilisateur sur le canal \"questions\".",
-            "description": "Permet d'envoyer un message sur le canal \"questions\". Ce message sera coloré en vert pour indiquer qu'il s'agit d'une réponse à une précédente question posée par un autre utilisateur.",
-            "syntax": "<réponse>",
+        "ban": {
+            "shortdesc": "(mod) Banni un utilisateur.",
+            "description": "Commande accessible aux modérateurs. Bannissement temporaire d'un utilisateur. Ce dernier est immédiatement déconnecté s'il était connecté et ne pourra plus accéder au service jusqu'à ce que le délai spécifié se soit écoulé. Néanmoins le bannissement peut être levé prématurément avec la commande \"unban\". Seuls les utilisateurs ayant le rôle \"modérateurs\" peuvent bannir. Il n'est pas nécessaire qu l'utilisateur visé par le bannissement soit connecté. Tous les utilisateurs connecté sont immédiatement mis au courant de l'opération via le canal \"info\"",
+            "syntax": "<utilisateur> <durée> <raison>",
             "parameters": [
                 {
-                    "name": "réponse",
-                    "description": "Contenu de la réponse qui sera affiché tel quel sur le canal \"questions\"."
-                }
-            ]
-        },
-        "ask": {
-            "shortdesc": "Demande assistance sur le canal \"questions\".",
-            "description": "Permet de poser une question sur le canal \"questions\", tous les utilisateur qui écoute ce canal recevront la question, et peuvent y répondre avec la commande \"answer\". Sur ce canal, les question sont colorée en orange pour pouvoir les distinguer des réponses.",
-            "syntax": "<question>",
-            "parameters": [
+                    "name": "utilisateur",
+                    "description": "Nom de l'utilisateur à bannir."
+                },
                 {
-                    "name": "question",
-                    "description": "Question qui sera postée (colorisée en orange) dans le canal \"questions\"."
+                    "name": "durée",
+                    "description": "Un nombre suivi d'une unité de temps (h pour heure, d pour jour) ; ex : 1d pour 1 jour, 12h pour douze haures."
+                },
+                {
+                    "name": "raison",
+                    "description": "Raison pour laquelle le bannissement a été effectuée"
                 }
             ]
         },
@@ -39,20 +36,15 @@
                 }
             ]
         },
-        "bugreport": {
-            "shortdesc": "Envoie la description d'un bug sur le canal \"bugreports\".",
-            "description": "Permet à quiconque de poster un message rapportant une anomalie du service rencontrée par l'utilisateur, cela signalera le problème à un administrateur qui pourra tenter de le corriger.",
-            "syntax": "<message>",
-            "parameters": [
-                {
-                    "name": "message",
-                    "description": "Brève description de l'erreur rencontrée."
-                }
-            ]
-        },
         "channels": {
             "shortdesc": "Affiche la liste des canaux de discussions.",
             "description": "Affiche la liste des canaux auxquels l'utilisateur est connecté ; ainsi que, pour chaque canal, s'il est actif ou pas. Certains canaux peuvent être rendu inactifs par l'utilisateur qui ne souhaite plus recevoir de message.",
+            "syntax": "",
+            "parameters": []
+        },
+        "commands": {
+            "shortdesc": "Affiche la liste des commandes.",
+            "description": "Affiche la liste des commandes disponnible pour les utilisateurs par l'ordre alphabétique.",
             "syntax": "",
             "parameters": []
         },
@@ -67,9 +59,9 @@
                 }
             ]
         },
-        "logout": {
-            "shortdesc": "Déconnexion.",
-            "description": "L'utilisateur se déconnecte du service.",
+        "female": {
+            "shortdesc": "Accorde au féminin les messages envoyés à l'utilisatrice.",
+            "description": "Défini si les message envoyé à l'utilisateur seront accordés ou pas au féminin; ceci pour des questions d'internationalisation de chaînes de caractères pour des langues telles que français ou espagnol qui ont des accords en genre.",
             "syntax": "",
             "parameters": []
         },
@@ -84,26 +76,32 @@
                 }
             ]
         },
-        "gossip": {
-            "shortdesc": "Poste un message sur le canal \"rumors\".",
-            "description": "Permet à l'utilisateur de poster une message sur le canal de discussion \"rumors\", à destination de tous les autres utilisateurs connectés. L'utilisattion de ce canal est principalement IC (in-character) et Role Play",
-            "syntax": "<message>",
+        "help": {
+            "shortdesc": "Affichage de l'aide en ligne",
+            "description": "Affiche le document d'aide correspondant au sujet spécifié en paramètre",
+            "syntax": "<sujet>",
             "parameters": [
                 {
-                    "name": "message",
-                    "description": "Contenu du message à poster sur le canal \"rumors\"."
+                    "name": "sujet",
+                    "description": "Sujet spécifié."
                 }
             ]
+        },
+        "logout": {
+            "shortdesc": "Déconnexion.",
+            "description": "L'utilisateur se déconnecte du service.",
+            "syntax": "",
+            "parameters": []
+        },
+        "newbie": {
+            "shortdesc": "Poste un message dans le canal \"newbie\".",
+            "description": "Permet de poster un message sur le canal \"newbie\", si le message se termine par \"?\" il sera coloré différemment de manière à apparaitre distinctement comme une question ou une demande d'assistance. Utilisée sans paramètre : active ou désactive alternativement l'écoute sur le canal \"newbie\". Lorsque l'écoute est désactivée l'utilisateur ne reçois plus de message en provenance de ce canal. L'écoute se réactive automatiquement lorsque l'utilisateur utilise la commande pout poster un message.",
+            "syntax": "",
+            "parameters": []
         },
         "passwd": {
             "shortdesc": "Change le mot de passe utilisateur (interactif).",
             "description": "Procède au changement du mot de passe de l'utilisateur. Notez que la commande ne prend pas de paramètres : le système demandera l'ancien et le nouveau mot de passe de manière interactive.",
-            "syntax": "",
-            "parameters": []
-        },
-        "questions": {
-            "shortdesc": "Active/Désactive le canal \"questions\".",
-            "description": "Active ou désactive alternativement l'écoute sur le canal \"questions\". Lorsque l'écoute est désactivée l'utilisateur ne reçois plus de essage en provenance de ce canal et l'utilisation de la commande \"answer\" est également désactivée. Si l'utilisateur tente d'utiliser la commande \"ask\" l'écoute se réactive automatiquement.",
             "syntax": "",
             "parameters": []
         },
@@ -112,6 +110,17 @@
             "description": "Affiche le plus ancien message privé non lu, envoyé par un autre utilisateur. Voir la commande \"sendmsg\" pour savoir comment envoyer des message privé à destination d'utilisateur non connectés.",
             "syntax": "",
             "parameters": []
+        },
+        "rp": {
+            "shordesc": "Poste su le canal \"roleplay\"",
+            "description": "Poste un message public sur le canal \"roleplay\". Comme son nom l'indique, ce canal est réservé aux discussions lié au jeu de rôle, qui privilégient l'immersion dans l'univers du jeu. Lancée sans paramètre, cette commande active ou désactive alternativement le canal \"roleplay\". Lorsque désactivé, plus aucun message en provenance de ce canal ne provient à l'utilisateur. Le canal se réactive automatiquement lorsque l'utilisateur utilise cette commande pour envoyer un message.",
+            "syntax": "<message>",
+            "parameters": [
+                {
+                    "name": "message",
+                    "description": "Contenu du message à poster dans le canal \"roleplay\""
+                }
+            ]
         },
         "sendmsg": {
             "shortdesc": "Envoi d'un message privé.",
@@ -134,36 +143,6 @@
             "syntax": "",
             "parameters": []
         },
-        "who": {
-            "shortdesc": "Affiche la liste des utilisateurs.",
-            "description": "Affiche la liste des utilisateur enregistré sur le serveur, la liste est triée, les utilisateur connecté apparaissent en tête de liste. Il est possible d'affiner la recher en entrant quelque caractères paramètre, dans ce cas, seul les utilisateurs dont le nom comporte cette suite de caractère seront affichés.",
-            "syntax": "[filtre]",
-            "parameters": [
-                {
-                    "name": "filtre",
-                    "description": "Si spécifié, seuls s'afficheront les utilisateur dont le nom contient le filtre spécifié."
-                }
-            ]
-        },
-        "ban": {
-            "shortdesc": "(mod) Banni un utilisateur.",
-            "description": "Commande accessible aux modérateurs. Bannissement temporaire d'un utilisateur. Ce dernier est immédiatement déconnecté s'il était connecté et ne pourra plus accéder au service jusqu'à ce que le délai spécifié se soit écoulé. Néanmoins le bannissement peut être levé prématurément avec la commande \"unban\". Seuls les utilisateurs ayant le rôle \"modérateurs\" peuvent bannir. Il n'est pas nécessaire qu l'utilisateur visé par le bannissement soit connecté. Tous les utilisateurs connecté sont immédiatement mis au courant de l'opération via le canal \"info\"",
-            "syntax": "<utilisateur> <durée> <raison>",
-            "parameters": [
-                {
-                    "name": "utilisateur",
-                    "description": "Nom de l'utilisateur à bannir."
-                },
-                {
-                    "name": "durée",
-                    "description": "Un nombre suivi d'une unité de temps (h pour heure, d pour jour) ; ex : 1d pour 1 jour, 12h pour douze haures."
-                },
-                {
-                    "name": "raison",
-                    "description": "Rainson pour laquelle le bannissement a été effectuée"
-                }
-            ]
-        },
         "unban": {
             "shortdesc": "(mod) Lève le bannissement d'un utilisateur.",
             "description": "Commande accessible aux modérateurs. A utiliser pour mettre prématurément fin au bannissement d'un utilisateur et permettre à ce dernier de pouvoir se reconnecter au service immédiatement. Tous les utilisateurs sont mis au courant de l'opération via le canal \"info\".",
@@ -175,17 +154,16 @@
                 }
             ]
         },
-        "female": {
-            "shortdesc": "Accorde au féminin les messages envoyés à l'utilisatrice.",
-            "description": "Défini si les message envoyé à l'utilisateur seront accordés ou pas au féminin; ceci pour des questions d'internationalisation de chaînes de caractères pour des langues telles que français ou espagnol qui ont des accords en genre.",
-            "syntax": "",
-            "parameters": []
-        },
-        "commands": {
-            "shortdesc": "Affiche la liste des commandes.",
-            "description": "Affiche la liste des commandes disponnible pour les utilisateurs par l'ordre alphabétique.",
-            "syntax": "",
-            "parameters": []
+        "who": {
+            "shortdesc": "Affiche la liste des utilisateurs.",
+            "description": "Affiche la liste des utilisateur enregistré sur le serveur, la liste est triée, les utilisateur connecté apparaissent en tête de liste. Il est possible d'affiner la recher en entrant quelque caractères paramètre, dans ce cas, seul les utilisateurs dont le nom comporte cette suite de caractère seront affichés.",
+            "syntax": "[filtre]",
+            "parameters": [
+                {
+                    "name": "filtre",
+                    "description": "Si spécifié, seuls s'afficheront les utilisateur dont le nom contient le filtre spécifié."
+                }
+            ]
         }
     }
 }

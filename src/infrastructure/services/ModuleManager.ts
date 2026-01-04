@@ -55,9 +55,9 @@ export class ModuleManager implements IModuleManager {
         }
     }
 
-    defineAssetScript(name: string, source: string) {
+    defineAssetScript(name: string, source: string, sFullPath: string) {
         this.addStatCountSize('scripts', 1, source.length);
-        this.scriptRunner.compile(name, source);
+        this.scriptRunner.compile(name, source, sFullPath);
     }
 
     defineAssetData(key: string, data: string) {
@@ -134,8 +134,13 @@ export class ModuleManager implements IModuleManager {
             const contentBuffer = await fs.readFile(sFullPath);
             switch (sType) {
                 case 'scripts': {
-                    const aId = [...aPath, sId];
-                    this.defineAssetScript(aId.join('/'), contentBuffer.toString());
+                    // We should not compile all types of scripts
+                    // Some scripts are only used as dependency of event or commands.
+                    if (aPath[0] === 'commands' || aPath[0] === 'events') {
+                        // this is a command, or an event, the only scripts types we are indexing
+                        const aId = [...aPath, sId];
+                        this.defineAssetScript(aId.join('/'), contentBuffer.toString(), sFullPath);
+                    }
                     break;
                 }
                 case 'locales': {

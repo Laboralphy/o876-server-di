@@ -96,6 +96,7 @@
         "channelInactive": "[ ]",
         "channelListItemName": "Canal",
         "channelListItemActive": "Actif",
+        "channelListItemCommand": "Commande",
         "channelSwitchActive": "Le canal {{ channel }} est désormais actif.",
         "channelSwitchInactive": "Le canal {{ channel }} est désormais inactif."
     },
