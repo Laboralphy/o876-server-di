@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MudletPackage>
+<MudletPackage version="1.001">
+	<ScriptPackage>
+		<Script isActive="yes" isFolder="no">
+			<name>PlasmudChat.class</name>
+			<packageName></packageName>
+			<script>PlasmudChat = PlasmudChat or {
+  widgets = {},
+}
+
+-- Clear all plasmud UI widgets
+function PlasmudChat.clearUI()
+  -- Destroyes a specific widget and all its children
+  -- @param widget {Widget}
+  local function destroyWidget(widget)
+    if widget and widget.destroy then
+      if widget.children then
+        for _, child in ipairs(widget.children) do
+          destroyWidget(child)
+        end
+      end
+      widget:destroy()
+    end
+  end
+  
+  for _, widget in pairs(PlasmudChat.widgets) do
+    if type(widget) == "table" and widget.destroy then
+      destroyWidget(widget)
+    end
+  end
+  PlasmudChat.widgets = {}
+end
+
+-- Rebuild plasmud chat UI
+function PlasmudChat.rebuildUI()
+  PlasmudChat.clearUI()
+  PlasmudChat.buildUI()
+end
+
+-- Build the plasmud chat user interface
+function PlasmudChat.buildUI()
+
+  local METRICS = {
+    CHANNEL_BUTTONS_WIDTH = 13,
+    MAIN_CONTAINER_X = 62,
+    MAIN_CONTAINER_Y = 20,
+    MAIN_CONTAINER_WIDTH = 35,
+    MAIN_CONTAINER_HEIGHT = 50
+  }
+
+  -- Main container
+  local mainContainer = Geyser.Container:new({
+    name = "chatMainContainer",
+    x = METRICS.MAIN_CONTAINER_X .. "%", y = METRICS.MAIN_CONTAINER_Y .. "%",
+    width = METRICS.MAIN_CONTAINER_WIDTH .. "%", height = METRICS.MAIN_CONTAINER_HEIGHT .. "%",
+    color = "1e1e1e"
+  })
+  print(PlasmudChat.metrics)
+  local channelButtons = Geyser.Label:new({
+    name = "chatChannelButtons",
+    x = 0, y = 0,
+    width = METRICS.CHANNEL_BUTTONS_WIDTH .. "%", height = "100%",
+  }, mainContainer)
+  
+  local channels = { 
+    [1] = { id = "public", caption = "Public", color = "7777bb" }, 
+    [2] = { id = "ooc", caption = "O.O.C.", color = "9966cc" }, 
+    [3] = { id = "info", caption = "Info", color = "ffff00" }, 
+    [4] = { id = "newbie", caption = "Newbie", color = "44ee66" },  
+    [5] = { id = "rp", caption = "Role Play", color = "bbbb99" },  
+    [6] = { id = "tech", caption = "Tech", color = "ff5533" },
+  }
+  for i, channel in ipairs(channels) do
+    Geyser.Button:new({
+      name = "channel_" .. channel.id,
+      x = 0, y = (i - 1) * 30,
+      width = "100%", height = 29,
+      msg = "&lt;center&gt;" .. channel.caption .. "&lt;/center&gt;",
+      clickFunction = function() print(channel.id) end,
+      style = "background-color: #" .. adjustColorIntensity(channel.color, 0.4) .. "; border: 1px solid #" .. adjustColorIntensity(channel.color, 0.6) .. ";"
+    }, channelButtons)
+  end
+  
+  local chatConsole = Geyser.MiniConsole:new({
+    name = "chatConsole",
+    x = METRICS.CHANNEL_BUTTONS_WIDTH .. "%", y = 0,
+    width = (100 - METRICS.CHANNEL_BUTTONS_WIDTH) .. "%", height = "100%",
+    fgcolor = "lightgrey",
+    fontSize = 10
+  }, mainContainer)
+  chatConsole:enableCommandLine()
+  
+  local function chatConsoleOnInput(text)
+    chatConsole:echo("[chat] " .. text .."\n")
+  end
+  
+  chatConsole:setCmdAction(chatConsoleOnInput)
+
+  PlasmudChat.widgets.mainContainer = mainContainer
+  PlasmudChat.widgets.channelButtons = channelButtons
+  PlasmudChat.widgets.chatConsole = chatConsole
+end
+
+PlasmudChat.rebuildUI()
+</script>
+			<eventHandlerList />
+		</Script>
+	</ScriptPackage>
+</MudletPackage>
