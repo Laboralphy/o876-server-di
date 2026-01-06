@@ -14,6 +14,7 @@ export const CommChannelListSchema = z.array(
         .object({
             name: z.string(),
             command: z.string().optional(),
+            color: z.string().optional(),
             enabled: z.boolean(),
         })
         .strict()

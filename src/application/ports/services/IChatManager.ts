@@ -7,6 +7,7 @@ export type ChannelListItem = {
     read: boolean;
     write: boolean;
     moderate: boolean;
+    color: string;
 };
 
 export interface IChatManager {

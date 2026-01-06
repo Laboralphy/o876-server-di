@@ -171,6 +171,10 @@ export class ChatManager implements IChatManager {
         if (user) {
             return Array.from(user.joinedChannels).map((channel) => {
                 const userPresence = channel.getUser(idUser);
+                const cd: ChannelDefinition | undefined = this.channelDefinitions.get(channel.id);
+                if (!cd) {
+                    throw new ReferenceError(`Channel ${channel.id} is not properly defined`);
+                }
                 if (userPresence) {
                     return {
                         id: channel.id,
@@ -178,6 +182,7 @@ export class ChatManager implements IChatManager {
                         read: userPresence.hasPower(POWERS.READ),
                         write: userPresence.hasPower(POWERS.WRITE),
                         moderate: userPresence.hasPower(POWERS.MODERATE),
+                        color: cd.color,
                     };
                 } else {
                     throw new Error(

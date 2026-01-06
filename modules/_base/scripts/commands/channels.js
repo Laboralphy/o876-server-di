@@ -10,6 +10,7 @@ function main(ctx) {
     const channelList = ctx.chat.getChannelList().map((c) => ({
         name: c.tag === '' ? c.id : c.tag,
         enabled: c.read,
+        color: c.color,
         command: oChannelCommandIndex[c.id],
     }));
     ctx.print('Comm.Channel.List', {
