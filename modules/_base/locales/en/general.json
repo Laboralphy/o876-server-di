@@ -58,8 +58,8 @@
         "exceedCapacity": "Maximum size reached : {{ lines }} max lines, {{ chars }} max chars."
     },
     "mail": {
-        "youHaveMail_one": "You have an unread message.",
-        "youHaveMail_other": "You have {{ count }} unread messages.",
+        "unreadMessage_one": "You have an unread message.",
+        "unreadMessage_other": "You have {{ count }} unread messages.",
         "inboxHeaderDate": "Date",
         "inboxEmpty": "Inbox is empty.",
         "recipientNotFound": "Recipient not found",

@@ -96,8 +96,13 @@
         "newbie": {
             "shortdesc": "Poste un message dans le canal \"newbie\".",
             "description": "Permet de poster un message sur le canal \"newbie\", si le message se termine par \"?\" il sera coloré différemment de manière à apparaitre distinctement comme une question ou une demande d'assistance. Utilisée sans paramètre : active ou désactive alternativement l'écoute sur le canal \"newbie\". Lorsque l'écoute est désactivée l'utilisateur ne reçois plus de message en provenance de ce canal. L'écoute se réactive automatiquement lorsque l'utilisateur utilise la commande pout poster un message.",
-            "syntax": "",
-            "parameters": []
+            "syntax": "[message]",
+            "parameters": [
+                {
+                    "name": "message",
+                    "description": "Message à poster sur le canal \"newbie\""
+                }
+            ]
         },
         "passwd": {
             "shortdesc": "Change le mot de passe utilisateur (interactif).",
