@@ -5,104 +5,154 @@
 		<Script isActive="yes" isFolder="no">
 			<name>PlasmudChat.class</name>
 			<packageName></packageName>
-			<script>PlasmudChat = PlasmudChat or {
-  widgets = {},
-}
+			<script>PlasmudChat = PlasmudChat or {}
+PlasmudChat.widgets = PlasmudChat.widgets or {}
+PlasmudChat.channels = PlasmudChat.channels or {}
+PlasmudChat.channelData = PlasmudChat.channelData or {}
 
--- Clear all plasmud UI widgets
-function PlasmudChat.clearUI()
-  -- Destroyes a specific widget and all its children
-  -- @param widget {Widget}
-  local function destroyWidget(widget)
-    if widget and widget.destroy then
-      if widget.children then
-        for _, child in ipairs(widget.children) do
-          destroyWidget(child)
-        end
-      end
-      widget:destroy()
-    end
+function PlasmudChat.selectChannel(sChannelId)
+  for i, channel in pairs(PlasmudChat.channels) do
+    channel.selected = false
+    channel.console:disableCommandLine()
+    channel.button:setState("up")
+    channel.console:hide()
   end
-  
-  for _, widget in pairs(PlasmudChat.widgets) do
-    if type(widget) == "table" and widget.destroy then
-      destroyWidget(widget)
-    end
-  end
-  PlasmudChat.widgets = {}
+  local selectedChannel = PlasmudChat.channels[sChannelId]
+  selectedChannel.selected = true
+  selectedChannel.button:setState("down")
+  selectedChannel.console:show()
+  selectedChannel.console:enableCommandLine()
+  local r, g, b = hexToRGB(selectedChannel.bgColor)
+  selectedChannel.console:setColor(r, g, b, 128)
 end
 
--- Rebuild plasmud chat UI
-function PlasmudChat.rebuildUI()
-  PlasmudChat.clearUI()
+function PlasmudChat.setChannels(channelData)
+  PlasmudChat.channelData = channelData
   PlasmudChat.buildUI()
+  print('displayed ?')
+end
+
+function PlasmudChat.getSelectedChannel()
+  for i, channel in pairs(PlasmudChat.channels) do
+    if channel.selected then
+      return channel
+    end
+  end
+  return nil
+end
+
+function PlasmudChat.chatConsoleOnInput(text)
+  local channel = PlasmudChat.getSelectedChannel()
+  print("envoyer : " .. text)
+  display(channel.command)
+  if channel then
+    send(channel.command .. " " .. text)
+  else
+    display(channel)
+  end
+end
+
+function PlasmudChat.clearAllChannels()
+  local parent = PlasmudChat.widgets.channelButtons
+  for i, channel in pairs(PlasmudChat.channels) do
+    local button = channel.button
+    button:hide()
+    parent:remove(button)
+    local console = channel.console
+    console:hide()
+    parent:remove(console)
+  end
+  PlasmudChat.channels = {}
 end
 
 -- Build the plasmud chat user interface
 function PlasmudChat.buildUI()
 
   local METRICS = {
-    CHANNEL_BUTTONS_WIDTH = 13,
-    MAIN_CONTAINER_X = 62,
-    MAIN_CONTAINER_Y = 20,
-    MAIN_CONTAINER_WIDTH = 35,
-    MAIN_CONTAINER_HEIGHT = 50
+    CHANNEL_BUTTONS_WIDTH = 10,
+    MAIN_CONTAINER_X = "-84c",
+    MAIN_CONTAINER_Y = "-29c",
+    MAIN_CONTAINER_WIDTH = 80,
+    MAIN_CONTAINER_HEIGHT = 25
   }
-
+  
   -- Main container
   local mainContainer = Geyser.Container:new({
     name = "chatMainContainer",
-    x = METRICS.MAIN_CONTAINER_X .. "%", y = METRICS.MAIN_CONTAINER_Y .. "%",
-    width = METRICS.MAIN_CONTAINER_WIDTH .. "%", height = METRICS.MAIN_CONTAINER_HEIGHT .. "%",
-    color = "1e1e1e"
+    x = METRICS.MAIN_CONTAINER_X, y = METRICS.MAIN_CONTAINER_Y,
+    width = METRICS.MAIN_CONTAINER_WIDTH .. "c", height = METRICS.MAIN_CONTAINER_HEIGHT .. "c",
   })
-  print(PlasmudChat.metrics)
   local channelButtons = Geyser.Label:new({
     name = "chatChannelButtons",
     x = 0, y = 0,
-    width = METRICS.CHANNEL_BUTTONS_WIDTH .. "%", height = "100%",
+    width = METRICS.CHANNEL_BUTTONS_WIDTH .. "c", height = "100%",
+  }, mainContainer)
+  channelButtons:setStyleSheet([[
+    background-color: #1e1e1e;
+    border: 1px solid #444444;
+  ]])
+  
+  local chatBackground = Geyser.Label:new({
+    name = "chatConsoleBackground",
+    x = METRICS.CHANNEL_BUTTONS_WIDTH .. "c", y = 0,
+    width = (METRICS.MAIN_CONTAINER_WIDTH - METRICS.CHANNEL_BUTTONS_WIDTH) .. "c", height = "100%"
   }, mainContainer)
   
-  local channels = { 
-    [1] = { id = "public", caption = "Public", color = "7777bb" }, 
-    [2] = { id = "ooc", caption = "O.O.C.", color = "9966cc" }, 
-    [3] = { id = "info", caption = "Info", color = "ffff00" }, 
-    [4] = { id = "newbie", caption = "Newbie", color = "44ee66" },  
-    [5] = { id = "rp", caption = "Role Play", color = "bbbb99" },  
-    [6] = { id = "tech", caption = "Tech", color = "ff5533" },
-  }
-  for i, channel in ipairs(channels) do
-    Geyser.Button:new({
+  -- iterating thru PlasmudChat.channelData to build buttons
+  PlasmudChat.clearAllChannels()
+  for i, channel in ipairs(PlasmudChat.channelData) do
+    local sChannelCaption = channel.caption or channel.id
+    local button = Geyser.Button:new({
       name = "channel_" .. channel.id,
+      tooltip = "View channel " .. sChannelCaption .. " content",
+      downTooltip = "View channel " .. sChannelCaption .. " content",
+      twoState = true,
       x = 0, y = (i - 1) * 30,
       width = "100%", height = 29,
-      msg = "&lt;center&gt;" .. channel.caption .. "&lt;/center&gt;",
-      clickFunction = function() print(channel.id) end,
-      style = "background-color: #" .. adjustColorIntensity(channel.color, 0.4) .. "; border: 1px solid #" .. adjustColorIntensity(channel.color, 0.6) .. ";"
+      msg = "&lt;center&gt;" .. sChannelCaption .. "&lt;/center&gt;",
+      downMsg = "&lt;center&gt;" .. sChannelCaption .. "&lt;/center&gt;",
+      clickFunction = function() 
+        -- Change state &amp; select a new console
+        PlasmudChat.selectChannel(channel.id) 
+      end,
+      downFunction = function ()
+        -- Prevent default
+      end,
+      style = "background-color: #" .. adjustColorIntensity(channel.color, 0.4) .. "; border: 1px solid #" .. adjustColorIntensity(channel.color, 0.6) .. ";",
+      downStyle = "background-color: #" .. adjustColorIntensity(channel.color, 0.6) .. "; border: 1px solid #" .. adjustColorIntensity(channel.color, 0.9) .. ";"
     }, channelButtons)
+    local sBGColor = adjustColorIntensity(channel.color, 0.2)
+    local chatConsole = Geyser.MiniConsole:new({
+      name = "chatConsole_" .. channel.id,
+      x = 0, y = 0,
+      width = "100%", height = "100%",
+      fgColor = "lightgrey",
+      fontSize = 10,
+      bgColor = "#" .. sBGColor
+    }, chatBackground)
+    chatConsole:clear()
+    chatConsole:setCmdAction(function (text)
+      PlasmudChat.chatConsoleOnInput(text)
+    end)
+    chatConsole:echo(channel.caption .."\n")
+    PlasmudChat.channels[channel.id] = {
+      id = channel.id,
+      selected = false,
+      button = button,
+      console = chatConsole,
+      bgColor = sBGColor,
+      command = channel.command
+    }
   end
-  
-  local chatConsole = Geyser.MiniConsole:new({
-    name = "chatConsole",
-    x = METRICS.CHANNEL_BUTTONS_WIDTH .. "%", y = 0,
-    width = (100 - METRICS.CHANNEL_BUTTONS_WIDTH) .. "%", height = "100%",
-    fgcolor = "lightgrey",
-    fontSize = 10
-  }, mainContainer)
-  chatConsole:enableCommandLine()
-  
-  local function chatConsoleOnInput(text)
-    chatConsole:echo("[chat] " .. text .."\n")
-  end
-  
-  chatConsole:setCmdAction(chatConsoleOnInput)
-
   PlasmudChat.widgets.mainContainer = mainContainer
   PlasmudChat.widgets.channelButtons = channelButtons
-  PlasmudChat.widgets.chatConsole = chatConsole
+  PlasmudChat.widgets.chatBackground = chatBackground
+  if #PlasmudChat.channelData &gt; 0 then
+    PlasmudChat.selectChannel(PlasmudChat.channelData[1].id)
+  end
 end
 
-PlasmudChat.rebuildUI()
+PlasmudChat.buildUI()
 </script>
 			<eventHandlerList />
 		</Script>
