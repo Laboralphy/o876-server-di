@@ -65,6 +65,8 @@ import { ChatGetChannels } from '../application/use-cases/chat/ChatGetChannels';
 import { TimeContextService } from '../infrastructure/services/context-services/TimeContextService';
 import { IGMCPGateway } from '../application/ports/services/IGMCPGateway';
 import { GMCPGateway } from '../infrastructure/services/GMCPGateway';
+import { GmcpContextService } from '../infrastructure/services/context-services/GmcpContextService';
+import { RunGMCPCommand } from '../application/use-cases/commands/RunGMCPCommand';
 
 /**
  * To as a new use case, port ...,
@@ -103,6 +105,7 @@ export interface Cradle {
 
     // use cases : command
     runCommand: RunCommand;
+    runGMCPCommand: RunGMCPCommand;
 
     // use cases : mail
     sendMail: SendMail;
@@ -142,6 +145,7 @@ export interface Cradle {
     userContextService: UserContextService;
     chatContextService: ChatContextService;
     timeContextService: TimeContextService;
+    gmcpContextService: GmcpContextService;
 }
 // Container creation
 export const container = createContainer<Cradle>();
@@ -176,6 +180,7 @@ container.register({
 
     // use cases : commands
     runCommand: asClass(RunCommand).singleton(),
+    runGMCPCommand: asClass(RunGMCPCommand).singleton(),
 
     // use cases : mail
     sendMail: asClass(SendMail).singleton(),
@@ -219,6 +224,7 @@ container.register({
     userContextService: asClass(UserContextService).scoped(),
     chatContextService: asClass(ChatContextService).scoped(),
     timeContextService: asClass(TimeContextService).scoped(),
+    gmcpContextService: asClass(GmcpContextService).scoped(),
 });
 
 /**

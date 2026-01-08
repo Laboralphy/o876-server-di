@@ -6,17 +6,16 @@ const oChannelCommandIndex = Object.fromEntries(aChannelData.map((c) => [c.chann
  * Get a list of all channels the user has access
  * @param ctx {IClientContext}
  */
-function main(ctx) {
+async function main(ctx) {
     const channelList = ctx.chat.getChannelList().map((c) => ({
         name: c.tag === '' ? c.id : c.tag,
         enabled: c.read,
         color: c.color,
         command: oChannelCommandIndex[c.id],
     }));
-    ctx.print('Comm.Channel.List', {
-        _gmcp: channelList,
-    });
-    ctx.print('chat-channel-list', { channelList });
+    if (!(await ctx.gmcp.send('Comm.Channel.List', channelList))) {
+        await ctx.print('chat-channel-list', { channelList });
+    }
 }
 
 module.exports = main(context);

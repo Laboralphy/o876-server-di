@@ -13,6 +13,9 @@ import { ClientCradle } from '../../boot/container';
 import { IClientContext } from '../../application/ports/classes/IClientContext';
 import { IApiContextBuilder } from '../../application/ports/services/IApiContextBuilder';
 import { SPECIAL_MESSAGE } from '../../domain/enums/special-message';
+import { GMCPGateway } from '../services/GMCPGateway';
+import { IGMCPGateway } from '../../application/ports/services/IGMCPGateway';
+import { GMCPPacket } from '../../libs/gmcp/GMCPPacket';
 
 const debugTelnet = debug('srv:telnet');
 
@@ -51,9 +54,11 @@ export class TelnetClientController extends AbstractClientController {
     private changePasswordStruct: ChangePasswordStruct;
     private createAccountStruct: CreateUserDto;
     private textEditorStruct: TextEditorStruct;
+    private gmcpGateway: IGMCPGateway;
 
     constructor(cradle: ClientCradle) {
         super(cradle);
+        this.gmcpGateway = cradle.gmcpGateway;
         this.idClient = cradle.idClient;
         this.phase = PHASES.NONE;
         this.changePasswordStruct = {
@@ -424,71 +429,88 @@ export class TelnetClientController extends AbstractClientController {
         this.phase = PHASES.NONE;
         await this.loginProcess(clientSession);
 
-        clientSocket.onMessage(async (message: string) => {
-            try {
-                // in telnet
-                // the first two messages are used to receive credentials
-                // the subsequent messages must be parsed
-                const csd = this.getClientSession(idClient);
-                switch (csd.state) {
-                    case CLIENT_STATES.NONE: {
-                        // Client has been disconnected or is about to be disconnected
-                        // ignore message
-                        break;
-                    }
-
-                    case CLIENT_STATES.PAUSE: {
-                        // Client is not supposed to send message, the process is paused for security reason
-                        // ignore message
-                        break;
-                    }
-
-                    case CLIENT_STATES.LOGIN: {
-                        await this.loginProcess(csd, message);
-                        break;
-                    }
-
-                    case CLIENT_STATES.CREATE_ACCOUNT: {
-                        await this.createAccountProcess(csd, message);
-                        break;
-                    }
-
-                    case CLIENT_STATES.AUTHENTICATED: {
-                        // When client is authenticated, all message are passed to th command interpreter
-                        if (message.endsWith('|')) {
-                            await this.textEditorProcess(
-                                clientSession,
-                                message.slice(0, message.length - 1)
-                            );
-                        } else {
-                            await this.execCommand(idClient, message);
-                        }
-                        break;
-                    }
-
-                    case CLIENT_STATES.TEXT_EDITOR: {
-                        await this.textEditorProcess(csd, message);
-                        break;
-                    }
-
-                    case CLIENT_STATES.CHANGE_PASSWORD: {
-                        await this.changePasswordProcess(csd, message);
-                        break;
-                    }
-
-                    default: {
-                        // Unexpected client state
-                        // Destroying client
-                        debugTelnet('client %s is in an unknown state %d', idClient, csd.state);
-                        return this.dropClient(idClient);
-                    }
+        clientSocket.onMessage(async (message: string | Buffer) => {
+            if (message instanceof Buffer) {
+                try {
+                    // This is where GMCP enters
+                    // TODO process gmcp Buffer here
+                    const p = GMCPPacket.parse(message);
+                    debugTelnet('client %s > GMCP %s', idClient, p.opcode);
+                    return this.execGMCPCommand(idClient, p);
+                } catch (err) {
+                    const error = err as Error;
+                    console.error(error);
+                    // any error leads to client disconnection
+                    // we don't want anything suspicious here
+                    await this.dropClient(idClient);
                 }
-            } catch (err) {
-                const error = err as Error;
-                console.error(error);
-                // any error leads to client disconnection
-                // we don't want anything suspicious here
-                await this.dropClient(idClient);
+            } else {
+                message = message.toString();
+                try {
+                    // in telnet
+                    // the first two messages are used to receive credentials
+                    // the subsequent messages must be parsed
+                    const csd = this.getClientSession(idClient);
+                    switch (csd.state) {
+                        case CLIENT_STATES.NONE: {
+                            // Client has been disconnected or is about to be disconnected
+                            // ignore message
+                            break;
+                        }
+
+                        case CLIENT_STATES.PAUSE: {
+                            // Client is not supposed to send message, the process is paused for security reason
+                            // ignore message
+                            break;
+                        }
+
+                        case CLIENT_STATES.LOGIN: {
+                            await this.loginProcess(csd, message);
+                            break;
+                        }
+
+                        case CLIENT_STATES.CREATE_ACCOUNT: {
+                            await this.createAccountProcess(csd, message);
+                            break;
+                        }
+
+                        case CLIENT_STATES.AUTHENTICATED: {
+                            // When client is authenticated, all message are passed to th command interpreter
+                            if (message.endsWith('|')) {
+                                await this.textEditorProcess(
+                                    clientSession,
+                                    message.slice(0, message.length - 1)
+                                );
+                            } else {
+                                await this.execCommand(idClient, message);
+                            }
+                            break;
+                        }
+
+                        case CLIENT_STATES.TEXT_EDITOR: {
+                            await this.textEditorProcess(csd, message);
+                            break;
+                        }
+
+                        case CLIENT_STATES.CHANGE_PASSWORD: {
+                            await this.changePasswordProcess(csd, message);
+                            break;
+                        }
+
+                        default: {
+                            // Unexpected client state
+                            // Destroying client
+                            debugTelnet('client %s is in an unknown state %d', idClient, csd.state);
+                            return this.dropClient(idClient);
+                        }
+                    }
+                } catch (err) {
+                    const error = err as Error;
+                    console.error(error);
+                    // any error leads to client disconnection
+                    // we don't want anything suspicious here
+                    await this.dropClient(idClient);
+                }
             }
         });
     }

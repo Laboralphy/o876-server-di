@@ -12,7 +12,7 @@ export interface IClientSocket {
      * Listen to message from client
      * @param callback
      */
-    onMessage(callback: (message: string) => void): void;
+    onMessage(callback: (message: string | Buffer) => void): void;
 
     /**
      * Listen to disconnect events.

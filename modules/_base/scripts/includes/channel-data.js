@@ -43,7 +43,7 @@ module.exports = {
     },
     TECH: {
         channel: 'tech',
-        command: '',
+        command: 'tech',
     },
     // Clan/Group
     CLAN: {

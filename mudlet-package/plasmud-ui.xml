@@ -2,10 +2,126 @@
 <!DOCTYPE MudletPackage>
 <MudletPackage version="1.001">
 	<ScriptPackage>
-		<Script isActive="yes" isFolder="no">
-			<name>PlasmudChat.class</name>
+		<ScriptGroup isActive="yes" isFolder="yes">
+			<name>plasmud</name>
 			<packageName></packageName>
-			<script>PlasmudChat = PlasmudChat or {}
+			<script></script>
+			<eventHandlerList />
+			<ScriptGroup isActive="yes" isFolder="yes">
+				<name>0_tools</name>
+				<packageName></packageName>
+				<script></script>
+				<eventHandlerList />
+				<Script isActive="yes" isFolder="no">
+					<name>PlasmudTools.class</name>
+					<packageName></packageName>
+					<script>PlasmudTools = PlasmudTools or {}
+
+
+function PlasmudTools.adjustColorIntensity(hexColor, multiplier)
+    -- Convertir le code hexadécimal en composantes RGB
+    local r = tonumber(hexColor:sub(1, 2), 16)
+    local g = tonumber(hexColor:sub(3, 4), 16)
+    local b = tonumber(hexColor:sub(5, 6), 16)
+
+    -- Appliquer le multiplicateur à chaque composante
+    r = math.floor(r * multiplier)
+    g = math.floor(g * multiplier)
+    b = math.floor(b * multiplier)
+
+    -- Limiter les valeurs entre 0 et 255
+    r = math.max(0, math.min(255, r))
+    g = math.max(0, math.min(255, g))
+    b = math.max(0, math.min(255, b))
+
+    -- Convertir les composantes en hexadécimal (2 chiffres, majuscules)
+    local newHexColor = string.format("%02X%02X%02X", r, g, b)
+
+    return newHexColor
+end
+
+-- Converts an hexadecimal color into RGB components.
+-- @param hexColor css string (ex: "#FF5733" ou "FF5733").
+-- @return r, g, b (value ranged from 0 to 255) or nil if error.
+function PlasmudTools.hexToRGB(hexColor)
+    -- Remove starting "#" if any
+    hexColor = hexColor:gsub("#", "")
+
+    -- Only 6 digits strings
+    if #hexColor ~= 6 then
+        return nil, "css 6 hex digit color code only (RRGGBB)."
+    end
+
+    local r = tonumber(hexColor:sub(1, 2), 16)
+    local g = tonumber(hexColor:sub(3, 4), 16)
+    local b = tonumber(hexColor:sub(5, 6), 16)
+
+    if not r or not g or not b then
+        return nil, "Invalide hexadecimal color code."
+    end
+
+    return r, g, b
+end
+
+-- swaps key/:value of a table
+-- { south = 's', north = 'n' }
+-- becomes :
+-- { s = 'south', n = 'north' }
+-- @param t {table}
+-- @return {table}
+function PlasmudTools.swapKeyValue (t)
+  local r = {}
+  for key, value in pairs(t) do
+      r[value] = key
+  end
+  return r
+end
+
+-- splits a string into several fragments
+-- returns a table
+-- @param sInput {string} input string to be split
+-- @param sep {string} separator (default is space)
+-- @return {table} resulting table
+function PlasmudTools.split(sInput, sep)
+  if sep == nil then
+    sep = "%s"
+  end
+  local t = {}
+  for str in string.gmatch(sInput, "([^"..sep.."]+)") do
+    table.insert(t, tonumber(str))        
+  end
+  return t
+end
+
+-- flatten table
+function PlasmudTools.flattenTable(table, prefix, result)
+    prefix = prefix or ""
+    local result = result or {}
+    local key, value
+
+    for key, value in pairs(table) do
+        local newKey = prefix == "" and key or prefix .. "." .. key
+        if type(value) == "table" then
+            PlasmudTools.flattenTable(value, newKey, result)
+        else
+            result[newKey] = value
+        end
+    end
+
+    return result
+end</script>
+					<eventHandlerList />
+				</Script>
+			</ScriptGroup>
+			<ScriptGroup isActive="yes" isFolder="yes">
+				<name>chat</name>
+				<packageName></packageName>
+				<script></script>
+				<eventHandlerList />
+				<Script isActive="yes" isFolder="no">
+					<name>PlasmudChat.class</name>
+					<packageName></packageName>
+					<script>PlasmudChat = PlasmudChat or {}
 PlasmudChat.widgets = PlasmudChat.widgets or {}
 PlasmudChat.channels = PlasmudChat.channels or {}
 PlasmudChat.channelData = PlasmudChat.channelData or {}
@@ -22,14 +138,17 @@ function PlasmudChat.selectChannel(sChannelId)
   selectedChannel.button:setState("down")
   selectedChannel.console:show()
   selectedChannel.console:enableCommandLine()
-  local r, g, b = hexToRGB(selectedChannel.bgColor)
-  selectedChannel.console:setColor(r, g, b, 128)
+  selectedChannel.console:setCmdAction(function (text)
+    PlasmudChat.chatConsoleOnInput(text)
+  end)
+
+  local r, g, b = PlasmudTools.hexToRGB(selectedChannel.bgColor)
+  selectedChannel.console:setColor(r, g, b, 255)
 end
 
 function PlasmudChat.setChannels(channelData)
   PlasmudChat.channelData = channelData
   PlasmudChat.buildUI()
-  print('displayed ?')
 end
 
 function PlasmudChat.getSelectedChannel()
@@ -41,14 +160,23 @@ function PlasmudChat.getSelectedChannel()
   return nil
 end
 
+function PlasmudChat.printUserMessage(sChannelId, sUser, sText)
+  -- check channels
+  local channel = PlasmudChat.channels[sChannelId]
+  if channel then
+    local color = "#" .. PlasmudTools.adjustColorIntensity(channel.fgColor, 1.2)
+    local console = channel.console
+    console:setBold(true);
+    console:echo(sUser .. ": ")
+    console:setBold(false);
+    console:echo(sText .. "\n")
+  end
+end
+
 function PlasmudChat.chatConsoleOnInput(text)
   local channel = PlasmudChat.getSelectedChannel()
-  print("envoyer : " .. text)
-  display(channel.command)
   if channel then
     send(channel.command .. " " .. text)
-  else
-    display(channel)
   end
 end
 
@@ -118,10 +246,10 @@ function PlasmudChat.buildUI()
       downFunction = function ()
         -- Prevent default
       end,
-      style = "background-color: #" .. adjustColorIntensity(channel.color, 0.4) .. "; border: 1px solid #" .. adjustColorIntensity(channel.color, 0.6) .. ";",
-      downStyle = "background-color: #" .. adjustColorIntensity(channel.color, 0.6) .. "; border: 1px solid #" .. adjustColorIntensity(channel.color, 0.9) .. ";"
+      style = "background-color: #" .. PlasmudTools.adjustColorIntensity(channel.color, 0.4) .. "; border: 1px solid #" .. PlasmudTools.adjustColorIntensity(channel.color, 0.6) .. ";",
+      downStyle = "background-color: #" .. PlasmudTools.adjustColorIntensity(channel.color, 0.6) .. "; border: 1px solid #" .. PlasmudTools.adjustColorIntensity(channel.color, 0.9) .. ";"
     }, channelButtons)
-    local sBGColor = adjustColorIntensity(channel.color, 0.2)
+    local sBGColor = PlasmudTools.adjustColorIntensity(channel.color, 0.2)
     local chatConsole = Geyser.MiniConsole:new({
       name = "chatConsole_" .. channel.id,
       x = 0, y = 0,
@@ -131,15 +259,16 @@ function PlasmudChat.buildUI()
       bgColor = "#" .. sBGColor
     }, chatBackground)
     chatConsole:clear()
-    chatConsole:setCmdAction(function (text)
-      PlasmudChat.chatConsoleOnInput(text)
-    end)
+    local nPrevFontSize = chatConsole:getFontSize()
+    chatConsole:setFontSize(nPrevFontSize * 2)
     chatConsole:echo(channel.caption .."\n")
+    chatConsole:setFontSize(nPrevFontSize)
     PlasmudChat.channels[channel.id] = {
       id = channel.id,
       selected = false,
       button = button,
       console = chatConsole,
+      fgColor = channel.color,
       bgColor = sBGColor,
       command = channel.command
     }
@@ -151,10 +280,126 @@ function PlasmudChat.buildUI()
     PlasmudChat.selectChannel(PlasmudChat.channelData[1].id)
   end
 end
-
-PlasmudChat.buildUI()
 </script>
-			<eventHandlerList />
-		</Script>
+					<eventHandlerList />
+				</Script>
+			</ScriptGroup>
+			<ScriptGroup isActive="yes" isFolder="yes">
+				<name>gmcp</name>
+				<packageName></packageName>
+				<script></script>
+				<eventHandlerList />
+				<Script isActive="yes" isFolder="no">
+					<name>PlasmudGMCP.class</name>
+					<packageName></packageName>
+					<script>PlasmudGMCP = PlasmudGMCP or {}
+
+-- Sends a Core.Hello
+function PlasmudGMCP.sendCoreHello()
+  local v = getMudletVersion()
+  local sVersion = v.major .. "." .. v.minor .. "." .. v.revision
+  sendGMCP('Core.Hello {"client": "Mudlet", "version": "' .. sVersion .. '"}')
+end
+
+-- Sends a Core.Supports
+function PlasmudGMCP.sendCoreSupports(aSupports)
+  aSupports = PlasmudTools.flattenTable(aSupports)
+  local aPackages = {}
+  for sPackage, nVersion in pairs(aSupports) do
+    table.insert(aPackages, '"' .. sPackage .. ' ' .. nVersion .. '"')
+  end
+  sPackages = "[" .. table.concat(aPackages, ", ") .. "]"
+  sendGMCP('Core.Supports.Set ' .. sPackages)
+end
+</script>
+					<eventHandlerList />
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>Comm.Channel.List</name>
+					<packageName></packageName>
+					<script>function gmcpCommChannelList()
+  local result = {}
+  for _, cd in ipairs(gmcp.Comm.Channel.List) do
+    table.insert(result, {
+      id = cd.name,
+      caption = cd.name,
+      enabled = cd.enabled,
+      command = cd.command,
+      color = cd.color:gsub("#", "")
+    })
+  end
+  PlasmudChat.setChannels(result)
+end
+
+registerAnonymousEventHandler('gmcp.Comm.Channel.List', "gmcpCommChannelList")</script>
+					<eventHandlerList />
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>Comm.Channel.Text</name>
+					<packageName></packageName>
+					<script>function gmcpCommChannelText()
+  local oStruct = gmcp.Comm.Channel.Text
+  local sText = oStruct.text
+  local sTalker = oStruct.talker
+  local sChannelId = oStruct.channel
+  PlasmudChat.printUserMessage(sChannelId, sTalker, sText)
+end
+
+registerAnonymousEventHandler('gmcp.Comm.Channel.Text', "gmcpCommChannelText")</script>
+					<eventHandlerList />
+				</Script>
+			</ScriptGroup>
+			<Script isActive="yes" isFolder="no">
+				<name>PlasmudSystem.class</name>
+				<packageName></packageName>
+				<script>PlasmudSystem = PlasmudSystem or {}
+
+function PlasmudSystem.declareGMCPSupports ()
+  -- gmcp is enabled
+  -- sending Hello and Supports
+  PlasmudGMCP.sendCoreHello()
+  PlasmudGMCP.sendCoreSupports({
+    Char = 1,
+    Comm = {
+      Channel = 1
+    },
+    Room = {
+      Info = 1,
+      UpdateExits = 1
+    }
+  })
+end
+
+function PlasmudSystem.init()
+end</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>OnProtocolEnabled</name>
+				<packageName></packageName>
+				<script>function onProtocolEnabled(_, protocol)
+  debugc("event: onProtocolEnabled " .. protocol)
+  if protocol == "GMCP" then
+    PlasmudSystem.declareGMCPSupports()
+  end
+end
+
+registerAnonymousEventHandler("sysProtocolEnabled", "onProtocolEnabled")
+</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>OnConnected</name>
+				<packageName></packageName>
+				<script>-- What to do when client is connected to server
+function onConnected()
+  debugc("event: onConnectedEvent")
+  PlasmudSystem.init()
+end
+
+registerAnonymousEventHandler("sysConnectionEvent", "onConnected")</script>
+				<eventHandlerList />
+			</Script>
+		</ScriptGroup>
 	</ScriptPackage>
 </MudletPackage>

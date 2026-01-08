@@ -211,20 +211,22 @@ export class ChatManager implements IChatManager {
         const cd = this.channelDefinitions.get(channel.id);
         const sender = this._txat.getUser(user.id);
         if (cd) {
-            await this.sendUserMessage.execute(recv, 'Comm.Channel.Text', {
+            const { sent } = await this.sendUserMessage.execute(recv, 'Comm.Channel.Text', {
                 [SPECIAL_MESSAGE.GMCP]: {
                     channel: channel.id,
                     talker: sender.name,
                     text: message.content,
                 },
             });
-            await this.sendUserMessage.execute(recv, 'chat-message-post', {
-                chanColor: cd.color,
-                channel: channel.id,
-                userColor: user.color === '' ? cd.color : user.color,
-                user: sender.name,
-                message: message.content,
-            });
+            if (!sent) {
+                await this.sendUserMessage.execute(recv, 'chat-message-post', {
+                    chanColor: cd.color,
+                    channel: channel.id,
+                    userColor: user.color === '' ? cd.color : user.color,
+                    user: sender.name,
+                    message: message.content,
+                });
+            }
         } else {
             throw new Error(`Unknown channel id: ${channel.id}`);
         }

@@ -19,7 +19,11 @@ import { FindUser } from '../../application/use-cases/users/FindUser';
 import { JsonObject } from '../../domain/types/JsonStruct';
 import { SetUserPassword } from '../../application/use-cases/user-secrets/SetUserPassword';
 import { IClientContext } from '../../application/ports/classes/IClientContext';
-import { id } from 'zod/locales';
+import { GMCPMessage } from '../../libs/gmcp/validateGMCPSchema';
+import { RunGMCPCommand } from '../../application/use-cases/commands/RunGMCPCommand';
+import { GMCPPacket } from '../../libs/gmcp/GMCPPacket';
+import { ChatManager } from '../services/ChatManager';
+import { IChatManager } from '../../application/ports/services/IChatManager';
 
 const debugClient = debug('srv:client');
 
@@ -36,11 +40,13 @@ export abstract class AbstractClientController {
     private readonly getUserBan: GetUserBan;
     private readonly time: ITime;
     private readonly runCommand: RunCommand;
+    private readonly runGMCPCommand: RunGMCPCommand;
     private readonly registerClient: RegisterClient;
     private readonly createUser: CreateUser;
     private readonly serverConfig: IServerConfig;
     private readonly findUser: FindUser;
     private readonly setUserPassword: SetUserPassword;
+    private readonly chatManager: IChatManager;
 
     constructor(cradle: Cradle) {
         this.authenticateUser = cradle.authenticateUser;
@@ -50,11 +56,13 @@ export abstract class AbstractClientController {
         this.getUserBan = cradle.getUserBan;
         this.time = cradle.time;
         this.runCommand = cradle.runCommand;
+        this.runGMCPCommand = cradle.runGMCPCommand;
         this.registerClient = cradle.registerClient;
         this.createUser = cradle.createUser;
         this.findUser = cradle.findUser;
         this.serverConfig = cradle.serverConfig;
         this.setUserPassword = cradle.setUserPassword;
+        this.chatManager = cradle.chatManager;
     }
 
     getServerConfig(): IServerConfig {
@@ -65,6 +73,12 @@ export abstract class AbstractClientController {
         const csd = this.communicationLayer.getClientSession(idClient);
         debugClient('%s > %s', csd.user?.name, sCommand);
         return this.runCommand.execute(csd, sCommand);
+    }
+
+    execGMCPCommand(idClient: string, command: GMCPMessage) {
+        const csd = this.communicationLayer.getClientSession(idClient);
+        debugClient('%s GMCP> %s', csd.id, command.opcode);
+        return this.runGMCPCommand.execute(csd, command.opcode, command.body);
     }
 
     getAuthenticatedUser(idClient: string): User | null {
@@ -169,6 +183,25 @@ export abstract class AbstractClientController {
             }
             csd.state = CLIENT_STATES.AUTHENTICATED;
             debugClient('client %s has been authenticated as user %s', idClient, csd.user.name);
+            // should receive the chat channel list at this point
+            const channelData = new Map<string, string>([
+                ['public', 'pub'],
+                ['newbie', 'newbie'],
+                ['ooc', 'ooc'],
+                ['rp', 'rp'],
+                ['info', 'broadcast'],
+                ['staff', 'staff'],
+                ['tech', 'tech'],
+            ]);
+            // Time to send channels thru gmcp
+            const channelList = this.chatManager.getUserJoinedChannels(csd.user.id).map((c) => ({
+                name: c.tag === '' ? c.id : c.tag,
+                enabled: c.read,
+                color: c.color,
+                command: channelData.get(c.id) ?? '',
+            }));
+            const p = new GMCPPacket({ opcode: 'Comm.Channel.List', body: channelList });
+            await this.communicationLayer.sendMessage(idClient, p.render());
             return true;
         } catch (e) {
             const error = e as Error;

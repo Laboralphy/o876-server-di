@@ -4,15 +4,14 @@ import { JsonObject } from '../../domain/types/JsonStruct';
 import { SendClientMessage } from '../../application/use-cases/clients/SendClientMessage';
 import { ClientCradle } from '../../boot/container';
 import { DestroyClient } from '../../application/use-cases/clients/DestroyClient';
-import { getMoonPhase } from '../../libs/moon-phase';
 import { debug } from '../../libs/o876-debug';
 import { MailContextService } from './context-services/MailContextService';
 import { UserContextService } from './context-services/UserContextService';
 import { ChatContextService } from './context-services/ChatContextService';
-import { ITemplateRepository } from '../../application/ports/services/ITemplateRepository';
 import { IStringRepository } from '../../application/ports/services/IStringRepository';
 import { TimeContextService } from './context-services/TimeContextService';
 import { IScriptRunner } from '../../application/ports/services/IScriptRunner';
+import { GmcpContextService } from './context-services/GmcpContextService';
 
 const debugCtx = debug('srv:apictx');
 
@@ -20,12 +19,14 @@ export class ApiContextBuilder implements IApiContextBuilder {
     private readonly sendClientMessage: SendClientMessage;
     private readonly destroyClient: DestroyClient;
     private readonly idClient: string;
+    private readonly stringRepository: IStringRepository;
+    private readonly scriptRunner: IScriptRunner;
+
     private readonly mailContextService: MailContextService;
     private readonly userContextService: UserContextService;
     private readonly chatContextService: ChatContextService;
-    private readonly stringRepository: IStringRepository;
     private readonly timeContextService: TimeContextService;
-    private readonly scriptRunner: IScriptRunner;
+    private readonly gmcpContextService: GmcpContextService;
 
     constructor(cradle: ClientCradle) {
         // use cases
@@ -40,6 +41,7 @@ export class ApiContextBuilder implements IApiContextBuilder {
         this.userContextService = cradle.userContextService;
         this.chatContextService = cradle.chatContextService;
         this.timeContextService = cradle.timeContextService;
+        this.gmcpContextService = cradle.gmcpContextService;
 
         // repositories
         this.stringRepository = cradle.stringRepository;
@@ -94,6 +96,7 @@ export class ApiContextBuilder implements IApiContextBuilder {
             user: this.userContextService,
             chat: this.chatContextService,
             time: this.timeContextService,
+            gmcp: this.gmcpContextService,
         };
         return cmdContext;
     }

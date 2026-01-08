@@ -7,6 +7,7 @@ import { ITime } from '../../ports/services/ITime';
 import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
 import { ICommunicationLayer } from '../../ports/services/ICommunicationLayer';
 import { IChatManager } from '../../ports/services/IChatManager';
+import { IGMCPGateway } from '../../ports/services/IGMCPGateway';
 
 /**
  * This use case will check if specified client-login & password
@@ -21,6 +22,7 @@ export class AuthenticateUser {
     private readonly time: ITime;
     private readonly communicationLayer: ICommunicationLayer;
     private readonly chatManager: IChatManager;
+    private readonly gmcpGateway: IGMCPGateway;
 
     constructor(cradle: Cradle) {
         this.userRepository = cradle.userRepository;
@@ -29,6 +31,7 @@ export class AuthenticateUser {
         this.time = cradle.time;
         this.communicationLayer = cradle.communicationLayer;
         this.chatManager = cradle.chatManager;
+        this.gmcpGateway = cradle.gmcpGateway;
     }
 
     /**
@@ -58,7 +61,7 @@ export class AuthenticateUser {
         }
         user.tsLastUsed = this.time.now();
         await this.userRepository.save(user);
-        this.autoexec(user);
+        await this.autoexec(user);
         return user;
     }
 }

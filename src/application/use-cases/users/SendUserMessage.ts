@@ -15,7 +15,11 @@ export class SendUserMessage {
         this.userRepository = cradle.userRepository;
     }
 
-    async execute(userId: string, key: string, parameters?: JsonObject): Promise<void> {
+    async execute(
+        userId: string,
+        key: string,
+        parameters?: JsonObject
+    ): Promise<{ locale: boolean; template: boolean; gmcp: boolean; sent: boolean }> {
         const user = await this.userRepository.get(userId);
         if (!user) {
             throw new ReferenceError(`User ${userId} not found`);
@@ -24,6 +28,12 @@ export class SendUserMessage {
         if (client) {
             return this.sendClientMessage.execute(client.id, key, parameters);
         }
+        return {
+            gmcp: false,
+            locale: false,
+            sent: false,
+            template: false,
+        };
         // if there is no client attached to the user then maybe the user has just been disconnected
         // and the SendUserMessage.execute has been somehow delayed.
         // This happens when a user disconnected and the chat system is trying to notify the departing user

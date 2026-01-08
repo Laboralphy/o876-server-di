@@ -62,8 +62,7 @@ export class GMCPPacket {
      * @param encoding
      */
     render(encoding = GMCPPacket.ENCODING_UTF8) {
-        const message = validateGMCPSchema(this.message.opcode, this.message.body);
-        return this.renderBuffer(message, encoding);
+        return this.renderBuffer(this.message, encoding);
     }
 
     /**
