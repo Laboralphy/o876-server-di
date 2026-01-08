@@ -136,7 +136,8 @@ export class ModuleManager implements IModuleManager {
                 case 'scripts': {
                     // We should not compile all types of scripts
                     // Some scripts are only used as dependency of event or commands.
-                    if (aPath[0] === 'commands' || aPath[0] === 'events') {
+                    const p0 = aPath[0];
+                    if (p0 === 'commands' || p0 === 'gmcp' || p0 === 'events') {
                         // this is a command, or an event, the only scripts types we are indexing
                         const aId = [...aPath, sId];
                         this.defineAssetScript(aId.join('/'), contentBuffer.toString(), sFullPath);

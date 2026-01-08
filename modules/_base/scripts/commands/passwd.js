@@ -3,7 +3,7 @@
  * @param ctx {IClientContext}
  */
 function main(ctx) {
-    return ctx.changePassword();
+    return ctx.user.changePassword();
 }
 
 module.exports = main(context);

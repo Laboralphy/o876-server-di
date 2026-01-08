@@ -16,12 +16,12 @@ export class RunGMCPCommand {
         data: JsonObject | string | null | JsonArray
     ) {
         try {
-            const sScriptName = 'commands/' + opcode;
+            const sScriptName = 'gmcp/' + opcode;
             // If script name does not exists, do not fire error
             // the gmcp opcode is simply not supported, this should not be considered as an error
             // We may log this in the future
             if (this.scriptRunner.scriptNames.includes(sScriptName)) {
-                const result = this.scriptRunner.run('commands/' + opcode, {
+                const result = this.scriptRunner.run('gmcp/' + opcode, {
                     parameters: data,
                     context: clientSession.clientContext,
                 });
