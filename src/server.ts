@@ -37,7 +37,8 @@ export class Server {
     }
 
     async initLocales() {
-        const lng = this.env.SERVER_LANGUAGE ?? 'en';
+        const oServerConfig = container.resolve('serverConfig');
+        const lng = oServerConfig.getVariables().language ?? 'en';
         debugServer('loading i18n strings (language: %s)', lng);
         const oStringRepository = container.resolve('stringRepository');
         await oStringRepository.init();

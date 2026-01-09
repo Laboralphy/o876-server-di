@@ -16,6 +16,7 @@ export class ServerConfig implements IServerConfig {
             author,
             license,
             description,
+            language: 'en',
             loginNewUser: 'new',
             mailMaxExpirationDays: 30,
             mailMaxMessageLength: 1024,

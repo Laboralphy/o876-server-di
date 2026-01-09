@@ -1,8 +1,15 @@
+# The server will send message to client using this language
+# available languages : "en", "fr"
+language: fr
+
 # This is what you must enter as login to create a new account
+# by default "new"
 loginNewUser: new
 
 # Number of days before a mail expires and is deleted from the mailbox, unless it is pinned
+# by default 30
 mailMaxExpirationDays: 30
 
 # Maximum character count in a messages
+# by default 1024
 mailMaxMessageLength: 1024

@@ -2,11 +2,12 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { initI18nStrings } from './infrastructure/cli/tools/i18n-strings';
 import { user } from './infrastructure/cli/commands/user';
-import { getEnv } from './boot/dotenv';
 import { render } from './libs/i18n-loader';
+import { ServerConfig } from './infrastructure/services/ServerConfig';
 
 async function main() {
-    const sLang = getEnv().SERVER_LANGUAGE ?? 'en';
+    const oServerConfig = new ServerConfig();
+    const sLang = oServerConfig.getVariables().language ?? 'en';
     await initI18nStrings(sLang);
     yargs(hideBin(process.argv))
         .locale(sLang)
