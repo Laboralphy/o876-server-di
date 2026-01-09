@@ -104,11 +104,33 @@
                 }
             ]
         },
+        "ooc": {
+            "shortdesc": "Posts a message on the OOC channel",
+            "description": "Posts a public message on the OOC channel. This channel is for Out of character discussions (real life, chit chat, weather...). Also you may deactivate this channel if the command is run with no parameters. The channel will auto-reactivate the next time you use the command.",
+            "syntax": "[message]",
+            "parameters": [
+                {
+                    "name": "message",
+                    "description": "Message to be post on channel"
+                }
+            ]
+        },
         "passwd": {
             "shortdesc": "Change user password",
             "description": "Changes the user's password. Note that this command does not take parameters: the system will interactively prompt for the old and new passwords.",
             "syntax": "",
             "parameters": []
+        },
+        "pub": {
+            "shortdesc": "Posts a message on the Public channel",
+            "description": "Posts a public message on the Public channel. This channel is mostly for In-character discussions (Usually game information, assistance...). This channel could be considered as a giant virtual tavern where characters can talk. Also you may deactivate this channel if the command is run with no parameters. The channel will auto-reactivate the next time you use the command.",
+            "syntax": "[message]",
+            "parameters": [
+                {
+                    "name": "message",
+                    "description": "Message to be post on channel"
+                }
+            ]
         },
         "readmsg": {
             "shortdesc": "Read offline messages",
@@ -117,7 +139,7 @@
             "parameters": []
         },
         "rp": {
-            "shordesc": "Post messages on channel \"roleplay\"",
+            "shortdesc": "Post messages on channel \"roleplay\"",
             "description": "Post a public message in the \"roleplay\" channel. As its name suggests, this channel is reserved for discussions related to role-playing games, which prioritize immersion in the game world. When used without parameters, this command toggles the \"roleplay\" channel on and off. When disabled, the user will no longer receive messages from this channel. The channel automatically reactivates when the user uses this command to send a message.",
             "syntax": "[message]",
             "parameters": [
@@ -139,6 +161,28 @@
                 {
                     "name": "message",
                     "description": "Message to send to the recipient."
+                }
+            ]
+        },
+        "staff": {
+            "shortdesc": "Posts a message on the staff channel",
+            "description": "Posts a public message on the staff channel. This channel is restricted to members of the staff (moderators, administrators, game masters). Also you may deactivate this channel if the command is run with no parameters. The channel will auto-reactivate the next time you use the command.",
+            "syntax": "[message]",
+            "parameters": [
+                {
+                    "name": "message",
+                    "description": "Message to be post on channel"
+                }
+            ]
+        },
+        "tech": {
+            "shortdesc": "Posts a message on the Tech channel",
+            "description": "Posts a public message on the Tech channel. This channel is restricted to Technical topics (like bug reports or anything about game development). This kind of topics is immersion breaking, this is why this channel exists. Also you may deactivate this channel if the command is run with no parameters. The channel will auto-reactivate the next time you use the command.",
+            "syntax": "[message]",
+            "parameters": [
+                {
+                    "name": "message",
+                    "description": "Message to be post on channel"
                 }
             ]
         },

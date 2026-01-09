@@ -30,6 +30,12 @@ function sortAndProcess(a: string[]): string[] {
     return a.filter((x) => !x.endsWith('_female')).sort((x, y) => x.localeCompare(y));
 }
 
+/**
+ * This test is for ensuring that all command of each module have all their help locales
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+
 describe('extractJsonKeys', () => {
     it('should return [alpha] where extracting json keys of {alpha: 1}', () => {
         expect(extractJsonKeys({ alpha: 1 })).toEqual(['alpha']);
@@ -91,5 +97,34 @@ describe('moduleBaseLocalesXXHelp', () => {
         const frKeys = sortAndProcess(extractJsonKeys(moduleBaseLocalesFRHelp));
         const enKeys = sortAndProcess(extractJsonKeys(moduleBaseLocalesENHelp));
         expect(enKeys).toEqual(frKeys);
+    });
+});
+
+describe('Help commands', () => {
+    const MODULES: string[] = ['modules/_base'];
+    const COMMANDS: string[] = [];
+
+    beforeAll(() => {
+        MODULES.map((m: string) => {
+            const files = fs
+                .readdirSync(path.resolve(m, 'scripts/commands'))
+                .map((s) => path.basename(s, '.js'));
+            COMMANDS.push(...files);
+        });
+    });
+
+    it('all commands should have its help locale', () => {
+        const frKeys = sortAndProcess(extractJsonKeys(moduleBaseLocalesFRHelp.help));
+        const enKeys = sortAndProcess(extractJsonKeys(moduleBaseLocalesENHelp.help));
+        for (const cmd of COMMANDS) {
+            expect(enKeys).toContain(cmd + '.shortdesc');
+            expect(enKeys).toContain(cmd + '.description');
+            expect(enKeys).toContain(cmd + '.syntax');
+            expect(enKeys).toContain(cmd + '.parameters');
+            expect(frKeys).toContain(cmd + '.shortdesc');
+            expect(frKeys).toContain(cmd + '.description');
+            expect(frKeys).toContain(cmd + '.syntax');
+            expect(frKeys).toContain(cmd + '.parameters');
+        }
     });
 });

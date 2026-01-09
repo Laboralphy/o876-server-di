@@ -104,11 +104,33 @@
                 }
             ]
         },
+        "ooc": {
+            "shortdesc": "Poste un message sur le canal OOC",
+            "description": "Poste un message public sur le canal OOC. Ce canal est dédié aux discussions Out of character (Vie réelle, blabla, météo, etc...). Permet également de désactiver les message en provenance de ce canal lorsqu'utilisé sans paramètre (Le canal s'autoréactive la prochaine fois que la commande est utilisée).",
+            "syntax": "[message]",
+            "parameters": [
+                {
+                    "name": "message",
+                    "description": "Message à poster sur le canal"
+                }
+            ]
+        },
         "passwd": {
             "shortdesc": "Change le mot de passe utilisateur (interactif).",
             "description": "Procède au changement du mot de passe de l'utilisateur. Notez que la commande ne prend pas de paramètres : le système demandera l'ancien et le nouveau mot de passe de manière interactive.",
             "syntax": "",
             "parameters": []
+        },
+        "pub": {
+            "shortdesc": "Poste un message sur le canal Public",
+            "description": "Poste un message public sur le canal Public. Ce canal est dédié aux discussions plutôt in-character ou concernant le jeu lui même comme les organisation de partie, éventuellement des demande de renseignement, considérer ce canal comme une taverne ou un bar virtuel. Permet également de désactiver les messages en provenance de ce canal lorsqu'utilisé sans paramètre (Le canal s'autoréactive la prochaine fois que la commande est utilisée).",
+            "syntax": "[message]",
+            "parameters": [
+                {
+                    "name": "message",
+                    "description": "Message à poster sur le canal"
+                }
+            ]
         },
         "readmsg": {
             "shortdesc": "Lecture des messages privés.",
@@ -117,7 +139,7 @@
             "parameters": []
         },
         "rp": {
-            "shordesc": "Poste su le canal \"roleplay\"",
+            "shortdesc": "Poste su le canal \"roleplay\"",
             "description": "Poste un message public sur le canal \"roleplay\". Comme son nom l'indique, ce canal est réservé aux discussions lié au jeu de rôle, qui privilégient l'immersion dans l'univers du jeu. Lancée sans paramètre, cette commande active ou désactive alternativement le canal \"roleplay\". Lorsque désactivé, plus aucun message en provenance de ce canal ne provient à l'utilisateur. Le canal se réactive automatiquement lorsque l'utilisateur utilise cette commande pour envoyer un message.",
             "syntax": "<message>",
             "parameters": [
@@ -139,6 +161,28 @@
                 {
                     "name": "message",
                     "description": "Message à transmettre au destinataire."
+                }
+            ]
+        },
+        "staff": {
+            "shortdesc": "Poste un message sur le canal Staff",
+            "description": "Poste un message public sur le canal Staff. Ce canal est dédié aux discussions enter membres du staff (modérateurs, administrateurs, game masters). Permet également de désactiver les messages en provenance de ce canal lorsqu'utilisé sans paramètre (Le canal s'autoréactive la prochaine fois que la commande est utilisée).",
+            "syntax": "[message]",
+            "parameters": [
+                {
+                    "name": "message",
+                    "description": "Message à poster sur le canal"
+                }
+            ]
+        },
+        "tech": {
+            "shortdesc": "Poste un message sur le canal Tech",
+            "description": "Poste un message public sur le canal Tech. Ce canal est dédié aux discussions enter techniquel (rapports de bugs, question techniques). Ce genre de sujets est particulièrement éloigné de l'experience de jeu et c'est pourquoi ils ont leur propre canal. Permet également de désactiver les messages en provenance de ce canal lorsqu'utilisé sans paramètre (Le canal s'autoréactive la prochaine fois que la commande est utilisée).",
+            "syntax": "[message]",
+            "parameters": [
+                {
+                    "name": "message",
+                    "description": "Message à poster sur le canal"
                 }
             ]
         },
