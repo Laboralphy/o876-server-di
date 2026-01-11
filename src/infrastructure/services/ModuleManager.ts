@@ -29,6 +29,7 @@ export class ModuleManager implements IModuleManager {
     private readonly stringRepository: IStringRepository;
     private readonly templateRepository: ITemplateRepository;
     private readonly stats: Map<string, AssetStatItemFormat> = new Map();
+    private readonly modulePathRegistry = new Map<string, string>();
 
     constructor(cradle: Cradle) {
         this.scriptRunner = cradle.scriptRunner;
@@ -39,6 +40,19 @@ export class ModuleManager implements IModuleManager {
         this.addStatCategory('templates');
         this.addStatCategory('scripts');
         this.addStatCategory('data');
+    }
+
+    getModuleLocation(sModuleName: string): string {
+        const mp = this.modulePathRegistry.get(sModuleName);
+        if (mp) {
+            return mp;
+        } else {
+            throw new ReferenceError(`Module '${sModuleName}' not found.`);
+        }
+    }
+
+    getLoadedModules(): string[] {
+        return Array.from(this.modulePathRegistry.keys());
     }
 
     addStatCategory(name: string): void {
@@ -110,7 +124,16 @@ export class ModuleManager implements IModuleManager {
     }
 
     async loadModuleFromFolder(location: string) {
+        location = path.normalize(path.resolve(location));
         const aFiles = await fs.readdir(location, { recursive: true });
+        const sModuleName = path.basename(location);
+        if (this.modulePathRegistry.has(sModuleName)) {
+            throw new Error(`Module '${sModuleName}' already defined at location ${location}.`);
+        }
+        if (Array.from(this.modulePathRegistry.values()).includes(location)) {
+            throw new Error(`This location ${location} is already defined by another module.`);
+        }
+        this.modulePathRegistry.set(sModuleName, location);
         for (const sPath of aFiles) {
             const sFullPath = path.normalize(path.join(location, sPath));
             const oStat = await fs.stat(sFullPath);
@@ -167,7 +190,7 @@ export class ModuleManager implements IModuleManager {
                 }
             }
         }
-        debugmm('module loaded from location : %s', location);
+        debugmm('module %s loaded from location : %s', sModuleName, location);
         this.printStats();
     }
 
@@ -178,9 +201,5 @@ export class ModuleManager implements IModuleManager {
         } else {
             throw new ReferenceError(`Asset not found ${name}`);
         }
-    }
-
-    runScript(idClient: string, key: string, parameters: string[]) {
-        // run command
     }
 }

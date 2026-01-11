@@ -1,4 +1,5 @@
 import Koa from 'koa';
+import { send } from '@koa/send';
 import bodyParser from 'koa-bodyparser';
 import { userRoutes } from './infrastructure/web/routes/user.routes';
 import { container, createClientContainer } from './boot/container';
@@ -10,18 +11,21 @@ import { expandPath } from './libs/expand-path';
 import telnet, { Server as TelnetServer, Client as TelnetClient } from 'telnet2';
 import path from 'node:path';
 import fs from 'node:fs/promises';
+import { mediaServe } from './infrastructure/web/middlewares/media-serve';
 
 const debugServer = debug('srv:main');
 
 export class Server {
-    private readonly httpApi: Koa;
+    private readonly adminApi: Koa;
+    private readonly staticApp: Koa;
     private readonly telnetServer: TelnetServer;
     private readonly env = getEnv();
 
     constructor() {
         // all service are constructed during this instance construction
         // so we don't have to declare those variables | undefined
-        this.httpApi = new Koa();
+        this.adminApi = new Koa();
+        this.staticApp = new Koa();
         this.telnetServer = this.createTelnetServer();
     }
 
@@ -55,6 +59,7 @@ export class Server {
         debugServer('initializing modules');
         const mm = container.resolve('moduleManager');
         await mm.loadModuleFromFolder(path.resolve(__dirname, '../modules/_base'));
+        await mm.loadModuleFromFolder(path.resolve(__dirname, '../modules/media-test'));
     }
 
     /**
@@ -95,7 +100,7 @@ export class Server {
      */
     async initApiService() {
         debugServer('starting api service');
-        const app = this.httpApi;
+        const app = this.adminApi;
 
         // Middlewares
         debugServer('initializing middlewares');
@@ -110,8 +115,24 @@ export class Server {
         return new Promise((resolve) => {
             // Start listening
             const port = parseInt(this.env.SERVER_HTTP_API_PORT ?? '8080');
-            this.httpApi.listen(port, '127.0.0.1', () => {
+            this.adminApi.listen(port, '127.0.0.1', () => {
                 debugServer('http api service is now listening on port %d', port);
+                resolve(undefined);
+            });
+        });
+    }
+
+    async initStaticService() {
+        const app = this.staticApp;
+        debugServer('initializing static service');
+
+        app.use(mediaServe(container));
+
+        return new Promise((resolve) => {
+            // Start listening
+            const port = parseInt(this.env.SERVER_STATIC_PORT ?? '8082');
+            app.listen(port, '0.0.0.0', () => {
+                debugServer('static assets delivering service is now listening on port %d', port);
                 resolve(undefined);
             });
         });
@@ -177,6 +198,7 @@ export class Server {
         await this.initTelnetService();
         await this.initWebsocketService();
         await this.initModules();
+        await this.initStaticService();
 
         process.on('SIGTERM', async () => {
             debugServer('receiving SIGTERM');

@@ -43,7 +43,7 @@ export class CommunicationLayer implements ICommunicationLayer {
 
     /**
      * Destroy a client session forcing socket disconnection
-     * Does nothing bad is client is already disconnected
+     * Does nothing bad is client if already disconnected
      * Removes clientSession if exists
      * @param idClient client identifier
      */

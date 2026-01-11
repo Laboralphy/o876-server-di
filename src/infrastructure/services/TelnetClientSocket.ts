@@ -2,7 +2,6 @@ import { IClientSocket } from '../../domain/ports/adapters/IClientSocket';
 import { Client as TelnetClient } from 'telnet2';
 import { TextEncoder } from 'node:util';
 import { Command } from '../../../@types/telnet2';
-import { JsonObject } from '../../domain/types/JsonStruct';
 
 const encoder = new TextEncoder();
 
