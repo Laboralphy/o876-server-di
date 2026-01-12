@@ -3,10 +3,10 @@ import { getEnv } from '../../../boot/dotenv';
 import { HTTP_STATUS } from '../../../domain/enums/http-status';
 
 type FetchErrorCause = {
-    code: string,
-    address: string,
-    port: number
-}
+    code: string;
+    address: string;
+    port: number;
+};
 
 type FetchError = Error & { cause: FetchErrorCause };
 
@@ -60,10 +60,10 @@ export async function wfGet<T>(url: string): Promise<T> {
         const data = await doJsonRequest('GET', url);
         return data as T;
     } catch (err) {
-        const error = err as FetchError
-        const cause = (error.cause ?? { code: '', address: '', port: 0 })
+        const error = err as FetchError;
+        const cause = error.cause ?? { code: '', address: '', port: 0 };
         if (cause.code === 'ECONNREFUSED') {
-            console.error('Host unreachable at %s port %d', cause.address, cause.port)
+            console.error('Host unreachable at %s port %d', cause.address, cause.port);
         }
         process.exit(2);
     }

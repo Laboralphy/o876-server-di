@@ -1,7 +1,7 @@
 import { Cradle } from '../../../boot/container';
 import { ICommunicationLayer } from '../../ports/services/ICommunicationLayer';
 import { IChatManager } from '../../ports/services/IChatManager';
-import { CLIENT_STATES } from '../../../domain/enums/client-states';
+import { id } from 'zod/v4/locales';
 
 /**
  * This use case destroys a registered client, because its connection has been close.
@@ -28,6 +28,8 @@ export class DestroyClient {
                 this.chatManager.unregisterUser(user);
             }
             this.communicationLayer.dropClient(idClient);
-        } catch {}
+        } catch {
+            console.warn('Client session already dropped', id);
+        }
     }
 }
