@@ -13,3 +13,7 @@ mailMaxExpirationDays: 30
 # Maximum character count in a messages
 # by default 1024
 mailMaxMessageLength: 1024
+
+# List of modules
+# use yaml syntax to specify the list
+modules: [ "media-test" ]

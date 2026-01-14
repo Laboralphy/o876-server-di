@@ -58,8 +58,11 @@ export class Server {
     async initModules() {
         debugServer('initializing modules');
         const mm = container.resolve('moduleManager');
+        const sc = container.resolve('serverConfig');
         await mm.loadModuleFromFolder(path.resolve(__dirname, '../modules/_base'));
-        await mm.loadModuleFromFolder(path.resolve(__dirname, '../modules/media-test'));
+        for (const m of sc.getVariables().modules) {
+            await mm.loadModuleFromFolder(path.resolve(__dirname, '../modules/', m));
+        }
     }
 
     /**

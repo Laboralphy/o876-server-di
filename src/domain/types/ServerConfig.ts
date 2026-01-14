@@ -11,6 +11,7 @@ export const ServerConfigOptionsSchema = z
         loginNewUser: z.string(),
         mailMaxExpirationDays: z.number().int(),
         mailMaxMessageLength: z.number().int(),
+        modules: z.array(z.string()),
     })
     .strict();
 

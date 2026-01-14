@@ -8,6 +8,10 @@ import { CoreSupportsSet, CoreSupportsSetSchema } from './schemas/client/CoreSup
 import { CoreSupportsAdd, CoreSupportsAddSchema } from './schemas/client/CoreSupportsAdd';
 import { CoreSupportsRemove, CoreSupportsRemoveSchema } from './schemas/client/CoreSupportsRemove';
 import { JsonValue } from '../../domain/types/JsonStruct';
+import { ClientMediaDefault, ClientMediaDefaultSchema } from './schemas/server/ClientMediaDefault';
+import { ClientMediaPlay, ClientMediaPlaySchema } from './schemas/server/ClientMediaPlay';
+import { ClientMediaLoad, ClientMediaLoadSchema } from './schemas/server/ClientMediaLoad';
+import { ClientMediaStop, ClientMediaStopSchema } from './schemas/server/ClientMediaStop';
 
 export type GMCPMessage =
     | { opcode: ''; body: null }
@@ -19,10 +23,30 @@ export type GMCPMessage =
     | { opcode: 'Core.Supports.Add'; body: CoreSupportsAdd }
     | { opcode: 'Core.Hello'; body: CoreHello }
     | { opcode: 'Core.KeepAlive'; body: CoreKeepAlive }
-    | { opcode: 'Core.Ping'; body: CorePing };
+    | { opcode: 'Core.Ping'; body: CorePing }
+    | { opcode: 'Client.Media.Default'; body: ClientMediaDefault }
+    | { opcode: 'Client.Media.Play'; body: ClientMediaPlay }
+    | { opcode: 'Client.Media.Load'; body: ClientMediaLoad }
+    | { opcode: 'Client.Media.Stop'; body: ClientMediaStop };
 
 export function validateGMCPSchema(opcode: string, body: JsonValue): GMCPMessage {
     switch (opcode) {
+        case 'Client.Media.Default': {
+            return { opcode, body: ClientMediaDefaultSchema.parse(body) };
+        }
+
+        case 'Client.Media.Play': {
+            return { opcode, body: ClientMediaPlaySchema.parse(body) };
+        }
+
+        case 'Client.Media.Load': {
+            return { opcode, body: ClientMediaLoadSchema.parse(body) };
+        }
+
+        case 'Client.Media.Stop': {
+            return { opcode, body: ClientMediaStopSchema.parse(body) };
+        }
+
         case 'Comm.Channel.Text': {
             return { opcode, body: CommChannelTextSchema.parse(body) };
         }

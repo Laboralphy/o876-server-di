@@ -14,7 +14,17 @@ export interface IClientContext extends IClientContextServices {
      * @param key message content, or a i18n string reference, or hbs template
      * @param parameters a plain object used to replace variables in i18n string or hbs template
      */
-    print(key: string, parameters?: JsonObject): Promise<void>;
+    print(
+        key: string,
+        parameters?: JsonObject
+    ): Promise<{
+        locale: boolean;
+        template: boolean;
+        gmcp: boolean;
+        sent: boolean;
+    }>;
+
+    debug(sFmt: string, ...args: any[]): void;
 
     /**
      * Synchronous call

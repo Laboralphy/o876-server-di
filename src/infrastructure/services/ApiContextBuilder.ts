@@ -57,7 +57,15 @@ export class ApiContextBuilder implements IApiContextBuilder {
             return this.stringRepository.render(key, parameters);
         };
 
-        const print = (key: string, parameters?: JsonObject): Promise<void> => {
+        const print = (
+            key: string,
+            parameters?: JsonObject
+        ): Promise<{
+            locale: boolean;
+            template: boolean;
+            gmcp: boolean;
+            sent: boolean;
+        }> => {
             return this.sendClientMessage.execute(idClient, key, parameters);
         };
 
@@ -75,6 +83,7 @@ export class ApiContextBuilder implements IApiContextBuilder {
             /****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ****** CORE ******/
 
             print,
+            debug: debugCtx,
             strref,
 
             get commandNames() {

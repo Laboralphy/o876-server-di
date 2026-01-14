@@ -20,6 +20,7 @@ export class ServerConfig implements IServerConfig {
             loginNewUser: 'new',
             mailMaxExpirationDays: 30,
             mailMaxMessageLength: 1024,
+            modules: [],
         };
     }
 

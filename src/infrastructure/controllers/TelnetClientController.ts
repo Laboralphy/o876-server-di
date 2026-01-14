@@ -435,7 +435,6 @@ export class TelnetClientController extends AbstractClientController {
                     // This is where GMCP enters
                     // TODO process gmcp Buffer here
                     const p = GMCPPacket.parse(message);
-                    debugTelnet('client %s > GMCP %s', idClient, p.opcode);
                     return this.execGMCPCommand(idClient, p);
                 } catch (err) {
                     const error = err as Error;
