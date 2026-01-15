@@ -67,6 +67,8 @@ import { IGMCPGateway } from '../application/ports/services/IGMCPGateway';
 import { GMCPGateway } from '../infrastructure/services/GMCPGateway';
 import { GmcpContextService } from '../infrastructure/services/context-services/GmcpContextService';
 import { RunGMCPCommand } from '../application/use-cases/commands/RunGMCPCommand';
+import { ListMail } from '../application/use-cases/mail/ListMail';
+import { RunUserEvent } from '../application/use-cases/commands/RunUserEvent';
 
 /**
  * To as a new use case, port ...,
@@ -106,10 +108,12 @@ export interface Cradle {
     // use cases : command
     runCommand: RunCommand;
     runGMCPCommand: RunGMCPCommand;
+    runUserEvent: RunUserEvent;
 
     // use cases : mail
     sendMail: SendMail;
     readMail: ReadMail;
+    listMail: ListMail;
 
     // repositories
     userRepository: IUserRepository;
@@ -181,10 +185,12 @@ container.register({
     // use cases : commands
     runCommand: asClass(RunCommand).singleton(),
     runGMCPCommand: asClass(RunGMCPCommand).singleton(),
+    runUserEvent: asClass(RunUserEvent).singleton(),
 
     // use cases : mail
     sendMail: asClass(SendMail).singleton(),
     readMail: asClass(ReadMail).singleton(),
+    listMail: asClass(ListMail).singleton(),
 
     // repositories
     userRepository: asClass(UserRepository).singleton(),

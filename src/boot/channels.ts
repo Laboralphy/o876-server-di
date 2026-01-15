@@ -122,3 +122,19 @@ export const CHANNEL_DEFINITION: ChannelDefinition[] = [
         staff: false,
     },
 ];
+
+/**
+ * Currently I'm putting the dict associating channel <-> command, here
+ * I'm still thinking about a more suitable location by for the moment
+ * it should be good here.
+ * Let's see in the future if the channels/commands is often chenged
+ */
+export const CHANNEL_COMMANDS = new Map<string, string>([
+    [CHANNEL_SYMBOLIC_ID.TALK, 'pub'],
+    [CHANNEL_SYMBOLIC_ID.NOOB, 'newbie'],
+    [CHANNEL_SYMBOLIC_ID.OOC, 'ooc'],
+    [CHANNEL_SYMBOLIC_ID.ROLEPLAY, 'rp'],
+    [CHANNEL_SYMBOLIC_ID.INFO, 'broadcast'],
+    [CHANNEL_SYMBOLIC_ID.STAFF, 'staff'],
+    [CHANNEL_SYMBOLIC_ID.TECH, 'tech'],
+]);

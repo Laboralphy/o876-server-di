@@ -87,6 +87,12 @@
                 }
             ]
         },
+        "listmsg": {
+            "shortdesc": "Liste des messages non lus",
+            "description": "Affiche la liste des message non lu, envoyés par d'autres utilisateurs.",
+            "syntax": "",
+            "parameters": []
+        },
         "logout": {
             "shortdesc": "Déconnexion.",
             "description": "L'utilisateur se déconnecte du service.",

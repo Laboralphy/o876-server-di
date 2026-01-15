@@ -6,7 +6,7 @@
         ],
         "login": "Login: ",
         "password": "Password: ",
-        "badLogin": "Invalid username or password.",
+        "badLogin": "Authentication failed : {{ reason }}.",
         "authenticated": "Welcome {{ name }}.",
         "goodbye": "Goodbye !"
     },
@@ -58,7 +58,7 @@
         "exceedCapacity": "Maximum size reached : {{ lines }} max lines, {{ chars }} max chars."
     },
     "mail": {
-        "unreadMessage_one": "You have an unread message.",
+        "unreadMessage_one": "You have {{ count }} unread message.",
         "unreadMessage_other": "You have {{ count }} unread messages.",
         "inboxHeaderDate": "Date",
         "inboxEmpty": "Inbox is empty.",
@@ -66,7 +66,10 @@
         "mailSent": "Message sent to {{ name }}.",
         "mailReceived": "Received mail from {{ sender }}",
         "emptyMailNotSent": "Empty message will not be sent.",
-        "endOfMessage": "End of message"
+        "endOfMessage": "End of message",
+        "listHeaderSender": "Sender",
+        "listHeaderDate": "Date",
+        "listHeaderPreview": "Preview"
     },
     "passwd": {
         "mustBeLobby": "You must be in Lobby mode in order to change your password."
@@ -74,7 +77,9 @@
     "who": {
         "colUser": "Users",
         "colRoles": "Roles",
-        "colOnline": "Online"
+        "roleAdmin": "Admin",
+        "roleGameMaster": "GameMaster",
+        "roleModerator": "Moderator"
     },
     "moon": {
         "labels": {

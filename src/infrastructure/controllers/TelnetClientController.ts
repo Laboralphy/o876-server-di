@@ -142,14 +142,12 @@ export class TelnetClientController extends AbstractClientController {
                 // exit password mode
                 await this.exitPasswordMode(clientSession.id);
                 // client is expected to enter password
-                const bLogInResult = await this.setLoginPassword(clientSession.id, message);
+                const { authenticated: bLogInResult, reason } = await this.setLoginPassword(
+                    clientSession.id,
+                    message
+                );
                 if (bLogInResult) {
-                    const user = this.getAuthenticatedUser(clientSession.id)!;
                     // authentication ok
-                    // send a welcome message
-                    await this.sendMessage(clientSession.id, 'welcome.authenticated', {
-                        name: user.name,
-                    });
                     // Change client state
                     clientSession.state = CLIENT_STATES.AUTHENTICATED;
                 } else {
@@ -159,7 +157,7 @@ export class TelnetClientController extends AbstractClientController {
                     } else {
                         debugTelnet('client %s : authentication failed', clientSession.id);
                         await this.pauseClient(clientSession.id, 100);
-                        await this.sendMessage(clientSession.id, 'welcome.badLogin');
+                        await this.sendMessage(clientSession.id, 'welcome.badLogin', { reason });
                     }
                     await this.dropClient(clientSession.id);
                     this.phase = PHASES.NONE;

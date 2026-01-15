@@ -1,0 +1,14 @@
+{{!--
+Display a list of unread message
+@param body message body
+@param sender name of user who sent this message
+@param date
+--}}
+{{#table}}
+    {{t "mail.listHeaderDate" }}, {{t "mail.listHeaderSender" }}, {{t "mail.listHeaderPreview" }}
+    {{#each messages}}
+        {{date ts }}, {{ name }}, {{ preview }}
+    {{/each}}
+{{/table}}
+
+{{t "mail.unreadMessage" count=count}}

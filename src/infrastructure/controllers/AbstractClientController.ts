@@ -9,6 +9,7 @@ import { ITime } from '../../application/ports/services/ITime';
 import { IClientSocket } from '../../domain/ports/adapters/IClientSocket';
 import { User } from '../../domain/entities/User';
 import { RunCommand } from '../../application/use-cases/commands/RunCommand';
+import { RunUserEvent } from '../../application/use-cases/commands/RunUserEvent';
 import { ClientSession } from '../../domain/types/ClientSession';
 import { RegisterClient } from '../../application/use-cases/clients/RegisterClient';
 import { CLIENT_STATES } from '../../domain/enums/client-states';
@@ -22,8 +23,9 @@ import { IClientContext } from '../../application/ports/classes/IClientContext';
 import { GMCPMessage } from '../../libs/gmcp/validateGMCPSchema';
 import { RunGMCPCommand } from '../../application/use-cases/commands/RunGMCPCommand';
 import { GMCPPacket } from '../../libs/gmcp/GMCPPacket';
-import { ChatManager } from '../services/ChatManager';
 import { IChatManager } from '../../application/ports/services/IChatManager';
+import { SYS_EVENTS } from '../../domain/enums/sys-events';
+import { CHANNEL_COMMANDS } from '../../boot/channels';
 
 const debugClient = debug('srv:client');
 
@@ -47,6 +49,7 @@ export abstract class AbstractClientController {
     private readonly findUser: FindUser;
     private readonly setUserPassword: SetUserPassword;
     private readonly chatManager: IChatManager;
+    private readonly runUserEvent: RunUserEvent;
 
     constructor(cradle: Cradle) {
         this.authenticateUser = cradle.authenticateUser;
@@ -63,6 +66,7 @@ export abstract class AbstractClientController {
         this.serverConfig = cradle.serverConfig;
         this.setUserPassword = cradle.setUserPassword;
         this.chatManager = cradle.chatManager;
+        this.runUserEvent = cradle.runUserEvent;
     }
 
     getServerConfig(): IServerConfig {
@@ -156,7 +160,32 @@ export abstract class AbstractClientController {
         );
     }
 
-    async setLoginPassword(idClient: string, password: string) {
+    /**
+     * This function is called when a user is authenticated
+     * This is a list of tasks to be run.
+     */
+    async userAuthenticatedTasks(clientSession: ClientSession) {
+        const user = clientSession.user;
+        if (user) {
+            this.chatManager.registerUser(user);
+            const channelData = CHANNEL_COMMANDS;
+            // Time to send channels thru gmcp
+            const channelList = this.chatManager.getUserJoinedChannels(user.id).map((c) => ({
+                name: c.tag === '' ? c.id : c.tag,
+                enabled: c.read,
+                color: c.color,
+                command: channelData.get(c.id) ?? '',
+            }));
+            const p = new GMCPPacket({ opcode: 'Comm.Channel.List', body: channelList });
+            await this.communicationLayer.sendMessage(clientSession.id, p.render());
+            await this.runUserEvent.execute(clientSession, SYS_EVENTS.sysUserAuthenticated, {});
+        }
+    }
+
+    async setLoginPassword(
+        idClient: string,
+        password: string
+    ): Promise<{ authenticated: boolean; reason: string }> {
         const csd = this.communicationLayer.getClientSession(idClient);
         try {
             debugClient('client %s login as %s password : ********', idClient, csd.login);
@@ -179,36 +208,28 @@ export abstract class AbstractClientController {
                 );
                 // destroy client socket, then exit function
                 csd.state = CLIENT_STATES.BANNED;
-                return false;
+                return {
+                    authenticated: true,
+                    reason: 'banned: ' + ban.reason,
+                };
             }
             csd.state = CLIENT_STATES.AUTHENTICATED;
             debugClient('client %s has been authenticated as user %s', idClient, csd.user.name);
+            await this.userAuthenticatedTasks(csd);
             // should receive the chat channel list at this point
-            const channelData = new Map<string, string>([
-                ['public', 'pub'],
-                ['newbie', 'newbie'],
-                ['ooc', 'ooc'],
-                ['rp', 'rp'],
-                ['info', 'broadcast'],
-                ['staff', 'staff'],
-                ['tech', 'tech'],
-            ]);
-            // Time to send channels thru gmcp
-            const channelList = this.chatManager.getUserJoinedChannels(csd.user.id).map((c) => ({
-                name: c.tag === '' ? c.id : c.tag,
-                enabled: c.read,
-                color: c.color,
-                command: channelData.get(c.id) ?? '',
-            }));
-            const p = new GMCPPacket({ opcode: 'Comm.Channel.List', body: channelList });
-            await this.communicationLayer.sendMessage(idClient, p.render());
-            return true;
+            return {
+                authenticated: true,
+                reason: '',
+            };
         } catch (e) {
             const error = e as Error;
             await this.pauseClient(idClient, 1500);
             debugClient('client %s authentication error: %s', idClient, error.message);
             csd.state = CLIENT_STATES.NONE;
-            return false;
+            return {
+                authenticated: false,
+                reason: error.message,
+            };
         }
     }
 

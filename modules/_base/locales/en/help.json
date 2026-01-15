@@ -87,6 +87,12 @@
                 }
             ]
         },
+        "listmsg": {
+            "shortdesc": "List all unread messages",
+            "description": "Display the list of all unread received messages sent by other users.",
+            "syntax": "",
+            "parameters": []
+        },
         "logout": {
             "shortdesc": "Disconnect user",
             "description": "The user disconnects from the service.",

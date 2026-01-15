@@ -6,7 +6,7 @@
         ],
         "login": "Login: ",
         "password": "Mot de passe: ",
-        "badLogin": "Nom d'utilisateur ou mot de passe incorrect.",
+        "badLogin": "Echec de l'authentification : {{ reason }}.",
         "authenticated": "Bienvenue {{ name }}.",
         "goodbye": "Au revoir !"
     },
@@ -68,7 +68,10 @@
         "mailSent": "Message envoyé à {{ name }}.",
         "mailReceived": "Message reçu de {{ sender }}",
         "emptyMailNotSent": "Message vide : envoi annulé.",
-        "endOfMessage": "Fin du message"
+        "endOfMessage": "Fin du message",
+        "listHeaderSender": "Expéditeur",
+        "listHeaderDate": "Date",
+        "listHeaderPreview": "Extrait"
     },
     "passwd": {
         "mustBeLobby": "Vous devez être en mode Lobby pour pouvoir changer le mot de passe."
@@ -76,7 +79,9 @@
     "who": {
         "colUser": "Utilisateur",
         "colRoles": "Rôles",
-        "colOnline": "En ligne"
+        "roleAdmin": "Admin",
+        "roleGameMaster": "GameMaster",
+        "roleModerator": "Modérateur"
     },
     "moon": {
         "labels": {

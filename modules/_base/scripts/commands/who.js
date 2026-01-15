@@ -30,19 +30,21 @@ async function main(ctx, params) {
     const users = await ctx.user.getUsers();
     const userFoundList = filterList(
         users
+            .filter((user) => ctx.user.isConnected(user))
             .map((user) => ({
                 name: user.displayName,
-                online: ctx.user.isConnected(user),
                 admin: user.roles.includes('ADMIN'),
                 moderator: user.roles.includes('MODERATOR'),
                 gameMaster: user.roles.includes('GAME_MASTER'),
             }))
             .slice(0, 25)
             .sort((a, b) => {
-                if (a.online === b.online) {
+                const na = (a.admin ? 4 : 0) + (a.moderator ? 2 : 0) + (a.gameMaster ? 1 : 0);
+                const nb = (b.admin ? 4 : 0) + (b.moderator ? 2 : 0) + (b.gameMaster ? 1 : 0);
+                if (na === nb) {
                     return a.name.localeCompare(b.name);
                 } else {
-                    return a.online ? -1 : 1;
+                    return nb - na;
                 }
             }),
         params[0]

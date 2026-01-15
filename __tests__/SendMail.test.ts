@@ -103,6 +103,8 @@ describe('SendMail', () => {
                         loginNewUser: 'new',
                         mailMaxExpirationDays: 30,
                         mailMaxMessageLength: 2000,
+                        language: 'en',
+                        modules: [],
                     };
                 },
             }),

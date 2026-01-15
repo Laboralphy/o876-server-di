@@ -6,16 +6,11 @@ GM 🎲
 
 @typedef user {{ name: string, online: boolean, admin: boolean, moderator: boolean, gameMaster: boolean }}
 --}}
-{{#table}}
-    {{t "who.colUser"}},{{t "who.colRoles"}},{{t "who.colOnline"}}
-    {{#each users}}
-        {{#line}}
-            {{#if online}}{{color "#2f4"}}{{else}}{{color "#888"}}{{/if}}{{ name }}{{color ""}},
-            {{#if admin}}{{#bold}}{{color "#ff0"}}A{{color ""}}{{/bold}}{{/if}}
-            {{#if gameMaster}}{{#bold}}{{color "#d0f"}}G{{color ""}}{{/bold}}{{/if}}
-            {{#if moderator}}{{#bold}}{{color "#f80"}}M{{color ""}}{{/bold}}{{/if}},
-            {{#if online }}{{color "#2f4"}}Online{{/if}}{{color ""}}
-        {{/line}}
-    {{/each}}
-    {{#if more}}..., ..., ...{{/if}}
-{{/table}}
+{{#each users}}
+    {{#line}}
+        {{#bold}}{{ name }}{{/bold}}
+        {{#if admin}}⚙️{{color "#ff0"}}{{t "who.roleAdmin"}}{{color ""}}{{/if}}
+        {{#if gameMaster}}🎲{{color "#d0f"}}{{t "who.roleGameMaster"}}{{color ""}}{{/if}}
+        {{#if moderator}}⚖️{{color "#f80"}}{{t "who.roleModerator"}}{{color ""}}{{/if}}
+    {{/line}}
+{{/each}}
