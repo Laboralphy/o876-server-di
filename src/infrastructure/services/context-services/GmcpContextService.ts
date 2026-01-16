@@ -42,7 +42,7 @@ export class GmcpContextService extends AbstractContextService {
         key: string = ''
     ) {
         if (!this.mediaDefaultSent) {
-            const sHost = getEnv().SERVER_STATIC_URL ?? 'http://127.0.0.1/';
+            const sHost = getEnv().SERVER_STATIC_URL ?? 'http://127.0.0.1:8082/';
             const sFinalSlash = sHost.endsWith('/') ? '' : '/';
             const payload: ClientMediaDefault = {
                 url: sHost + sFinalSlash,
