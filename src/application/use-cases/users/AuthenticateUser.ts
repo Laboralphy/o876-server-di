@@ -34,9 +34,11 @@ export class AuthenticateUser {
         if (!user) {
             throw new Error(USE_CASE_ERRORS.ENTITY_NOT_FOUND + ` User : ${login}`);
         }
-        if (this.communicationLayer.getUserClient(user)) {
+        const oAlreadyClient = this.communicationLayer.getUserClient(user);
+        if (oAlreadyClient) {
             // This user is already connected
-            throw new Error(USE_CASE_ERRORS.FORBIDDEN + ` User ${login} already connected`);
+            // Disconnect former client
+            this.communicationLayer.dropClient(oAlreadyClient.id);
         }
         const userSecret = await this.userSecretRepository.get(user.id);
         if (!userSecret) {

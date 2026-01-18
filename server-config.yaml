@@ -15,5 +15,11 @@ mailMaxExpirationDays: 30
 mailMaxMessageLength: 1024
 
 # List of modules
-# use yaml syntax to specify the list
+# you may use yaml syntax to specify the list
 modules: [ "media-test" ]
+
+# Client inactivity timeout
+# When client are inactive during a period of time exceeding this delay
+# the connection is automatically closed.
+# the value is in seconds
+clientKeepAliveDelay: 30

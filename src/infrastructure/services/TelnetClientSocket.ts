@@ -1,26 +1,26 @@
 import { IClientSocket } from '../../domain/ports/adapters/IClientSocket';
 import { Client as TelnetClient } from 'telnet2';
 import { TextEncoder } from 'node:util';
-import { Command } from '../../../@types/telnet2';
+import Telnet, { Command } from '../../../@types/telnet2';
 
 const encoder = new TextEncoder();
 
 export class TelnetClientSocket implements IClientSocket {
     private readonly options = new Set<string>();
 
-    constructor(private readonly socket: TelnetClient) {}
+    constructor(private readonly clientSock: Telnet.Client) {}
 
     close(): void {
-        this.socket.destroy();
+        this.clientSock.destroy();
     }
 
     onMessage(callback: (message: string | Buffer) => void): void {
-        this.socket.on('data', (data: Buffer) => {
+        this.clientSock.on('data', (data: Buffer) => {
             // trim CR/LF at the end.
             callback(data.toString().trimEnd());
             // watch out for binary data
         });
-        this.socket.on('command', (cmd: Command) => {
+        this.clientSock.on('command', (cmd: Command) => {
             const { command, data, option } = cmd;
             switch (command + ' ' + option) {
                 case 'will gmcp': {
@@ -45,7 +45,7 @@ export class TelnetClientSocket implements IClientSocket {
 
     send(message: string | Buffer): Promise<void> {
         return new Promise((resolve) => {
-            const socket = this.socket;
+            const socket = this.clientSock;
             if (!message) {
                 resolve();
                 return;
@@ -67,7 +67,7 @@ export class TelnetClientSocket implements IClientSocket {
     }
 
     onDisconnect(callback: () => void): void {
-        this.socket.on('close', () => {
+        this.clientSock.on('close', () => {
             callback();
         });
     }

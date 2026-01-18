@@ -12,6 +12,7 @@ export const ServerConfigOptionsSchema = z
         mailMaxExpirationDays: z.number().int(),
         mailMaxMessageLength: z.number().int(),
         modules: z.array(z.string()),
+        clientKeepAliveDelay: z.number().int().min(0),
     })
     .strict();
 

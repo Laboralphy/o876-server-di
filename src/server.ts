@@ -32,7 +32,7 @@ export class Server {
     createTelnetServer(): TelnetServer {
         // Example of creating GMCP telnet option
         telnet.OPTIONS.GMCP = 201;
-        telnet.OPTION_NAMES['201'] = 'gmcp';
+        telnet.OPTION_NAMES[telnet.OPTIONS.GMCP] = 'gmcp';
         // at client connection :
         // socket.do.gmcp()
         return telnet.createServer({

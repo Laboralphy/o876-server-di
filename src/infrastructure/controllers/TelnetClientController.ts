@@ -13,9 +13,8 @@ import { ClientCradle } from '../../boot/container';
 import { IClientContext } from '../../application/ports/classes/IClientContext';
 import { IApiContextBuilder } from '../../application/ports/services/IApiContextBuilder';
 import { SPECIAL_MESSAGE } from '../../domain/enums/special-message';
-import { GMCPGateway } from '../services/GMCPGateway';
-import { IGMCPGateway } from '../../application/ports/services/IGMCPGateway';
 import { GMCPPacket } from '../../libs/gmcp/GMCPPacket';
+import { IServerConfig } from '../../application/ports/services/IServerConfig';
 
 const debugTelnet = debug('srv:telnet');
 
@@ -54,11 +53,9 @@ export class TelnetClientController extends AbstractClientController {
     private changePasswordStruct: ChangePasswordStruct;
     private createAccountStruct: CreateUserDto;
     private textEditorStruct: TextEditorStruct;
-    private gmcpGateway: IGMCPGateway;
 
     constructor(cradle: ClientCradle) {
         super(cradle);
-        this.gmcpGateway = cradle.gmcpGateway;
         this.idClient = cradle.idClient;
         this.phase = PHASES.NONE;
         this.changePasswordStruct = {
@@ -409,10 +406,14 @@ export class TelnetClientController extends AbstractClientController {
      * The function parameter is the telnet socket
      * We listen the events fired by this socket, and we execute the corresponding use cases.
      */
-    async connect(socket: TelnetClient) {
-        const clientSocket = new TelnetClientSocket(socket);
-        // create new client session
+    async connect(telnetClient: TelnetClient) {
+        const clientSocket = new TelnetClientSocket(telnetClient);
         const idClient = this.idClient;
+        // Define keep alive delay
+        const nKeepAliveDelay = this.getServerConfig().getVariables().clientKeepAliveDelay * 1000;
+        debugTelnet('client %s set keep alive delay %d', idClient, nKeepAliveDelay);
+        telnetClient.output.setKeepAlive(true, nKeepAliveDelay);
+        // create new client session
         const clientContext: IClientContext = this.apiContextBuilder.buildApiContext();
         const clientSession = this.initClientSession(idClient, clientSocket, clientContext);
         const serverConfig = this.getServerConfig();
@@ -431,7 +432,6 @@ export class TelnetClientController extends AbstractClientController {
             if (message instanceof Buffer) {
                 try {
                     // This is where GMCP enters
-                    // TODO process gmcp Buffer here
                     const p = GMCPPacket.parse(message);
                     return this.execGMCPCommand(idClient, p);
                 } catch (err) {

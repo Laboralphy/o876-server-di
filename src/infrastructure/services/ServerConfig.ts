@@ -21,6 +21,7 @@ export class ServerConfig implements IServerConfig {
             mailMaxExpirationDays: 30,
             mailMaxMessageLength: 1024,
             modules: [],
+            clientKeepAliveDelay: 300000,
         };
     }
 
