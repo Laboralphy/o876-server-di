@@ -3,6 +3,7 @@ import { IScriptRunner } from '../../application/ports/services/IScriptRunner';
 
 export class ScriptRunner implements IScriptRunner {
     private readonly scripts = new Map<string, VMScript>();
+    private readonly eventScripts = new Map<string, VMScript[]>();
     private readonly baseContext: Record<string, unknown> = {};
 
     /**
@@ -17,7 +18,7 @@ export class ScriptRunner implements IScriptRunner {
      * Returns all script names
      */
     get scriptNames() {
-        return [...this.scripts.keys()];
+        return [...this.scripts.keys(), ...this.eventScripts.keys()];
     }
 
     /**
@@ -25,43 +26,90 @@ export class ScriptRunner implements IScriptRunner {
      * @param id script identifier
      * @param sSource js source of script
      * @param sFullPath used to resolve relative requires
+     * @param eventScript if true then marks this scripts as event script - all event script that share the same id are preserved
+     * and are all run at once when the event occurs. For example :
+     * @example
+     * compile('script1', '<javascript source 1>', './event-1.js', true)
+     * compile('script1', '<javascript source 2>', './event-2.js', true)
+     * will keep both script, and :
+     * run('script1', context)
+     * will run <javascript source 1> AND <javascript source 2>
      */
-    compile(id: string, sSource: string, sFullPath: string): void {
-        // Avec vm2, on ne "compile" pas à l'avance comme avec SandboxJS,
-        // mais on stocke le source pour l'exécuter plus tard avec le contexte.
-        this.scripts.set(id, new VMScript(sSource, sFullPath));
+    compile(id: string, sSource: string, sFullPath: string, eventScript: boolean = false): void {
+        const oCompiledScript = new VMScript(sSource, sFullPath)
+        if (eventScript) {
+            // this is an event script, 
+            // in this case : id is not unique : we keep all scripts of the same id, in an array
+            if (!this.eventScripts.has(id)) {
+                // first time we define this id
+                this.eventScripts.set(id, [])
+            }
+            const aEventScripts = this.eventScripts.get(id)
+            if (Array.isArray(aEventScripts)) {
+                // adding this compiled script in the list
+                aEventScripts.push(oCompiledScript);
+            } else {
+                // this error should not happen, as the only way to set eventScripts item is in this function
+                throw new ReferenceError(`Event script list ${id} is of unexpected type (i.e. not array)`);
+            }
+        } else {
+            this.scripts.set(id, oCompiledScript);
+        }
+    }
+
+    /**
+     * Will run a list of event script of the same id.
+     * Does not cry if id is inexistant : just ignoring the command, but return false
+     * otherwhise if a scripts as been run : return true
+     */
+    runEventHandlers(id: string, context: Record<string, any>); boolean {
+        const aScripts = this.eventScripts.get(id)
+        let bRun = false;
+        if (Array.isArray(aScripts)) {
+            for (const program of aScripts) {
+                this.runProgram(program, context);
+                bRun = true;
+            }
+        }
+        return bRun
+    }
+
+    private runProgram(program, context: Record<string, any>) {
+        const ctx = {
+            ...this.baseContext,
+            ...context
+        };
+        const vm = new NodeVM({
+            console: 'inherit', // allow use of console for debug purpose
+            sandbox: ctx, // Context by default
+            require: {
+                external: true,
+                root: './',
+            },
+            timeout: 1000, // Timeout (ms) 
+            allowAsync: true, // Allow async functions
+            eval: false, // allow neither eval nor Function
+            wasm: false, // Deactivatee WebAssembly
+        });
+        try {
+            // Execute script in specified context
+            return vm.run(program);
+        } catch (err) {
+            console.error(
+                `Erreur lors de l'exécution du script.`,
+                (err as Error).message
+            );
+            throw err;
+        }
     }
 
     run(id: string, context: Record<string, any>) {
+        if (this.eventScripts.has(id) {
+            return this.runEventHandlers(id, context);
+        }
         const script = this.scripts.get(id);
         if (script) {
-            const ctx = {
-                ...this.baseContext,
-                ...context,
-                include: (id: string) => this.run(id, context),
-            };
-            const vm = new NodeVM({
-                console: 'inherit', // Capture les logs
-                sandbox: ctx, // Contexte vide par défaut
-                require: {
-                    external: true,
-                    root: './',
-                },
-                timeout: 1000, // Timeout en ms
-                allowAsync: true, // Autorise les opérations asynchrones si nécessaire
-                eval: false, // Désactive eval et Function
-                wasm: false, // Désactive WebAssembly
-            });
-            try {
-                // Exécute le script dans le contexte
-                return vm.run(script);
-            } catch (err) {
-                console.error(
-                    `Erreur lors de l'exécution du script ${id}:`,
-                    (err as Error).message
-                );
-                throw err;
-            }
+            return this.runProgram(script)
         }
     }
 }
