@@ -4,9 +4,10 @@ dotenv.config();
 let bOkVariables: boolean = false;
 
 const VARIABLES = [
-    'SERVER_MODULE_PATH',
+    'SERVER_HOME_PATH',
     'SERVER_HTTP_API_PORT',
     'SERVER_TELNET_PORT',
+    'SERVER_SECURE_TELNET_PORT',
     'SERVER_WEBSOCKET_PORT',
     'SERVER_STATIC_PORT',
     'SERVER_STATIC_URL',

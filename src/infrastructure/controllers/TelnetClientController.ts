@@ -15,6 +15,7 @@ import { IApiContextBuilder } from '../../application/ports/services/IApiContext
 import { SPECIAL_MESSAGE } from '../../domain/enums/special-message';
 import { GMCPPacket } from '../../libs/gmcp/GMCPPacket';
 import { IServerConfig } from '../../application/ports/services/IServerConfig';
+import { IClientSocket } from '../../domain/ports/adapters/IClientSocket';
 
 const debugTelnet = debug('srv:telnet');
 
@@ -406,8 +407,7 @@ export class TelnetClientController extends AbstractClientController {
      * The function parameter is the telnet socket
      * We listen the events fired by this socket, and we execute the corresponding use cases.
      */
-    async connect(telnetClient: TelnetClient) {
-        const clientSocket = new TelnetClientSocket(telnetClient);
+    async connect(clientSocket: IClientSocket) {
         const idClient = this.idClient;
         // create new client session
         const clientContext: IClientContext = this.apiContextBuilder.buildApiContext();

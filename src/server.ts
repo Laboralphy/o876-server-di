@@ -7,12 +7,12 @@ import { scopePerRequest } from 'awilix-koa';
 import { debug } from './libs/o876-debug';
 import { getEnv } from './boot/dotenv';
 import { expandPath } from './libs/expand-path';
-import telnet, { Server as TelnetServer, Client as TelnetClient } from 'telnet2';
+import telnet, { Client as TelnetClient, Server as TelnetServer } from 'telnet2';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { mediaServe } from './infrastructure/web/middlewares/media-serve';
-import { Server as SSHServer } from 'ssh2';
-import os from 'node:os';
+import { TelnetClientSocket } from './infrastructure/services/TelnetClientSocket';
+import * as tls from 'node:tls';
 
 const debugServer = debug('srv:main');
 
@@ -20,7 +20,7 @@ export class Server {
     private readonly adminApi: Koa;
     private readonly staticApp: Koa;
     private readonly telnetServer: TelnetServer;
-    private _sshServer: SSHServer | null = null;
+    private tlsServer: tls.Server | null = null;
     private readonly env = getEnv();
 
     constructor() {
@@ -62,8 +62,8 @@ export class Server {
         const mm = container.resolve('moduleManager');
         const sc = container.resolve('serverConfig');
         await mm.loadModuleFromFolder(path.resolve(__dirname, '../modules/_base'));
-        for (const m of sc.getVariables().modules) {
-            await mm.loadModuleFromFolder(path.resolve(__dirname, '../modules/', m));
+        for (const sModuleName of sc.getVariables().modules) {
+            await mm.loadModuleFromFolder(path.resolve(__dirname, '../modules/', sModuleName));
         }
     }
 
@@ -71,12 +71,12 @@ export class Server {
      * Build directory tree, for storing json-database, modules ...
      */
     async initDataDirectory() {
-        if (!this.env.SERVER_MODULE_PATH) {
-            throw new Error(`Environment variable not set : SERVER_MODULE_PATH`);
+        if (!this.env.SERVER_HOME_PATH) {
+            throw new Error(`Environment variable not set : SERVER_HOME_PATH`);
         }
-        const sModuleLocation = expandPath(this.env.SERVER_MODULE_PATH);
-        debugServer('module directory is %s', sModuleLocation);
-        await fs.mkdir(sModuleLocation, { recursive: true });
+        const sHomeLocation = expandPath(this.env.SERVER_HOME_PATH);
+        debugServer('home directory is %s', sHomeLocation);
+        await fs.mkdir(sHomeLocation, { recursive: true });
     }
 
     async initDatabase() {
@@ -143,28 +143,32 @@ export class Server {
         });
     }
 
+    private async handleTelnetClient(client: TelnetClient) {
+        try {
+            client.do.transmit_binary(); // easier unicode character transmission
+            client.do.window_size(); // make the client emit 'window size' events
+            client.do.gmcp(); // accept GMCP client
+            const uidg = container.resolve('idGenerator');
+            const idClient = uidg.generateUID();
+            debugServer('incoming telnet client %s', idClient);
+            const clientScope = createClientContainer(idClient);
+            const telnetClientController = clientScope.resolve('telnetClientController');
+            client.on('close', () => {
+                clientScope.dispose();
+                debugServer('dispose client %s context', idClient);
+            });
+            await telnetClientController.connect(new TelnetClientSocket(client));
+        } catch (err) {
+            console.error('Error during client connection phase :', err);
+            client.end();
+        }
+    }
+
     initTelnetService(): Promise<void> {
         debugServer('starting telnet service');
-        this.telnetServer.on('client', async (client: TelnetClient) => {
-            try {
-                client.do.transmit_binary(); // easier unicode character transmission
-                client.do.window_size(); // make the client emit 'window size' events
-                client.do.gmcp(); // accept GMCP client
-                const uidg = container.resolve('idGenerator');
-                const idClient = uidg.generateUID();
-                debugServer('incoming telnet client %s', idClient);
-                const clientScope = createClientContainer(idClient);
-                const telnetClientController = clientScope.resolve('telnetClientController');
-                client.on('close', () => {
-                    clientScope.dispose();
-                    debugServer('dispose client %s context', idClient);
-                });
-                await telnetClientController.connect(client);
-            } catch (err) {
-                console.error('Error during client connection phase :', err);
-                client.end();
-            }
-        });
+        this.telnetServer.on('client', async (client: TelnetClient) =>
+            this.handleTelnetClient(client)
+        );
         return new Promise((resolve) => {
             const port = parseInt(this.env.SERVER_TELNET_PORT ?? '8080');
             this.telnetServer.listen(port, () => {
@@ -174,23 +178,23 @@ export class Server {
         });
     }
 
-    async initSSHService() {
-        const sHostKeysFileContent = await fs.readFile(
-            path.resolve(os.homedir(), './.ssh/host_keys')
+    async initSecureTelnetService() {
+        debugServer('starting secure telnet service');
+        const sHomeLocation = expandPath(this.env.SERVER_HOME_PATH ?? '.');
+        const options = {
+            key: await fs.readFile(path.join(sHomeLocation, 'certs/server-key.pem')), // Clé privée
+            cert: await fs.readFile(path.join(sHomeLocation, 'certs/server-cert.pem')), // Certificat public
+        };
+
+        const server = tls.createServer(options, (socket) =>
+            this.handleTelnetClient(new telnet.Client({ socket }))
         );
-        this._sshServer = new SSHServer(
-            {
-                hostKeys: [sHostKeysFileContent.toString()],
-            },
-            (client) => {
-                const uidg = container.resolve('idGenerator');
-                const idClient = uidg.generateUID();
-                debugServer('incoming ssh client %s', idClient);
-                const clientScope = createClientContainer(idClient);
-                const sshClientController = clientScope.resolve('sshClientController');
-                sshClientController.connect(client);
-            }
-        );
+        this.tlsServer = server;
+        return new Promise((resolve) => {
+            server.listen(parseInt(this.env.SERVER_SECURE_TELNET_PORT ?? '8992'), '0.0.0.0', () => {
+                resolve(server);
+            });
+        });
     }
 
     async initWebsocketService() {
@@ -220,6 +224,7 @@ export class Server {
         await this.initChatService();
         await this.initApiService();
         await this.initTelnetService();
+        await this.initSecureTelnetService();
         await this.initWebsocketService();
         await this.initModules();
         await this.initStaticService();

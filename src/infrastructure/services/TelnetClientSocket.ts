@@ -1,9 +1,5 @@
 import { IClientSocket } from '../../domain/ports/adapters/IClientSocket';
-import { Client as TelnetClient } from 'telnet2';
-import { TextEncoder } from 'node:util';
 import Telnet, { Command } from '../../../@types/telnet2';
-
-const encoder = new TextEncoder();
 
 export class TelnetClientSocket implements IClientSocket {
     private readonly options = new Set<string>();
