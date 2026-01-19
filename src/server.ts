@@ -1,5 +1,4 @@
 import Koa from 'koa';
-import { send } from '@koa/send';
 import bodyParser from 'koa-bodyparser';
 import { userRoutes } from './infrastructure/web/routes/user.routes';
 import { container, createClientContainer } from './boot/container';
@@ -12,6 +11,8 @@ import telnet, { Server as TelnetServer, Client as TelnetClient } from 'telnet2'
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { mediaServe } from './infrastructure/web/middlewares/media-serve';
+import { Server as SSHServer } from 'ssh2';
+import os from 'node:os';
 
 const debugServer = debug('srv:main');
 
@@ -19,6 +20,7 @@ export class Server {
     private readonly adminApi: Koa;
     private readonly staticApp: Koa;
     private readonly telnetServer: TelnetServer;
+    private _sshServer: SSHServer | null = null;
     private readonly env = getEnv();
 
     constructor() {
@@ -150,7 +152,7 @@ export class Server {
                 client.do.gmcp(); // accept GMCP client
                 const uidg = container.resolve('idGenerator');
                 const idClient = uidg.generateUID();
-                debugServer('incoming client %s', idClient);
+                debugServer('incoming telnet client %s', idClient);
                 const clientScope = createClientContainer(idClient);
                 const telnetClientController = clientScope.resolve('telnetClientController');
                 client.on('close', () => {
@@ -170,6 +172,25 @@ export class Server {
                 resolve(undefined);
             });
         });
+    }
+
+    async initSSHService() {
+        const sHostKeysFileContent = await fs.readFile(
+            path.resolve(os.homedir(), './.ssh/host_keys')
+        );
+        this._sshServer = new SSHServer(
+            {
+                hostKeys: [sHostKeysFileContent.toString()],
+            },
+            (client) => {
+                const uidg = container.resolve('idGenerator');
+                const idClient = uidg.generateUID();
+                debugServer('incoming ssh client %s', idClient);
+                const clientScope = createClientContainer(idClient);
+                const sshClientController = clientScope.resolve('sshClientController');
+                sshClientController.connect(client);
+            }
+        );
     }
 
     async initWebsocketService() {

@@ -18,8 +18,9 @@ export interface IScriptRunner {
      * @param id script identifier
      * @param sSource script source code (js)
      * @param sFullPath is used to resolve relative requires
+     * @param eventScript if true, the script will not overwrite a former script with same id, both will be run
      */
-    compile(id: string, sSource: string, sFullPath: string): void;
+    compile(id: string, sSource: string, sFullPath: string, eventScript: boolean): void;
 
     /**
      * Run a specific script with a specific partial context.

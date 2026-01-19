@@ -409,10 +409,6 @@ export class TelnetClientController extends AbstractClientController {
     async connect(telnetClient: TelnetClient) {
         const clientSocket = new TelnetClientSocket(telnetClient);
         const idClient = this.idClient;
-        // Define keep alive delay
-        const nKeepAliveDelay = this.getServerConfig().getVariables().clientKeepAliveDelay * 1000;
-        debugTelnet('client %s set keep alive delay %d', idClient, nKeepAliveDelay);
-        telnetClient.output.setKeepAlive(true, nKeepAliveDelay);
         // create new client session
         const clientContext: IClientContext = this.apiContextBuilder.buildApiContext();
         const clientSession = this.initClientSession(idClient, clientSocket, clientContext);

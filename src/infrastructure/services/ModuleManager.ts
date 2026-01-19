@@ -71,7 +71,12 @@ export class ModuleManager implements IModuleManager {
 
     defineAssetScript(name: string, source: string, sFullPath: string) {
         this.addStatCountSize('scripts', 1, source.length);
-        this.scriptRunner.compile(name, source, sFullPath);
+        this.scriptRunner.compile(name, source, sFullPath, false);
+    }
+
+    defineAssetEventScript(name: string, source: string, sFullPath: string) {
+        this.addStatCountSize('scripts', 1, source.length);
+        this.scriptRunner.compile(name, source, sFullPath, true);
     }
 
     defineAssetData(key: string, data: string) {
@@ -160,10 +165,18 @@ export class ModuleManager implements IModuleManager {
                     // We should not compile all types of scripts
                     // Some scripts are only used as dependency of event or commands.
                     const p0 = aPath[0];
-                    if (p0 === 'commands' || p0 === 'gmcp' || p0 === 'events') {
+                    if (p0 === 'commands' || p0 === 'gmcp') {
                         // this is a command, or an event, the only scripts types we are indexing
                         const aId = [...aPath, sId];
                         this.defineAssetScript(aId.join('/'), contentBuffer.toString(), sFullPath);
+                    } else if (p0 === 'events') {
+                        // this is a command, or an event, the only scripts types we are indexing
+                        const aId = [...aPath, sId];
+                        this.defineAssetEventScript(
+                            aId.join('/'),
+                            contentBuffer.toString(),
+                            sFullPath
+                        );
                     }
                     break;
                 }
