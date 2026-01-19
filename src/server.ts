@@ -184,6 +184,7 @@ export class Server {
         const options = {
             key: await fs.readFile(path.join(sHomeLocation, 'certs/server-key.pem')), // Clé privée
             cert: await fs.readFile(path.join(sHomeLocation, 'certs/server-cert.pem')), // Certificat public
+            rejectUnauthorized: false,
         };
 
         const server = tls.createServer(options, (socket) =>
