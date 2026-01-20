@@ -46,8 +46,6 @@ export class TelnetClientSocket implements IClientSocket {
                 resolve();
                 return;
             }
-            // const utf8String = Buffer.from(encoder.encode(message.toString()));
-            // const bWriteOk = socket.write(utf8String);
             const bWriteOk = socket.write(message);
             if (!bWriteOk) {
                 // Buffer is full : data not sent : waiting for 'drain' event

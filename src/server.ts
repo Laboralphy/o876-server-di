@@ -13,6 +13,7 @@ import fs from 'node:fs/promises';
 import { mediaServe } from './infrastructure/web/middlewares/media-serve';
 import { TelnetClientSocket } from './infrastructure/services/TelnetClientSocket';
 import * as tls from 'node:tls';
+import { TlsOptions } from 'tls';
 
 const debugServer = debug('srv:main');
 
@@ -181,15 +182,33 @@ export class Server {
     async initSecureTelnetService() {
         debugServer('starting secure telnet service');
         const sHomeLocation = expandPath(this.env.SERVER_HOME_PATH ?? '.');
-        const options = {
-            key: await fs.readFile(path.join(sHomeLocation, 'certs/server-key.pem')), // Clé privée
-            cert: await fs.readFile(path.join(sHomeLocation, 'certs/server-cert.pem')), // Certificat public
-            rejectUnauthorized: false,
+
+        const pleaseReadSecretFile = async (sFile: string) => {
+            const sSecretPath = path.join(sHomeLocation, 'certs', sFile);
+            try {
+                debugServer('loading secret file : %s', sSecretPath);
+                return await fs.readFile(sSecretPath);
+            } catch {
+                debugServer('error reading secret file', sSecretPath);
+                return undefined;
+            }
         };
 
-        const server = tls.createServer(options, (socket) =>
-            this.handleTelnetClient(new telnet.Client({ socket }))
-        );
+        const key = await pleaseReadSecretFile('server-key.pem');
+        const cert = await pleaseReadSecretFile('server-cert.pem');
+
+        if (!key || !cert) {
+            throw new Error('Could not initialize secure telnet service : missing secret file');
+        }
+
+        const options: TlsOptions = {
+            key,
+            cert,
+        };
+
+        const server = tls.createServer(options, (socket) => {
+            this.handleTelnetClient(new telnet.Client({ socket }));
+        });
         this.tlsServer = server;
         return new Promise((resolve) => {
             server.listen(parseInt(this.env.SERVER_SECURE_TELNET_PORT ?? '8992'), '0.0.0.0', () => {
