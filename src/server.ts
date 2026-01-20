@@ -194,11 +194,18 @@ export class Server {
             }
         };
 
-        const key = await pleaseReadSecretFile('server-key.pem');
         const cert = await pleaseReadSecretFile('server-cert.pem');
+        if (!cert) {
+            throw new Error(
+                'Could not initialize secure telnet service : missing server certificate file'
+            );
+        }
 
-        if (!key || !cert) {
-            throw new Error('Could not initialize secure telnet service : missing secret file');
+        const key = await pleaseReadSecretFile('server-key.pem');
+        if (!key) {
+            throw new Error(
+                'Could not initialize secure telnet service : missing server public key file'
+            );
         }
 
         const options: TlsOptions = {
@@ -207,7 +214,9 @@ export class Server {
         };
 
         const server = tls.createServer(options, (socket) => {
-            this.handleTelnetClient(new telnet.Client({ socket }));
+            const oClientSocket = new telnet.Client({ socket });
+            oClientSocket.options.convertLF = false;
+            this.handleTelnetClient(oClientSocket);
         });
         this.tlsServer = server;
         return new Promise((resolve) => {

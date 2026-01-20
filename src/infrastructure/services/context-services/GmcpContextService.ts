@@ -42,8 +42,13 @@ export class GmcpContextService extends AbstractContextService {
         key: string = ''
     ) {
         if (!this.mediaDefaultSent) {
-            const oURL = new URL(getEnv().SERVER_STATIC_URL ?? 'http://127.0.0.1:8082/');
-            oURL.port = getEnv().SERVER_STATIC_PORT ?? '8082';
+            const sStaticURL = getEnv().SERVER_STATIC_URL;
+            if (!sStaticURL) {
+                throw new Error(
+                    'SERVER_STATIC_URL variable is required - value must point to a valid static endpoint'
+                );
+            }
+            const oURL = new URL(sStaticURL);
             const sHost = oURL.href;
             const sFinalSlash = sHost.endsWith('/') ? '' : '/';
             const payload: ClientMediaDefault = {
