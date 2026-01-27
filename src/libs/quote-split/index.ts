@@ -1,1 +1,1 @@
-export { quoteSplit } from './quote-split-2';
+export { quoteSplit } from './quote-split';

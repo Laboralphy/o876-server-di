@@ -1,7 +1,6 @@
-import { Argv, Arguments } from 'yargs';
+import { Arguments, Argv } from 'yargs';
 import { User } from '../../../../domain/entities/User';
 import { HttpError, wfGet, wfPut } from '../../tools/web-fetcher';
-import i18n from 'i18next';
 import { render } from '../../../../libs/i18n-loader';
 
 interface IUserUnbanArgs extends Arguments {

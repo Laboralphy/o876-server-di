@@ -13,7 +13,7 @@ import fs from 'node:fs/promises';
 import { mediaServe } from './infrastructure/web/middlewares/media-serve';
 import { TelnetClientSocket } from './infrastructure/services/TelnetClientSocket';
 import * as tls from 'node:tls';
-import { TlsOptions } from 'tls';
+import { TlsOptions } from 'node:tls';
 
 const debugServer = debug('srv:main');
 
@@ -87,7 +87,7 @@ export class Server {
             host: this.env.SERVER_DB_HOST ?? '',
             user: this.env.SERVER_DB_USER ?? '',
             password: this.env.SERVER_DB_PASSWORD ?? '',
-            port: parseInt(this.env.SERVER_DB_PORT ?? ''),
+            port: Number.parseInt(this.env.SERVER_DB_PORT ?? ''),
             name: this.env.SERVER_DB_NAME ?? '',
         });
     }
@@ -120,7 +120,7 @@ export class Server {
         app.use(userRoutes(container.resolve('apiUserController')).routes());
         return new Promise((resolve) => {
             // Start listening
-            const port = parseInt(this.env.SERVER_HTTP_API_PORT ?? '8080');
+            const port = Number.parseInt(this.env.SERVER_HTTP_API_PORT ?? '8080');
             this.adminApi.listen(port, '127.0.0.1', () => {
                 debugServer('http api service is now listening on port %d', port);
                 resolve(undefined);
@@ -136,7 +136,7 @@ export class Server {
 
         return new Promise((resolve) => {
             // Start listening
-            const port = parseInt(this.env.SERVER_STATIC_PORT ?? '8082');
+            const port = Number.parseInt(this.env.SERVER_STATIC_PORT ?? '8082');
             app.listen(port, '0.0.0.0', () => {
                 debugServer('static assets delivering service is now listening on port %d', port);
                 resolve(undefined);
@@ -171,7 +171,7 @@ export class Server {
             this.handleTelnetClient(client)
         );
         return new Promise((resolve) => {
-            const port = parseInt(this.env.SERVER_TELNET_PORT ?? '8080');
+            const port = Number.parseInt(this.env.SERVER_TELNET_PORT ?? '8080');
             this.telnetServer.listen(port, () => {
                 debugServer('telnet service is now listening on port %d', port);
                 resolve(undefined);
@@ -220,9 +220,13 @@ export class Server {
         });
         this.tlsServer = server;
         return new Promise((resolve) => {
-            server.listen(parseInt(this.env.SERVER_SECURE_TELNET_PORT ?? '8992'), '0.0.0.0', () => {
-                resolve(server);
-            });
+            server.listen(
+                Number.parseInt(this.env.SERVER_SECURE_TELNET_PORT ?? '8992'),
+                '0.0.0.0',
+                () => {
+                    resolve(server);
+                }
+            );
         });
     }
 

@@ -1,4 +1,4 @@
-import { quoteSplit, quoteSplitEx } from './quote-split-2';
+import { quoteSplit, quoteSplitEx } from './quote-split';
 
 describe('quotesplit', () => {
     it('should return [alpha] when parsing : alpha', () => {

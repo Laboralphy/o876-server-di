@@ -14,10 +14,10 @@ export class FindUser {
     async execute(dto: FindUserDto): Promise<User | undefined> {
         if (dto.name !== undefined) {
             return this.userRepository.findByName(dto.name);
-        } else if (dto.displayName !== undefined) {
-            return this.userRepository.findByDisplayName(dto.displayName);
-        } else {
+        } else if (dto.displayName === undefined) {
             throw new Error(USE_CASE_ERRORS.FORBIDDEN + ' Find user criterium');
+        } else {
+            return this.userRepository.findByDisplayName(dto.displayName);
         }
     }
 }

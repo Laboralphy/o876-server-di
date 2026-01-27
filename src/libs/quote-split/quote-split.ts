@@ -17,52 +17,47 @@ export type QuoteSplitResult = {
 };
 
 export function quoteSplitEx(input: string): QuoteSplitResult {
-    const args: string[] = [];
-    let currentArg = '';
+    const tokens: string[] = [];
+    let currentToken = '';
     let inDoubleQuote = false;
     let escapeNext = false;
 
-    for (let i = 0, l = input.length; i < l; ++i) {
-        const char = input.charAt(i);
+    const flushToken = (): void => {
+        if (currentToken.length > 0) {
+            tokens.push(currentToken);
+            currentToken = '';
+        }
+    };
 
+    for (const ch of input) {
         if (escapeNext) {
-            currentArg += char;
+            currentToken += ch;
             escapeNext = false;
             continue;
         }
 
-        if (char === '\\') {
-            if (escapeNext) {
-                currentArg += char; // Ajoute le \ littéral
-                escapeNext = false;
-            } else {
-                escapeNext = true;
-            }
+        if (ch === '\\') {
+            escapeNext = true;
             continue;
         }
 
-        if (char === '"') {
+        if (ch === '"') {
             inDoubleQuote = !inDoubleQuote;
             continue;
         }
 
-        if (WHITESPACE.has(char) && !inDoubleQuote) {
-            if (currentArg.length > 0) {
-                args.push(currentArg);
-                currentArg = '';
-            }
+        if (WHITESPACE.has(ch) && !inDoubleQuote) {
+            flushToken();
             continue;
         }
 
-        currentArg += char;
+        currentToken += ch;
     }
 
-    if (currentArg.length > 0) {
-        args.push(currentArg);
-    }
+    flushToken();
 
     return {
-        strings: args,
+        strings: tokens,
         inDoubleQuote,
         escapeNext,
     };

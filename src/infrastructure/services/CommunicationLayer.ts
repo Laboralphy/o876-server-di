@@ -61,7 +61,7 @@ export class CommunicationLayer implements ICommunicationLayer {
         return this.getClientSession(idClient).clientSocket.send(message);
     }
 
-    async dropAllClients() {
+    async dropAllClients(): Promise<void[]> {
         return Promise.all(
             Array.from(this.clientSessions.entries()).map(([idClient]) => this.dropClient(idClient))
         );

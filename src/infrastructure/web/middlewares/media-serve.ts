@@ -8,14 +8,14 @@ import { debug } from '../../../libs/o876-debug';
 const debugMedia = debug('srv:media');
 
 export function mediaServe(container: AwilixContainer<Cradle>) {
-    const REGEX_PATH = /^\/([^\/]+)\/(images|sounds)\/(.*)$/;
+    const REGEX_PATH = /^\/([^/]+)\/(images|sounds)\/(.*)$/;
     const mm = container.resolve('moduleManager');
     return async (ctx: Context, next: Next) => {
         try {
             const sPath = ctx.path;
             // should be something like "/{module_name}/images/items/dagger-1efd.jpg"
             // or "/{module_name}/sounds/mech/door-slam.mp3"
-            const r = sPath.match(REGEX_PATH);
+            const r = REGEX_PATH.exec(sPath);
             if (r) {
                 const [, sModuleName, sAssetCategory, sAssetPath] = r;
                 const sModulePath = mm.getModuleLocation(sModuleName);

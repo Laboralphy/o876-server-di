@@ -50,7 +50,7 @@ export async function loadFolder(location: string, aNamespaces: string[] = []) {
     const aFiles = await fs.readdir(location, { recursive: true });
     return Promise.all(
         aFiles
-            .map((file) => file.match(/^([a-z]+)\/([^/.]+)\.json$/i))
+            .map((file) => /^([a-z]+)\/([^/.]+)\.json$/i.exec(file))
             .filter((r) => !!r)
             .map((r) => ({ file: r[0], lng: r[1], ns: r[2] }))
             .filter(({ ns }) => aNamespaces.length == 0 || aNamespaces.includes(ns))

@@ -209,7 +209,7 @@ export abstract class AbstractClientController {
                 // destroy client socket, then exit function
                 csd.state = CLIENT_STATES.BANNED;
                 return {
-                    authenticated: true,
+                    authenticated: false,
                     reason: 'banned: ' + ban.reason,
                 };
             }

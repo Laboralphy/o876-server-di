@@ -10,14 +10,19 @@ export function parseCSVLine(line: string): string[] {
     const result: string[] = [];
     let insideQuotes: boolean = false;
     let currentField: string = '';
+    let skipNext: boolean = false;
 
     for (let i = 0; i < line.length; i++) {
+        if (skipNext) {
+            skipNext = false;
+            continue;
+        }
         const char = line[i];
 
         if (char === QUOTE && insideQuotes && line[i + 1] === QUOTE) {
             // Handle escaped quotes
             currentField += QUOTE;
-            i++; // Skip the next quote
+            skipNext = true;
         } else if (char === QUOTE) {
             // Toggle the insideQuotes flag
             insideQuotes = !insideQuotes;

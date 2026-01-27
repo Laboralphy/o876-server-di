@@ -11,7 +11,7 @@ const FANCY_ORDER = ALPHABET + ALPHABET.toLowerCase();
  */
 function fancyLetter(s: string, nStyle: STYLES = 0) {
     const i = FANCY_ORDER.indexOf(s);
-    return i >= 0 ? '\uD835' + String.fromCharCode(0xdc00 + i + 52 * nStyle) : s;
+    return i >= 0 ? '\uD835' + String.fromCodePoint(0xdc00 + i + 52 * nStyle) : s;
 }
 
 /**

@@ -1,15 +1,11 @@
-export interface IContextMethod {
-    (...args: any[]): any;
-}
+export type IContextMethod = (...args: any[]) => any;
 
 export interface IExtension {
     publishedMethods(extensionContext: ExtensionContext): Record<string, IContextMethod>;
 }
 
 export class ExtensionContext {
-    private extensions: Map<string, IExtension> = new Map();
-
-    constructor() {}
+    private readonly extensions: Map<string, IExtension> = new Map();
 
     // Méthode pour ajouter une extension (ex: un composant Plasmud)
     public registerExtension(name: string, extension: IExtension): void {

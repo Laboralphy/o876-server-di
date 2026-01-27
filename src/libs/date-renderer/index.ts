@@ -89,9 +89,7 @@ export function renderDuration(nDuration: number, options: RenderDurationOptions
 
     const aMask = aValues.filter((v) => v.value > 0).slice(0, 2);
     if (aMask.length > 1) {
-        if (aMask[0].value > 1) {
-            aMask.pop();
-        } else if (Math.abs(aMask[1].rank - aMask[0].rank) > 1) {
+        if (aMask[0].value > 1 || Math.abs(aMask[1].rank - aMask[0].rank) > 1) {
             aMask.pop();
         }
     }

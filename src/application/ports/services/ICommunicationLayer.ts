@@ -24,7 +24,7 @@ export interface ICommunicationLayer {
      * The server is willing to expel a client from the service.
      * @param idClient
      */
-    dropClient(idClient: string): void;
+    dropClient(idClient: string): Promise<void>;
 
     /**
      * Sends a message to a client
@@ -37,7 +37,7 @@ export interface ICommunicationLayer {
      * Immediately drops all connected client.
      * Used when the service is shutting down
      */
-    dropAllClients(): void;
+    dropAllClients(): Promise<void[]>;
 
     /**
      * Return client associated with a spécific user

@@ -120,10 +120,10 @@ const REGEX_CSS_COLOR = /^#[0-9a-z]{3,6}$/i;
  * @param sColor input color, can be a css code (starting with #) or a standard html color label (red, blue...)
  */
 export function evaluateColorCode(sColor: string): number {
-    if (sColor.match(REGEX_CSS_COLOR)) {
+    if (REGEX_CSS_COLOR.exec(sColor)) {
         const sHexColor = sColor.substring(1).toLowerCase();
         if (sHexColor.length === 3) {
-            return parseInt(
+            return Number.parseInt(
                 '0x' +
                     sHexColor.charAt(0) +
                     sHexColor.charAt(0) +
@@ -133,14 +133,14 @@ export function evaluateColorCode(sColor: string): number {
                     sHexColor.charAt(2)
             );
         } else if (sHexColor.length === 6) {
-            return parseInt('0x' + sHexColor);
+            return Number.parseInt('0x' + sHexColor);
         } else {
-            return NaN;
+            return Number.NaN;
         }
     }
     const sColorValue = COLOR_CODES[sColor.toLowerCase()];
     if (sColorValue) {
-        return parseInt('0x' + sColorValue.substring(1));
+        return Number.parseInt('0x' + sColorValue.substring(1));
     } else {
         throw new Error(`Invalid color code : ${sColor}`);
     }
@@ -178,7 +178,7 @@ export function parseRGB(sColor: string) {
             sColor.charAt(2) +
             sColor.charAt(2);
     }
-    const nColor = parseInt('0x' + sColor);
+    const nColor = Number.parseInt('0x' + sColor);
     const r = (nColor >> 16) & 0xff;
     const g = (nColor >> 8) & 0xff;
     const b = nColor & 0xff;
@@ -195,7 +195,8 @@ function getAnsi16Code(sColor: string, background: boolean = false): number | un
         sColor = COLOR_CODES[sColor.toLowerCase()];
     }
     const c = ANSI_16_COLOR_MAP.get(sColor.toLowerCase());
-    return c === undefined ? undefined : c + 30 + (background ? 60 : 0);
+    const n = background ? 60 : 0;
+    return c === undefined ? undefined : c + 30 + n;
 }
 
 /**
@@ -204,8 +205,8 @@ function getAnsi16Code(sColor: string, background: boolean = false): number | un
  */
 function getAnsi256Code(sColor: string): string {
     const bStartsZero = sColor.startsWith('0');
-    const ac = parseInt(sColor);
-    if (bStartsZero || isNaN(ac)) {
+    const ac = Number.parseInt(sColor);
+    if (bStartsZero || Number.isNaN(ac)) {
         const { r, g, b } = parseRGB(sColor);
         return getColorCode(r, g, b);
     } else {
@@ -235,10 +236,10 @@ function bg256(color: string) {
  */
 export function fgcolor(sColor: string): string {
     const color16 = getAnsi16Code(sColor);
-    if (color16 !== undefined) {
-        return CSI + color16.toString() + ANSI_TERM_CHAR;
-    } else {
+    if (color16 === undefined) {
         return fg256(getAnsi256Code(sColor));
+    } else {
+        return CSI + color16.toString() + ANSI_TERM_CHAR;
     }
 }
 
@@ -248,9 +249,9 @@ export function fgcolor(sColor: string): string {
  */
 export function bgcolor(sColor: string): string {
     const color16 = getAnsi16Code(sColor, true);
-    if (color16 !== undefined) {
-        return CSI + color16.toString() + ANSI_TERM_CHAR;
-    } else {
+    if (color16 === undefined) {
         return bg256(getAnsi256Code(sColor));
+    } else {
+        return CSI + color16.toString() + ANSI_TERM_CHAR;
     }
 }

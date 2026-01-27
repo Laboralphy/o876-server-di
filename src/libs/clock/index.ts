@@ -35,8 +35,6 @@ class TimeOutTask {
 export class Clock {
     private readonly _timeOutTaskRegistry = new Map<string, TimeOutTask>();
 
-    constructor() {}
-
     /**
      * Declares a new restartable timeout handler, with a specific identifier
      * this identifier is used to restart timeout if needed, with the restart method.

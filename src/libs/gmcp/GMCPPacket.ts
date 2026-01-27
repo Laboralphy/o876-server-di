@@ -93,7 +93,7 @@ export class GMCPPacket {
             buffer.readUint8(buffer.length - 2) === COMMANDS.IAC &&
             buffer.readUint8(buffer.length - 1) === COMMANDS.SE
         ) {
-            const oPayload = buffer.subarray(3, buffer.length - 2);
+            const oPayload = buffer.subarray(3, -2);
             const s =
                 encoding === this.ENCODING_UTF8
                     ? textDecoder.decode(oPayload).trim()

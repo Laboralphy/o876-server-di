@@ -95,7 +95,7 @@ export function parseAnsiStyle(sStyle: string): ParseAnsiStyleResult {
         aParsed.forEach((p) => {
             const pm = p.match(R_STYLE_COMP);
             if (pm) {
-                const pm2 = pm.map((x) => parseInt(x));
+                const pm2 = pm.map((x) => Number.parseInt(x));
                 const prev = [0, 0, 0];
                 for (const n of pm2) {
                     const [n2, n1] = prev.slice(-2);
@@ -199,7 +199,10 @@ export function parseAnsiStyle(sStyle: string): ParseAnsiStyleResult {
     return {
         fg,
         bg,
-        attrs: attrs.sort((a, b) => a.localeCompare(b)).join(''),
+        attrs: attrs
+            .slice()
+            .sort((a, b) => a.localeCompare(b))
+            .join(''),
     };
 }
 
@@ -220,13 +223,12 @@ export function parseAnsiStyle(sStyle: string): ParseAnsiStyleResult {
 export function parse(sAnsiString: string) {
     const a = tokenizeAnsi(sAnsiString);
     const output: StyleStructure[] = [];
-    [] = [];
     let sLastStyle = '';
     let sContent = '';
     const commitStyle = (style: string) => {
         const { fg, bg, attrs } = parseAnsiStyle(sLastStyle);
-        const fghex = fg ? ANSI_REVERSED_CODES[parseInt(fg)] : '';
-        const bghex = bg ? ANSI_REVERSED_CODES[parseInt(bg)] : '';
+        const fghex = fg ? ANSI_REVERSED_CODES[Number.parseInt(fg)] : '';
+        const bghex = bg ? ANSI_REVERSED_CODES[Number.parseInt(bg)] : '';
         output.push({ fg: fghex, bg: bghex, text: sContent, attrs });
         sLastStyle = style;
         sContent = '';

@@ -98,7 +98,7 @@ export class Channel {
      */
     postMessage(idUser: string, content: string) {
         const user = this._users.get(idUser);
-        if (user && user.hasPower(POWERS.WRITE)) {
+        if (user?.hasPower(POWERS.WRITE)) {
             const message = new Message(idUser, content, Date.now());
             while (this.messages.length >= this.maxLines) {
                 this.messages.shift();

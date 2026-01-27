@@ -44,10 +44,10 @@ export async function doJsonRequest(
     const sFinalUrl = buildUrl(url);
     const response = await fetch(sFinalUrl, payload);
     if (response.ok) {
-        if (response.status !== HTTP_STATUS.NO_CONTENT) {
-            return response.json();
-        } else {
+        if (response.status === HTTP_STATUS.NO_CONTENT) {
             return '';
+        } else {
+            return response.json();
         }
     } else {
         const sErrorMessage = await response.text();

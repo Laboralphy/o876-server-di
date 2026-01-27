@@ -1,9 +1,8 @@
-import { Argv, Arguments } from 'yargs';
+import { Arguments, Argv } from 'yargs';
 import { TableRenderer, Themes } from '../../../../libs/table-renderer';
 import { renderDate } from '../../../../libs/date-renderer';
 import { HttpError, wfGet } from '../../tools/web-fetcher';
 import { User } from '../../../../domain/entities/User';
-import i18n from 'i18next';
 import { render } from '../../../../libs/i18n-loader';
 
 interface IUserListArgs extends Arguments {

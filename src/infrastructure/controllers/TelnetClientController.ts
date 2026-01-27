@@ -144,11 +144,14 @@ export class TelnetClientController extends AbstractClientController {
                     clientSession.id,
                     message
                 );
+                console.log('ban 1');
                 if (bLogInResult) {
+                    console.log('ban 2');
                     // authentication ok
                     // Change client state
                     clientSession.state = CLIENT_STATES.AUTHENTICATED;
                 } else {
+                    console.log('ban 3');
                     if (clientSession.state === CLIENT_STATES.BANNED) {
                         debugTelnet('client %s : user banned', clientSession.id);
                         await this.pauseClient(clientSession.id, 100);
@@ -161,6 +164,7 @@ export class TelnetClientController extends AbstractClientController {
                     this.phase = PHASES.NONE;
                     break;
                 }
+                console.log('ban 4');
                 this.phase = PHASES.NONE;
                 break;
             }

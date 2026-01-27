@@ -1,8 +1,8 @@
 // infrastructure/web/middlewares/validate.ts
 import { Context, Next } from 'koa';
-import { ZodError, ZodSchema } from 'zod';
+import z, { ZodError } from 'zod';
 
-export function validate(schema: ZodSchema) {
+export function validate(schema: z.ZodSchema) {
     return async (ctx: Context, next: Next) => {
         try {
             ctx.request.body = schema.parse(ctx.request.body);

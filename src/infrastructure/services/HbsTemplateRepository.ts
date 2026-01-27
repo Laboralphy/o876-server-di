@@ -2,29 +2,26 @@ import { ITemplateRepository } from '../../application/ports/services/ITemplateR
 import { JsonObject } from '../../domain/types/JsonStruct';
 import { IStringRepository } from '../../application/ports/services/IStringRepository';
 import { Cradle } from '../../boot/container';
-import handlebars, { HelperOptions } from 'handlebars';
+import Handlebars, { HelperOptions } from 'handlebars';
 import {
-    fgcolor,
-    bgcolor,
-    ANSI_RESET_BG,
-    ANSI_RESET_FG,
-    ANSI_RESET,
-    ANSI_UNDERLINE,
-    ANSI_UNDERLINE_OFF,
     ANSI_BOLD,
-    ANSI_STRIKE,
-    ANSI_BOLD_OFF,
-    ANSI_STRIKE_OFF,
-    ANSI_ITALIC,
-    ANSI_ITALIC_OFF,
     ANSI_INVERSE,
     ANSI_INVERSE_OFF,
+    ANSI_ITALIC,
+    ANSI_ITALIC_OFF,
+    ANSI_RESET,
+    ANSI_RESET_BG,
+    ANSI_RESET_FG,
+    ANSI_STRIKE,
+    ANSI_STRIKE_OFF,
+    ANSI_UNDERLINE,
+    ANSI_UNDERLINE_OFF,
+    bgcolor,
+    fgcolor,
 } from '../../libs/ansi-256/renderer';
-import Handlebars from 'handlebars';
 import { parseCSVLine } from '../../libs/parse-csv';
 import { TableRenderer } from '../../libs/table-renderer';
 import { ICellString } from '../../libs/table-renderer/ICellString';
-import stringWidth from 'string-width';
 import { ITime } from '../../application/ports/services/ITime';
 
 export class StylizedString implements ICellString {
@@ -79,38 +76,41 @@ export class HbsTemplateRepository implements ITemplateRepository {
     init(): void {
         const stringRepository = this.stringRepository;
         const time = this.time;
-        handlebars.registerHelper('t', function (key: string, options: HelperOptions) {
+        Handlebars.registerHelper('t', function (key: string, options: HelperOptions) {
             return stringRepository.render(key, { ...options.data.root, ...options.hash });
         });
-        handlebars.registerHelper('date', function (ts: string, format: string | HelperOptions) {
+        Handlebars.registerHelper('date', function (ts: string, format: string | HelperOptions) {
             if (typeof format !== 'string') {
                 format = 'ymd hm';
             }
             return time.renderDate(parseInt(ts), format);
         });
-        handlebars.registerHelper('underline', function (this: unknown, options: HelperOptions) {
+        Handlebars.registerHelper('underline', function (this: unknown, options: HelperOptions) {
             const content = options.fn(this);
             return new Handlebars.SafeString(ANSI_UNDERLINE + content + ANSI_UNDERLINE_OFF);
         });
-        handlebars.registerHelper('bold', function (this: unknown, options: HelperOptions) {
+        Handlebars.registerHelper('bold', function (this: unknown, options: HelperOptions) {
             const content = options.fn(this);
             return new Handlebars.SafeString(ANSI_BOLD + content + ANSI_RESET);
         });
-        handlebars.registerHelper('strike', function (this: unknown, options: HelperOptions) {
+        Handlebars.registerHelper('strike', function (this: unknown, options: HelperOptions) {
             const content = options.fn(this);
             return new Handlebars.SafeString(ANSI_STRIKE + content + ANSI_STRIKE_OFF);
         });
-        handlebars.registerHelper('italic', function (this: unknown, options: HelperOptions) {
+        Handlebars.registerHelper('italic', function (this: unknown, options: HelperOptions) {
             const content = options.fn(this);
             return new Handlebars.SafeString(ANSI_ITALIC + content + ANSI_ITALIC_OFF);
         });
-        handlebars.registerHelper('reverse', function (this: unknown, options: HelperOptions) {
+        Handlebars.registerHelper('reverse', function (this: unknown, options: HelperOptions) {
             const content = options.fn(this);
             return new Handlebars.SafeString(ANSI_INVERSE + content + ANSI_INVERSE_OFF);
         });
-        handlebars.registerHelper('color', function (fg: string, bg: string | HelperOptions) {
+        Handlebars.registerHelper('color', function (fg: string, bg: string | HelperOptions) {
             const sFG = fg == '' ? ANSI_RESET_FG : fgcolor(fg);
-            const sBG = typeof bg === 'string' ? (bg == '' ? ANSI_RESET_BG : bgcolor(bg)) : '';
+            let sBG: string = '';
+            if (typeof bg === 'string') {
+                sBG = bg === '' ? ANSI_RESET_BG : bgcolor(bg);
+            }
             return new Handlebars.SafeString(sFG + sBG);
         });
         Handlebars.registerHelper('table', function (this: unknown, options: HelperOptions) {
@@ -140,7 +140,7 @@ export class HbsTemplateRepository implements ITemplateRepository {
     }
 
     defineTemplate(key: string, templateContent: string): void {
-        const oTemplate = handlebars.compile(templateContent, { noEscape: true });
+        const oTemplate = Handlebars.compile(templateContent, { noEscape: true });
         this.registry.set(key, oTemplate);
     }
 

@@ -18,7 +18,7 @@ export enum Themes {
 
 export class TableRenderer {
     private _maxWidth = 80;
-    private _padding = {
+    private readonly _padding = {
         char: ' ',
         value: 1,
     };
@@ -114,7 +114,7 @@ export class TableRenderer {
             const r = [];
             const row = aTable[i];
             for (let x = 0; x < nFieldCount; ++x) {
-                const rs = row[x] === undefined ? '' : row[x];
+                const rs = row[x] ?? '';
                 r.push(rs);
             }
             t.push(r);
@@ -263,7 +263,7 @@ export class TableRenderer {
     }
 
     bold(s: string) {
-        const ESC = String.fromCharCode(27);
+        const ESC = String.fromCodePoint(27);
         return ESC + '[1m' + s + ESC + '[22m';
     }
 

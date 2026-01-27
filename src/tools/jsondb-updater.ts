@@ -106,10 +106,10 @@ switch (sCommand) {
             addCollectionProperty(collectionName, propertyName, true);
         } else if (defaultValue === 'false') {
             addCollectionProperty(collectionName, propertyName, false);
-        } else if (defaultValue.match(/^[0-9]+$/)) {
-            addCollectionProperty(collectionName, propertyName, parseInt(defaultValue));
-        } else if (defaultValue.match(/^[0-9]+\.[0-9]+$/)) {
-            addCollectionProperty(collectionName, propertyName, parseFloat(defaultValue));
+        } else if (new RegExp(/^\d+$/).exec(defaultValue)) {
+            addCollectionProperty(collectionName, propertyName, Number.parseInt(defaultValue));
+        } else if (new RegExp(/^\d+\.\d+$/).exec(defaultValue)) {
+            addCollectionProperty(collectionName, propertyName, Number.parseFloat(defaultValue));
         } else if (lookLikeObject(defaultValue)) {
             addCollectionProperty(collectionName, propertyName, JSON.parse(defaultValue));
         } else {

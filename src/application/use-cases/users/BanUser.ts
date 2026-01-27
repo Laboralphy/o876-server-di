@@ -6,13 +6,14 @@ import { SendClientMessage } from '../clients/SendClientMessage';
 import { DestroyClient } from '../clients/DestroyClient';
 import { ICommunicationLayer } from '../../ports/services/ICommunicationLayer';
 import { USE_CASE_ERRORS } from '../../../domain/enums/use-case-errors';
+import { User } from '../../../domain/entities/User';
 
 export class BanUser {
     private readonly userRepository: IUserRepository;
     private readonly sendClientMessage: SendClientMessage;
     private readonly destroyClient: DestroyClient;
     private readonly communicationLayer: ICommunicationLayer;
-    private time: ITime;
+    private readonly time: ITime;
 
     constructor(cradle: Cradle) {
         this.userRepository = cradle.userRepository;
@@ -22,29 +23,39 @@ export class BanUser {
         this.communicationLayer = cradle.communicationLayer;
     }
 
+    /**
+     * Retrieves the user who banned another user based on the provided data transfer object (DTO).
+     *
+     * @param {BanUserDto} dto - The data transfer object containing information about the ban, including the identifier of the user who performed the ban.
+     * @return {Promise<User | undefined>} A promise that resolves to the user who performed the ban, or undefined if the bannedBy property does not exist on the provided DTO.
+     * @throws {Error} If the specified banning user cannot be found in the repository.
+     */
+    async getBannedByUser(dto: BanUserDto): Promise<User | undefined> {
+        if (!dto.bannedBy) {
+            return undefined;
+        }
+        // checks if dto.bannedBy exists
+        const bannedByUser = await this.userRepository.get(dto.bannedBy);
+        if (!bannedByUser) {
+            throw new Error(USE_CASE_ERRORS.ENTITY_NOT_FOUND + ` BannedBy user : ${dto.bannedBy}`);
+        }
+        return bannedByUser;
+    }
+
     async execute(idUser: string, dto: BanUserDto) {
         const user = await this.userRepository.get(idUser);
         if (user) {
             const nNow = this.time.now();
             const forever = dto.duration == Infinity;
-            let bannedBy: string = '';
-            if (dto.bannedBy) {
-                // checks if dto.bannedBy exists
-                const bannedByUser = await this.userRepository.get(dto.bannedBy);
-                if (!bannedByUser) {
-                    throw new Error(
-                        USE_CASE_ERRORS.ENTITY_NOT_FOUND + ` BannedBy user : ${dto.bannedBy}`
-                    );
-                }
-                bannedBy = dto.bannedBy;
-            } // bannedBy should be either a valid user id or an empty string
+
+            const oBannedByUser = await this.getBannedByUser(dto);
             const tsEnd = nNow + dto.duration;
             user.ban = {
                 tsBegin: nNow,
                 tsEnd: forever ? 0 : tsEnd,
                 forever,
                 reason: dto.reason,
-                bannedBy: bannedBy == '' ? null : bannedBy,
+                bannedBy: oBannedByUser ? oBannedByUser.id : null,
             };
             await this.userRepository.save(user);
             const client = this.communicationLayer.getUserClient(user);

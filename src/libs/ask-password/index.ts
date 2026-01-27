@@ -28,7 +28,7 @@ export async function askPassword(sPrompt: string): Promise<string> {
                     break;
                 }
                 default: {
-                    if (c.charCodeAt(0) >= 32) {
+                    if ((c.codePointAt(0) ?? 0) >= 32) {
                         stdout.write('*');
                         return newchar(c);
                     }
@@ -52,7 +52,7 @@ export async function askPassword(sPrompt: string): Promise<string> {
             input += c;
         }
         function backspace() {
-            input = input.slice(0, input.length - 1);
+            input = input.slice(0, -1);
         }
     });
 }

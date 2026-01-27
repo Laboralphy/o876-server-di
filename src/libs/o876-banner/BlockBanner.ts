@@ -5,15 +5,15 @@ const PAVES: string = ' ▘▝▀▖▌▞▛▗▚▐▜▄▙▟█';
 
 export class BlockBanner {
     static getFontCharIndex(s: string): number[] {
-        let c = s.charCodeAt(0);
+        let c = s.codePointAt(0) ?? 0;
         let cx = 0;
         if (c < 32) {
             c = 32;
         }
         if (c >= 128) {
             const sx = s.normalize('NFD');
-            c = sx.charCodeAt(0);
-            cx = sx.charAt(0) > 'Z' ? sx.charCodeAt(1) : 0;
+            c = sx.codePointAt(0) ?? 0;
+            cx = sx.charAt(0) > 'Z' ? (sx.codePointAt(1) ?? 0) : 0;
         }
         const bDia = cx > 0;
         const aDia = bDia ? DIACRITICS[cx - 0x300] : FONT_BASE[0];
@@ -57,7 +57,7 @@ export class BlockBanner {
 
     static convertImageIntoBytes(aImage: string[]) {
         const extract = (row: string, x: number) =>
-            !!row ? BlockBanner.convertMaskIntoByte(row.substring(x, x + 8).padEnd(8, ' ')) : 0;
+            row ? BlockBanner.convertMaskIntoByte(row.substring(x, x + 8).padEnd(8, ' ')) : 0;
         const aBytes = [];
         for (let y = 0, height = aImage.length; y < height; y += 2) {
             const row1 = aImage[y];
