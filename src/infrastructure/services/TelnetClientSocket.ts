@@ -4,19 +4,19 @@ import Telnet, { Command } from '../../../@types/telnet2';
 export class TelnetClientSocket implements IClientSocket {
     private readonly options = new Set<string>();
 
-    constructor(private readonly clientSock: Telnet.Client) {}
+    constructor(private readonly clientWrapperSocket: Telnet.Client) {}
 
     close(): void {
-        this.clientSock.destroy();
+        this.clientWrapperSocket.destroy();
     }
 
     onMessage(callback: (message: string | Buffer) => void): void {
-        this.clientSock.on('data', (data: Buffer) => {
+        this.clientWrapperSocket.on('data', (data: Buffer) => {
             // trim CR/LF at the end.
             callback(data.toString().trimEnd());
             // watch out for binary data
         });
-        this.clientSock.on('command', (cmd: Command) => {
+        this.clientWrapperSocket.on('command', (cmd: Command) => {
             const { command, data, option } = cmd;
             switch (command + ' ' + option) {
                 case 'will gmcp': {
@@ -41,27 +41,27 @@ export class TelnetClientSocket implements IClientSocket {
 
     send(message: string | Buffer): Promise<void> {
         return new Promise((resolve) => {
-            const socket = this.clientSock;
+            const socket = this.clientWrapperSocket;
             if (!message) {
                 resolve();
                 return;
             }
             const bWriteOk = socket.write(message);
-            if (!bWriteOk) {
+            if (bWriteOk) {
+                // Buffer wasn't full, data has been sent, resolving promise
+                process.nextTick(resolve);
+            } else {
                 // Buffer is full : data not sent : waiting for 'drain' event
                 socket.once('drain', () => {
                     // all's good, data has been sent, resolving promise
                     resolve(undefined);
                 });
-            } else {
-                // Buffer wasn't full, data has been sent, resolving promise
-                process.nextTick(resolve);
             }
         });
     }
 
     onDisconnect(callback: () => void): void {
-        this.clientSock.on('close', () => {
+        this.clientWrapperSocket.on('close', () => {
             callback();
         });
     }

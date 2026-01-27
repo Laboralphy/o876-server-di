@@ -101,6 +101,7 @@ describe('ReadMail', () => {
                         mailMaxMessageLength: 2000,
                         language: 'en',
                         modules: [],
+                        clientKeepAliveDelay: 30,
                     };
                 },
             }),
