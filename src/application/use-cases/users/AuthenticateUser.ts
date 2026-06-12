@@ -30,7 +30,7 @@ export class AuthenticateUser {
 
     async execute(login: string, password: string): Promise<User> {
         const encryptedPassword = this.encryptor.encryptPassword(password);
-        const user: User | undefined = await this.userRepository.findByName(login);
+        const user = await this.userRepository.findByName(login);
         if (!user) {
             throw new Error(USE_CASE_ERRORS.ENTITY_NOT_FOUND + ` User : ${login}`);
         }
@@ -38,7 +38,7 @@ export class AuthenticateUser {
         if (oAlreadyClient) {
             // This user is already connected
             // Disconnect former client
-            this.communicationLayer.dropClient(oAlreadyClient.id);
+            await this.communicationLayer.dropClient(oAlreadyClient.id);
         }
         const userSecret = await this.userSecretRepository.get(user.id);
         if (!userSecret) {
