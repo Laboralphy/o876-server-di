@@ -92,9 +92,9 @@ describe('ModifyUser', () => {
         });
         it('should not throw an error when displayname is valid', async () => {
             const modifyUser = container.resolve<ModifyUser>('modifyUser');
-            await expect(async () => {
-                await modifyUser.execute('1', { displayName: 'Albator-LXXXIV' });
-            }).resolves.not.toThrow();
+            await expect(
+                modifyUser.execute('1', { displayName: 'Albator-LXXXIV' })
+            ).resolves.not.toThrow();
         });
     });
     it('should remove a new role to user 1', async () => {

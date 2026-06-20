@@ -57,11 +57,11 @@ describe('renderDuration', function () {
         expect(dd.renderDuration(0, { now: 'maintenant' })).toBe('maintenant');
     });
 
-    describe('render', function () {
+    it('render', function () {
         expect(dd.renderDate(new Date(), 'dur')).toBe('now');
     });
 
-    describe('custom duration render', function () {
+    it('custom duration render', function () {
         const options = {
             year: 'an',
             years: 'ans',

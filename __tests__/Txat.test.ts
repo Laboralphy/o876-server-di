@@ -16,13 +16,13 @@ describe('UserPresence', () => {
             const txat = new Txat.UserPresence('a1');
         }).not.toThrow();
     });
-    describe('UserPresence grant hasPower', () => {
+    it('UserPresence grant hasPower', () => {
         const up = new Txat.UserPresence('a1');
         expect(up.hasPower(POWERS.READ)).toBe(false);
         up.grant(POWERS.READ);
         expect(up.hasPower(POWERS.READ)).toBe(true);
     });
-    describe('UserPresence revoke hasPower', () => {
+    it('UserPresence revoke hasPower', () => {
         const up = new Txat.UserPresence('a1');
         expect(up.hasPower(POWERS.READ)).toBe(false);
         up.grant(POWERS.READ);
